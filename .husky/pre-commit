@@ -1,2 +1,2 @@
-npx biome format --write
-npx biome lint
+npx biome format --write;
+npx biome lint;
