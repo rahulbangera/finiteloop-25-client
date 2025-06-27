@@ -9,6 +9,17 @@
 		"lint": "next lint",
 		"prepare": "husky"
 	},
+	"lint-staged": {
+		"**/!(*.ts|*.tsx)": [
+			"npx biome format --write",
+			"npx biome lint"
+		],
+		"*.{ts,tsx}": [
+			"npx biome format --write",
+			"npx biome lint",
+			"tsc --noEmit"
+		]
+	},
 	"dependencies": {
 		"next": "15.3.4",
 		"react": "^19.0.0",
