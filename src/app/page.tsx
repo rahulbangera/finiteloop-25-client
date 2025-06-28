@@ -5,7 +5,7 @@ const page = () => {
 		<div className="min-h-screen pt-20 px-4 lg:px-8 relative">
 			{/* Desktop Rocket Background Image */}
 			<div
-				className="hidden lg:block absolute top-0 right-0 w-1/3 h-screen pointer-events-none z-0 opacity-80"
+				className="hidden lg:block absolute top-0 right-0 w-1/3 h-screen pointer-events-none z-0"
 				style={{
 					backgroundImage: "url('/desktop_rocket.png')",
 					backgroundSize: "cover",
