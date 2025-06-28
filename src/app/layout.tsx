@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
+import Background from "@/components/Background";
 
 export const metadata: Metadata = {
 	title: "Finite Loop Club",
@@ -22,6 +23,9 @@ export default function RootLayout({
 					enableSystem
 					disableTransitionOnChange
 				>
+					<div className="fixed inset-0 -z-10">
+						<Background />
+					</div>
 					{children}
 				</ThemeProvider>
 			</body>
