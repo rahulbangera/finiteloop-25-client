@@ -16,11 +16,25 @@ body {
 }
 
 :root {
-	--background: white;
-	--foreground: black;
+	--background: #ffffff;
+	--foreground: #000000;
 }
 
-[data-theme="dark"] {
-	--background: black;
-	--foreground: white;
+.dark {
+	--background: #000000;
+	--foreground: #ffffff;
+}
+
+.bg-top-right {
+	background-position: top right;
+}
+
+@media (min-width: 1024px) {
+	.desktop-bg-image {
+		background-image: url("/desktop_rocket.png");
+		background-size: contain;
+		background-repeat: no-repeat;
+		background-position: top right;
+		opacity: 0.8;
+	}
 }
