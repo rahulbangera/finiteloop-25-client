@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
+import Navbar from "@/components/Navbar";
 import Background from "@/components/Background";
 
 export const metadata: Metadata = {
@@ -19,10 +20,11 @@ export default function RootLayout({
 			<body>
 				<ThemeProvider
 					attribute="class"
-					defaultTheme="system"
-					enableSystem
+					defaultTheme="light"
+					enableSystem={false}
 					disableTransitionOnChange
 				>
+					<Navbar />
 					<div className="fixed inset-0 -z-10">
 						<Background />
 					</div>
