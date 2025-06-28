@@ -3,7 +3,7 @@
 export default function Events() {
 	return (
 		<main>
-			<h1>Events</h1>
+			<h1>Event</h1>
 		</main>
 	);
 }
