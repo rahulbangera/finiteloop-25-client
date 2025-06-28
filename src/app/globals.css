@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Lilita+One&family=Comic+Neue:wght@300;400;700&display=swap");
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -5,6 +6,7 @@
 @theme inline {
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);
+	--color-flc-yellow: #f1881a;
 	--font-sans: var(--font-geist-sans);
 	--font-mono: var(--font-geist-mono);
 }
@@ -12,7 +14,15 @@
 body {
 	background: var(--background);
 	color: var(--foreground);
-	font-family: Arial, Helvetica, sans-serif;
+	font-family: "Comic Neue", cursive;
+}
+
+.lilita-font {
+	font-family: "Lilita One", cursive;
+}
+
+.comic-font {
+	font-family: "Comic Neue", cursive;
 }
 
 :root {
@@ -32,9 +42,8 @@ body {
 @media (min-width: 1024px) {
 	.desktop-bg-image {
 		background-image: url("/desktop_rocket.png");
-		background-size: contain;
+		background-size: 50% auto;
 		background-repeat: no-repeat;
 		background-position: top right;
-		opacity: 0.8;
 	}
 }
