@@ -13,6 +13,16 @@ const page = () => {
 				}}
 			/>
 
+			<div
+				className="md:hidden fixed top-32 right-0 w-2/3 h-3/4 pointer-events-none z-0"
+				style={{
+					backgroundImage: "url('/mobile_rocket.png')",
+					backgroundSize: "contain",
+					backgroundRepeat: "no-repeat",
+					backgroundPosition: "top right",
+				}}
+			/>
+
 			<div className="h-screen flex items-center justify-center md:justify-start relative z-10">
 				<div className="w-full md:w-3/5 lg:w-2/3 xl:w-3/5 px-6 pr-12 pl-14 sm:px-8 sm:pr-16 sm:pl-10 md:px-12 lg:px-16 text-left">
 					<div className="space-y-4 lg:space-y-6">
@@ -33,7 +43,7 @@ const page = () => {
 					</div>
 
 					<div className="mt-4 sm:mt-6 lg:mt-8">
-						<p className="comic-font text-gray-300 text-lg sm:text-xl md:text-2xl lg:text-3xl leading-relaxed font-medium max-w-2xl">
+						<p className="comic-font text-lg sm:text-xl md:text-2xl lg:text-3xl leading-relaxed font-medium max-w-2xl">
 							<span className="md:hidden">
 								NMAMIT's premier
 								<br />

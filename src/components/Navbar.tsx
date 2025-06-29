@@ -40,6 +40,14 @@ export default function NavBar() {
 							style={{ objectFit: "contain" }}
 						/>
 					</div>
+					<div className="flex flex-col">
+						<h1 className="text-xl font-bold text-gray-800 dark:text-white leading-tight">
+							Finite Loop Club
+						</h1>
+						<p className="text-sm text-gray-600 dark:text-gray-300 leading-tight">
+							NMAMIT
+						</p>
+					</div>
 				</div>
 
 				<div className="flex flex-row justify-center items-center">
@@ -107,13 +115,21 @@ export default function NavBar() {
 
 			<div className="md:hidden fixed w-full h-20 flex flex-row items-center px-4 justify-between z-50 text-gray-800 dark:text-white">
 				<div className="flex flex-row gap-3 items-center">
-					<div className="relative w-12 h-12 bg-white/35 dark:bg-white/25 backdrop-blur-2xl rounded-2xl overflow-hidden shadow-xl  hover:bg-white/45 dark:hover:bg-white/35 transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+					<div className="relative w-12 h-12 bg-white/35 dark:bg-white/25 backdrop-blur-2xl rounded-2xl overflow-hidden shadow-xl hover:bg-white/45 dark:hover:bg-white/35 transition-all duration-300 hover:scale-105 hover:shadow-2xl">
 						<Image
 							src="/FLC.jpg"
 							alt="Finite Loop Club Logo"
 							fill
 							style={{ objectFit: "contain" }}
 						/>
+					</div>
+					<div className="flex flex-col">
+						<h1 className="text-lg font-bold text-gray-800 dark:text-white leading-tight">
+							Finite Loop Club
+						</h1>
+						<p className="text-xs text-gray-600 dark:text-gray-300 leading-tight">
+							NMAMIT
+						</p>
 					</div>
 				</div>
 
