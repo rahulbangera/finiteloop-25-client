@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
-import Navbar from "@/components/Navbar";
 import Background from "@/components/Background";
+import Footer from "@/components/footer";
+import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
 	title: "Finite Loop Club",
@@ -29,6 +30,7 @@ export default function RootLayout({
 						<Background />
 					</div>
 					{children}
+					<Footer />
 				</ThemeProvider>
 			</body>
 		</html>
