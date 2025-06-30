@@ -1,10 +1,9 @@
 "use client";
-
 import Image from "next/image";
-import { useState, useEffect } from "react";
-import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
 import { Sun, Moon, LogIn } from "lucide-react";
 import { useTheme } from "next-themes";
+import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 export default function NavBar() {
@@ -32,14 +31,16 @@ export default function NavBar() {
 		<>
 			<div className="hidden md:flex fixed w-screen h-20 flex-row items-center px-8 justify-between z-50 text-gray-800 dark:text-white">
 				<div className="flex flex-row gap-4 items-center">
-					<div className="relative w-12 h-12 bg-white/40 dark:bg-white/25 backdrop-blur-2xl rounded-2xl overflow-hidden shadow-xl hover:bg-white/50 dark:hover:bg-white/35 transition-all duration-300 hover:scale-105 hover:shadow-2xl">
-						<Image
-							src="/FLC.jpg"
-							alt="Finite Loop Club Logo"
-							fill
-							style={{ objectFit: "contain" }}
-						/>
-					</div>
+					<Link href="/">
+						<div className="relative w-12 h-12 bg-white/40 dark:bg-white/25 backdrop-blur-2xl rounded-2xl overflow-hidden shadow-xl hover:bg-white/50 dark:hover:bg-white/35 transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+							<Image
+								src="/FLC.jpg"
+								alt="Finite Loop Club Logo"
+								fill
+								style={{ objectFit: "contain" }}
+							/>
+						</div>
+					</Link>
 					<div className="flex flex-col">
 						<h1 className="text-xl font-bold text-gray-800 dark:text-white leading-tight">
 							Finite Loop Club
@@ -52,33 +53,39 @@ export default function NavBar() {
 
 				<div className="flex flex-row justify-center items-center">
 					<div className="flex flex-row gap-3 items-center px-4">
-						<button
-							type="button"
-							className="relative bg-white/35 dark:bg-white/25 hover:bg-white/45 dark:hover:bg-white/35 backdrop-blur-2xl rounded-2xl px-6 py-3 justify-center items-center flex shadow-lg cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-xl group overflow-hidden"
-						>
-							<div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-							<span className="relative font-semibold text-gray-800 dark:text-white tracking-wide">
-								Team
-							</span>
-						</button>
-						<button
-							type="button"
-							className="relative bg-white/35 dark:bg-white/25 hover:bg-white/45 dark:hover:bg-white/35 backdrop-blur-2xl rounded-2xl px-6 py-3 justify-center items-center flex shadow-lg cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-xl group overflow-hidden"
-						>
-							<div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-							<span className="relative font-semibold text-gray-800 dark:text-white tracking-wide">
-								Events
-							</span>
-						</button>
-						<button
-							type="button"
-							className="relative bg-white/35 dark:bg-white/25 hover:bg-white/45 dark:hover:bg-white/35 backdrop-blur-2xl rounded-2xl px-6 py-3 justify-center items-center flex shadow-lg cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-xl group overflow-hidden"
-						>
-							<div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-							<span className="relative font-semibold text-gray-800 dark:text-white tracking-wide">
-								Leaderboard
-							</span>
-						</button>
+						<Link href="/team">
+							<button
+								type="button"
+								className="relative bg-white/35 dark:bg-white/25 hover:bg-white/45 dark:hover:bg-white/35 backdrop-blur-2xl rounded-2xl px-6 py-3 justify-center items-center flex shadow-lg cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-xl group overflow-hidden"
+							>
+								<div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+								<span className="relative font-semibold text-gray-800 dark:text-white tracking-wide">
+									Team
+								</span>
+							</button>
+						</Link>
+						<Link href="/events">
+							<button
+								type="button"
+								className="relative bg-white/35 dark:bg-white/25 hover:bg-white/45 dark:hover:bg-white/35 backdrop-blur-2xl rounded-2xl px-6 py-3 justify-center items-center flex shadow-lg cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-xl group overflow-hidden"
+							>
+								<div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+								<span className="relative font-semibold text-gray-800 dark:text-white tracking-wide">
+									Events
+								</span>
+							</button>
+						</Link>
+						<Link href="/leaderboard">
+							<button
+								type="button"
+								className="relative bg-white/35 dark:bg-white/25 hover:bg-white/45 dark:hover:bg-white/35 backdrop-blur-2xl rounded-2xl px-6 py-3 justify-center items-center flex shadow-lg cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-xl group overflow-hidden"
+							>
+								<div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+								<span className="relative font-semibold text-gray-800 dark:text-white tracking-wide">
+									Leaderboard
+								</span>
+							</button>
+						</Link>
 					</div>
 
 					<div className="flex flex-row gap-4 items-center ml-6">
@@ -100,29 +107,32 @@ export default function NavBar() {
 								/>
 							)}
 						</button>
-
-						<button
-							type="button"
-							className="relative bg-gradient-to-r from-purple-600/90 to-blue-600/90 dark:from-indigo-600/90 dark:to-purple-700/90 hover:from-purple-700/95 hover:to-blue-700/95 dark:hover:from-indigo-700/95 dark:hover:to-purple-800/95 backdrop-blur-2xl rounded-2xl px-6 py-3 flex justify-center items-center shadow-lg cursor-pointer transition-all duration-300 hover:scale-[1.02] text-white font-semibold hover:shadow-xl group overflow-hidden tracking-wide"
-						>
-							<div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-							<LogIn size={20} className="relative mr-2 drop-shadow-sm" />
-							<span className="relative">Login</span>
-						</button>
+						<Link href="/auth/login">
+							<button
+								type="button"
+								className="relative bg-gradient-to-r from-purple-600/90 to-blue-600/90 dark:from-indigo-600/90 dark:to-purple-700/90 hover:from-purple-700/95 hover:to-blue-700/95 dark:hover:from-indigo-700/95 dark:hover:to-purple-800/95 backdrop-blur-2xl rounded-2xl px-6 py-3 flex justify-center items-center shadow-lg cursor-pointer transition-all duration-300 hover:scale-[1.02] text-white font-semibold hover:shadow-xl group overflow-hidden tracking-wide"
+							>
+								<div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+								<LogIn size={20} className="relative mr-2 drop-shadow-sm" />
+								<span className="relative">Login</span>
+							</button>
+						</Link>
 					</div>
 				</div>
 			</div>
 
 			<div className="md:hidden fixed w-full h-20 flex flex-row items-center px-4 justify-between z-50 text-gray-800 dark:text-white">
 				<div className="flex flex-row gap-3 items-center">
-					<div className="relative w-12 h-12 bg-white/35 dark:bg-white/25 backdrop-blur-2xl rounded-2xl overflow-hidden shadow-xl hover:bg-white/45 dark:hover:bg-white/35 transition-all duration-300 hover:scale-105 hover:shadow-2xl">
-						<Image
-							src="/FLC.jpg"
-							alt="Finite Loop Club Logo"
-							fill
-							style={{ objectFit: "contain" }}
-						/>
-					</div>
+					<Link href="/">
+						<div className="relative w-12 h-12 bg-white/35 dark:bg-white/25 backdrop-blur-2xl rounded-2xl overflow-hidden shadow-xl hover:bg-white/45 dark:hover:bg-white/35 transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+							<Image
+								src="/FLC.jpg"
+								alt="Finite Loop Club Logo"
+								fill
+								style={{ objectFit: "contain" }}
+							/>
+						</div>
+					</Link>
 					<div className="flex flex-col">
 						<h1 className="text-lg font-bold text-gray-800 dark:text-white leading-tight">
 							Finite Loop Club
