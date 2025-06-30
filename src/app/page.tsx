@@ -2,7 +2,7 @@ const page = () => {
 	return (
 		<div className="min-h-screen relative">
 			<div
-				className="hidden md:block fixed top-0 right-0 w-2/5 lg:w-1/3 xl:w-2/5 h-screen pointer-events-none z-0"
+				className="hidden md:block absolute top-0 right-0 w-2/5 lg:w-1/3 xl:w-2/5 h-screen pointer-events-none z-0"
 				style={{
 					backgroundImage: "url('/desktop_rocket.png')",
 					backgroundSize: "contain",
@@ -12,7 +12,7 @@ const page = () => {
 			/>
 
 			<div
-				className="md:hidden fixed top-32 right-0 w-2/3 h-3/4 pointer-events-none z-0"
+				className="md:hidden absolute top-32 right-0 w-2/3 h-3/4 pointer-events-none z-0"
 				style={{
 					backgroundImage: "url('/mobile_rocket.png')",
 					backgroundSize: "contain",
@@ -21,7 +21,7 @@ const page = () => {
 				}}
 			/>
 
-			<div className="h-screen flex items-center justify-center md:justify-start relative z-10">
+			<div className="h-screen flex items-center justify-center md:justify-start relative z-10 select-none">
 				<div className="w-full md:w-3/5 lg:w-2/3 xl:w-3/5 px-6 pr-12 pl-14 sm:px-8 sm:pr-16 sm:pl-10 md:px-12 lg:px-16 text-left">
 					<div className="space-y-4 lg:space-y-6">
 						<h1 className="lilita-font text-7xl sm:text-8xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-flc-yellow leading-tight tracking-wide">
