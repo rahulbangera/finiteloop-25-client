@@ -11,7 +11,7 @@ export default function BG() {
 
 	if (!mounted) return null;
 
-	const color = resolvedTheme === "dark" ? "#ffffff" : "#000000";
+	const color = resolvedTheme === "dark" ? "#ffffff" : "#F1881A";
 
 	return (
 		<section className="relative min-h-screen w-full overflow-hidden">
@@ -21,7 +21,7 @@ export default function BG() {
 				color={color}
 			/>
 
-			<div className="relative z-20 flex h-screen w-full items-center justify-center bg-white dark:bg-black"></div>
+			<div className="fixed z-20 flex h-screen w-full items-center justify-center bg-[radial-gradient(at_top_right,_#FBCFF4,_#EFD2FA,_#FEF9FF)] dark:bg-[radial-gradient(at_top_right,_#7F439D,_#33107C,_#060329)]"></div>
 		</section>
 	);
 }
