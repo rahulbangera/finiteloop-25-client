@@ -2,21 +2,15 @@ const page = () => {
 	return (
 		<div className="min-h-screen relative">
 			<div
-				className="hidden md:block absolute top-0 right-0 w-2/5 lg:w-1/3 xl:w-2/5 h-screen pointer-events-none z-0"
+				className="hidden md:block absolute top-0 right-0 w-2/5 lg:w-1/3 xl:w-2/5 h-screen pointer-events-none z-0 bg-[url('/desktop_rocket_light.webp')] dark:bg-[url('/desktop_rocket_dark.png')] bg-contain bg-no-repeat"
 				style={{
-					backgroundImage: "url('/desktop_rocket.png')",
-					backgroundSize: "contain",
-					backgroundRepeat: "no-repeat",
 					backgroundPosition: "center right",
 				}}
 			/>
 
 			<div
-				className="md:hidden absolute top-32 right-0 w-2/3 h-3/4 pointer-events-none z-0"
+				className="md:hidden absolute top-32 right-0 w-2/3 h-3/4 pointer-events-none z-0 bg-[url('/mobile_rocket.png')] bg-contain bg-no-repeat"
 				style={{
-					backgroundImage: "url('/mobile_rocket.png')",
-					backgroundSize: "contain",
-					backgroundRepeat: "no-repeat",
 					backgroundPosition: "top right",
 				}}
 			/>
