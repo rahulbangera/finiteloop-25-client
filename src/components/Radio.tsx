@@ -30,7 +30,7 @@ const Radio: React.FC<RadioProps> = ({ plans, selected, setSelected }) => {
 					/>
 					<label
 						htmlFor={plan.id}
-						className={`flex-1 flex items-center justify-center min-w-[100px] md:min-w-[130px] w-full text-[15px] md:text-[17px] lg:text-[19px] py-4 md:py-5 px-6 cursor-pointer font-semibold tracking-[0.3px] relative z-20 transition-colors duration-300 ${
+						className={`flex-1 flex items-center justify-center min-w-[100px] md:min-w-[130px] w-full text-[15px] md:text-[17px] lg:text-[19px] py-4 md:py-5 px-5 cursor-pointer font-semibold tracking-[0.3px] relative z-20 transition-colors duration-300 ${
 							selected === idx
 								? "text-black dark:text-white"
 								: "text-[#191919] dark:text-[#e5e5e5] dark:hover:text-white"
