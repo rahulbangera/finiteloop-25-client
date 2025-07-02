@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 const gliderStyles = [
 	// 1st one - bright purple
@@ -11,11 +11,11 @@ const gliderStyles = [
 
 interface RadioProps {
 	plans: { id: string; label: string }[];
+	selected: number;
+	setSelected: (index: number) => void;
 }
 
-const Radio: React.FC<RadioProps> = ({ plans }) => {
-	const [selected, setSelected] = useState(2);
-
+const Radio: React.FC<RadioProps> = ({ plans, selected, setSelected }) => {
 	return (
 		<div className="relative flex bg-white/35 dark:bg-white/10 rounded-xl backdrop-blur-md shadow-[inset_1px_1px_4px_rgba(255,255,255,0.2),inset_-1px_-1px_6px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.15)] overflow-hidden w-fit">
 			{plans.map((plan, idx) => (
