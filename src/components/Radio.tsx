@@ -14,10 +14,10 @@ interface RadioProps {
 }
 
 const Radio: React.FC<RadioProps> = ({ plans }) => {
-	const [selected, setSelected] = useState(0);
+	const [selected, setSelected] = useState(2);
 
 	return (
-		<div className="relative flex bg-black dark:bg-white/10 rounded-xl backdrop-blur-md shadow-[inset_1px_1px_4px_rgba(255,255,255,0.2),inset_-1px_-1px_6px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.15)] overflow-hidden w-fit">
+		<div className="relative flex bg-white/35 dark:bg-white/10 rounded-xl backdrop-blur-md shadow-[inset_1px_1px_4px_rgba(255,255,255,0.2),inset_-1px_-1px_6px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.15)] overflow-hidden w-fit">
 			{plans.map((plan, idx) => (
 				<React.Fragment key={plan.id}>
 					<input
@@ -30,10 +30,10 @@ const Radio: React.FC<RadioProps> = ({ plans }) => {
 					/>
 					<label
 						htmlFor={plan.id}
-						className={`flex-1 flex items-center justify-center min-w-[100px] w-full text-[14px] py-3 px-6 cursor-pointer font-semibold tracking-[0.3px] relative z-20 transition-colors duration-300 ${
+						className={`flex-1 flex items-center justify-center min-w-[100px] w-full text-[14px] md:text-[16px] lg:text-[18px] py-4 px-6 cursor-pointer font-semibold tracking-[0.3px] relative z-20 transition-colors duration-300 ${
 							selected === idx
-								? "text-white"
-								: "text-[#e5e5e5] hover:text-white"
+								? "text-black dark:text-white"
+								: "text-[#191919] dark:text-[#e5e5e5] dark:hover:text-white"
 						}`}
 					>
 						{plan.label}

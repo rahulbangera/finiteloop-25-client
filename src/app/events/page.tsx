@@ -92,7 +92,7 @@ const mockEvents: Record<EventYear, EventType[]> = {
 };
 
 const EventsPage = () => {
-	const [selectedYear, setSelectedYear] = useState<EventYear>("2023-24");
+	const [selectedYear, setSelectedYear] = useState<EventYear>("2025-26");
 
 	const handleToggleChange = (e: React.ChangeEvent<HTMLDivElement>) => {
 		const id = (e.target as HTMLElement).id;
@@ -115,7 +115,9 @@ const EventsPage = () => {
 			</div>
 			<div className="min-h-screen w-full grid justify-center items-start grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 				{mockEvents[selectedYear].length === 0 ? (
-					<p>No events for this year.</p>
+					<div className="w-full text-5xl text-black dark:text-white text-center col-span-full mt-40">
+						No Events for {selectedYear}
+					</div>
 				) : (
 					mockEvents[selectedYear].map((event) => (
 						<div
@@ -130,12 +132,14 @@ const EventsPage = () => {
 									alt={event.name}
 								/>
 							</div>
-							<div className="p-3 text-center bg-black/35 dark:bg-white/15 text-black dark:text-white">
-								<div className="text-sm font-semibold uppercase">
+							<div className="p-3 text-center bg-white/35 dark:bg-white/15 text-black dark:text-white">
+								<div className="text-lg md:text-xl lg:text-xl font-semibold uppercase">
 									{event.type}
 								</div>
-								<div className="m-0 text-lg font-bold">{event.name}</div>
-								<div className="text-sm">{event.date}</div>
+								<div className="m-0 text-3xl md:text-3xl lg:text-4xl font-bold">
+									{event.name}
+								</div>
+								<div className="text-lg md:text-xl">{event.date}</div>
 							</div>
 						</div>
 					))
