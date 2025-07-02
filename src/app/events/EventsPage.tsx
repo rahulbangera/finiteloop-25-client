@@ -229,10 +229,16 @@ const EventsPage = () => {
 								open={
 									selectedEvent?.name === event.name && window.innerWidth < 768
 								}
+								onOpenChange={(isOpen) => {
+									if (!isOpen) {
+										setSelectedEvent(null);
+										const params = new URLSearchParams(window.location.search);
+										params.delete("event");
+										const newUrl = `${window.location.pathname}${params.toString() ? "?" + params.toString() : ""}`;
+										window.history.replaceState({}, "", newUrl);
+									}
+								}}
 							>
-								<Drawer.Trigger asChild>
-									<div></div>
-								</Drawer.Trigger>
 								<Drawer.Portal>
 									<Drawer.Overlay className="fixed inset-0 bg-black/40 z-40" />
 									<Drawer.Content className="bg-white dark:bg-gray-900 rounded-t-xl p-6 fixed bottom-0 left-0 right-0 z-50">
@@ -290,6 +296,7 @@ const EventsPage = () => {
 				<Dialog.Portal>
 					<Dialog.Overlay className="fixed inset-0 bg-black/50 z-40" />
 					<Dialog.Content
+						onPointerDownOutside={(e) => e.preventDefault()} // 🛑 prevent close on outside click
 						className="bg-[radial-gradient(at_top_right,_#FBCFF4,_#E4CCF8,_#C4E2F7,_#FEF9FF)] dark:bg-[radial-gradient(at_top_right,_#7F439D,_#33107C,_#060329)] p-8 rounded-xl w-full max-w-3xl fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col md:flex-row gap-8 outline-none z-50"
 						aria-describedby="event-details"
 					>
@@ -299,7 +306,7 @@ const EventsPage = () => {
 						<button
 							type="button"
 							onClick={() => setShowDialog(false)}
-							className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 dark:hover:text-white text-xl"
+							className="absolute top-4 right-4 text-red-600 hover:text-black dark:hover:text-white text-3xl"
 						>
 							✕
 						</button>
