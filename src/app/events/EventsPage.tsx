@@ -11,6 +11,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 type EventYear = "2023-24" | "2024-25" | "2025-26";
 
 type EventType = {
+	id: number;
 	type: string;
 	name: string;
 	image: string;
@@ -25,6 +26,7 @@ type EventType = {
 const mockEvents: Record<EventYear, EventType[]> = {
 	"2023-24": [
 		{
+			id: 1,
 			type: "Hackathon",
 			name: "CodeSprint 1.0",
 			image: "/testing/overtime.png",
@@ -36,6 +38,7 @@ const mockEvents: Record<EventYear, EventType[]> = {
 			entryFee: "₹100",
 		},
 		{
+			id: 2,
 			type: "Special",
 			name: "TechQuiz",
 			image: "/testing/overtime.png",
@@ -49,6 +52,7 @@ const mockEvents: Record<EventYear, EventType[]> = {
 	],
 	"2024-25": [
 		{
+			id: 3,
 			type: "Hackathon",
 			name: "Hackverse",
 			image: "/testing/overtime.png",
@@ -60,6 +64,7 @@ const mockEvents: Record<EventYear, EventType[]> = {
 			entryFee: "Free",
 		},
 		{
+			id: 4,
 			type: "Competition",
 			name: "Algo Clash",
 			image: "/testing/overtime.png",
@@ -71,6 +76,7 @@ const mockEvents: Record<EventYear, EventType[]> = {
 			entryFee: "₹100",
 		},
 		{
+			id: 5,
 			type: "Workshop",
 			name: "DevJam",
 			image: "/testing/overtime.png",
@@ -82,6 +88,7 @@ const mockEvents: Record<EventYear, EventType[]> = {
 			entryFee: "₹150",
 		},
 		{
+			id: 6,
 			type: "Special",
 			name: "TechQuiz",
 			image: "/testing/overtime.png",
@@ -109,13 +116,13 @@ const EventsPage = () => {
 	const searchParams = useSearchParams();
 
 	useEffect(() => {
-		const eventSlug = searchParams.get("event");
+		const eventSlug = searchParams.get("id");
 		if (eventSlug) {
 			let foundYear: EventYear | null = null;
 			for (const year in mockEvents) {
 				const yearKey = year as EventYear;
 				const event = mockEvents[yearKey].find(
-					(e) => e.name.toLowerCase().replace(/\s+/g, "-") === eventSlug,
+					(e) => e.id === Number(eventSlug),
 				);
 				if (event) {
 					setSelectedEvent(event);
@@ -135,7 +142,7 @@ const EventsPage = () => {
 	useEffect(() => {
 		if (!showDialog) {
 			const params = new URLSearchParams(window.location.search);
-			params.delete("event");
+			params.delete("id");
 			const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
 			window.history.replaceState({}, "", newUrl);
 		}
@@ -154,8 +161,8 @@ const EventsPage = () => {
 
 	const handleCardClick = (event: EventType) => {
 		setSelectedEvent(event);
-		const slug = event.name.toLowerCase().replace(/\s+/g, "-");
-		router.push(`?event=${slug}`);
+		const slug = event.id;
+		router.push(`?id=${slug}`);
 		if (window.innerWidth >= 768) setShowDialog(true);
 	};
 
@@ -171,8 +178,8 @@ const EventsPage = () => {
 
 	const handleCopyLink = () => {
 		if (selectedEvent) {
-			const slug = selectedEvent.name.toLowerCase().replace(/\s+/g, "-");
-			const url = `${window.location.origin}/events?event=${slug}`;
+			const slug = selectedEvent.id;
+			const url = `${window.location.origin}/events?id=${slug}`;
 			navigator.clipboard.writeText(url);
 			alert("Link copied to clipboard");
 		}
@@ -234,7 +241,7 @@ const EventsPage = () => {
 										setSelectedEvent(null);
 										const params = new URLSearchParams(window.location.search);
 										params.delete("event");
-										const newUrl = `${window.location.pathname}${params.toString() ? "?" + params.toString() : ""}`;
+										const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
 										window.history.replaceState({}, "", newUrl);
 									}
 								}}
@@ -296,7 +303,7 @@ const EventsPage = () => {
 				<Dialog.Portal>
 					<Dialog.Overlay className="fixed inset-0 bg-black/50 z-40" />
 					<Dialog.Content
-						onPointerDownOutside={(e) => e.preventDefault()} // 🛑 prevent close on outside click
+						onPointerDownOutside={(e) => e.preventDefault()}
 						className="bg-[radial-gradient(at_top_right,_#FBCFF4,_#E4CCF8,_#C4E2F7,_#FEF9FF)] dark:bg-[radial-gradient(at_top_right,_#7F439D,_#33107C,_#060329)] p-8 rounded-xl w-full max-w-3xl fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col md:flex-row gap-8 outline-none z-50"
 						aria-describedby="event-details"
 					>
