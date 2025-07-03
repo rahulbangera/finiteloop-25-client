@@ -2,24 +2,24 @@ const page = () => {
 	return (
 		<div className="min-h-screen relative">
 			<div
-				className="hidden md:block absolute top-0 right-0 w-2/5 lg:w-1/3 xl:w-2/5 h-screen pointer-events-none z-0 bg-[url('/desktop_rocket_light.webp')] dark:bg-[url('/desktop_rocket_dark.png')] bg-contain bg-no-repeat"
+				className="hidden md:block absolute top-0 right-0 w-2/5 lg:w-1/3 xl:w-2/5 h-screen pointer-events-none z-0 bg-[url('/desktop_rocket_light.webp')] dark:bg-[url('/desktop_rocket_dark.png')] bg-cover bg-no-repeat"
 				style={{
-					backgroundPosition: "center right",
+					backgroundPosition: "80% center",
 				}}
 			/>
 
 			<div
-				className="md:hidden fixed top-24 -right-8 w-4/5 h-4/5 pointer-events-none z-0"
+				className="md:hidden fixed top-1/2 right-0 w-3/5 h-3/5 pointer-events-none z-0 transform -translate-y-1/2"
 				style={{
-					backgroundImage: "url('/mobile_rocket1.png')",
+					backgroundImage: "url('/mobile_rocket2.png')",
 					backgroundSize: "contain",
 					backgroundRepeat: "no-repeat",
-					backgroundPosition: "top right",
+					backgroundPosition: "center",
 				}}
 			/>
 
 			<div className="h-screen flex items-center justify-center md:justify-start relative z-10">
-				<div className="w-full md:w-3/5 lg:w-2/3 xl:w-3/5 px-4 pr-8 pl-8 sm:px-8 sm:pr-16 sm:pl-10 md:px-12 lg:px-16 text-left">
+				<div className="w-full md:w-3/5 lg:w-2/3 xl:w-3/5 px-8 pr-4 pl-8 sm:px-10 sm:pr-6 sm:pl-10 md:px-16 lg:px-20 text-left">
 					<div className="space-y-4 lg:space-y-6">
 						<h1 className="lilita-font text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-flc-yellow leading-tight tracking-wide">
 							<span className="md:hidden">
