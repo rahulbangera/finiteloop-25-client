@@ -130,20 +130,6 @@ export default function NavBar() {
 					</div>
 
 					<div className="flex flex-row gap-4 items-center ml-6">
-						{/* Demo Toggle Button - Should Remove Later */}
-						<button
-							type="button"
-							onClick={toggleDemoMode}
-							className={`relative backdrop-blur-2xl rounded-2xl px-3 py-2 flex justify-center items-center shadow-lg cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-xl group overflow-hidden text-xs font-medium ${
-								demoMode
-									? "bg-green-500/80 text-white"
-									: "bg-white/35 dark:bg-white/25 hover:bg-white/45 dark:hover:bg-white/35 text-gray-800 dark:text-white"
-							}`}
-						>
-							<div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-							<span className="relative">{demoMode ? "Auth ON" : "Auth"}</span>
-						</button>
-
 						<button
 							type="button"
 							onClick={toggleTheme}
