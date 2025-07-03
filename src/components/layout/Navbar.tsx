@@ -11,7 +11,6 @@ import { useSession, signOut } from "next-auth/react";
 export default function NavBar() {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [mounted, setMounted] = useState(false);
-	const [demoMode, setDemoMode] = useState(false); // We gotta remove this later
 	const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
 	const dropdownRef = useRef<HTMLDivElement>(null);
 	const { theme, setTheme } = useTheme();
@@ -50,17 +49,9 @@ export default function NavBar() {
 		signOut();
 	};
 
-	// Demo Code
-	const toggleDemoMode = () => {
-		setDemoMode(!demoMode);
-	};
-
 	const toggleProfileDropdown = () => {
 		setIsProfileDropdownOpen(!isProfileDropdownOpen);
 	};
-
-	// Demo Code
-	const effectiveSession = demoMode ? { user: { name: "Demo User" } } : session;
 
 	if (!mounted) {
 		return null;
@@ -149,7 +140,7 @@ export default function NavBar() {
 							)}
 						</button>
 
-						{effectiveSession ? (
+						{session ? (
 							<div className="relative" ref={dropdownRef}>
 								<button
 									type="button"
@@ -162,7 +153,7 @@ export default function NavBar() {
 										className="relative text-gray-800 dark:text-white mr-2 drop-shadow-sm"
 									/>
 									<span className="relative font-semibold text-gray-800 dark:text-white tracking-wide">
-										{effectiveSession.user?.name || "Profile"}
+										{session.user?.name || "Profile"}
 									</span>
 									<div
 										className={`ml-2 transition-transform duration-200 ${isProfileDropdownOpen ? "rotate-180" : ""}`}
@@ -254,24 +245,6 @@ export default function NavBar() {
 				</div>
 
 				<div className="flex flex-row gap-3 items-center">
-					{/* Demo Toggle Button - Remove Later */}
-					<button
-						type="button"
-						onClick={toggleDemoMode}
-						className={`relative backdrop-blur-2xl rounded-2xl w-12 h-12 flex justify-center items-center shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-xl group overflow-hidden ${
-							demoMode
-								? "bg-green-500/80"
-								: "bg-white/35 dark:bg-white/25 hover:bg-white/45 dark:hover:bg-white/35"
-						}`}
-					>
-						<div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-						<span
-							className={`relative text-xs font-bold ${demoMode ? "text-white" : "text-gray-800 dark:text-white"}`}
-						>
-							{demoMode ? "ON" : "D"}
-						</span>
-					</button>
-
 					<button
 						type="button"
 						onClick={toggleTheme}
@@ -357,7 +330,7 @@ export default function NavBar() {
 							</div>
 
 							<div className="mt-6 pt-6 border-t border-white/60 dark:border-white/50">
-								{effectiveSession ? (
+								{session ? (
 									<div className="space-y-4">
 										<Link href="/profile">
 											<button
@@ -371,7 +344,7 @@ export default function NavBar() {
 													className="relative mr-2 drop-shadow-sm"
 												/>
 												<span className="relative text-base">
-													{effectiveSession.user?.name || "Profile"}
+													{session.user?.name || "Profile"}
 												</span>
 											</button>
 										</Link>
