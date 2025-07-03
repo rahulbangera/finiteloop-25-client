@@ -1,7 +1,7 @@
 "use client";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-import Particles from "@/components/Particles";
+import Particles from "@/components/elements/Particles";
 
 export default function BG() {
 	const { resolvedTheme } = useTheme();

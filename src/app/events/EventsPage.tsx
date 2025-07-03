@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import Card from "@/components/Card";
-import Radio from "@/components/Radio";
+import Card from "@/components/elements/Card";
+import Radio from "@/components/elements/Radio";
 import { Drawer } from "vaul";
 import gsap from "gsap";
 import * as Dialog from "@radix-ui/react-dialog";

@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Background from "@/components/Background";
-import Footer from "@/components/Footer";
-import Navbar from "@/components/Navbar";
-import { Providers } from "@/components/Providers";
+import Background from "@/components/layout/Background";
+import Footer from "@/components/layout/Footer";
+import Navbar from "@/components/layout/Navbar";
+import { Providers } from "@/components/layout/Providers";
 
 export const metadata: Metadata = {
 	title: "Finite Loop Club",
