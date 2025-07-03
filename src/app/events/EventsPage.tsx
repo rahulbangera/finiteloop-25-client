@@ -30,7 +30,7 @@ const mockEvents: Record<EventYear, EventType[]> = {
 			type: "Hackathon",
 			name: "CodeSprint 1.0",
 			image: "/testing/overtime.png",
-			description: "A solo coding competition testing DSA skills.",
+			description: "",
 			date: "2024-02-15",
 			format: "Solo",
 			venue: "Auditorium",
@@ -162,7 +162,7 @@ const EventsPage = () => {
 	const handleCardClick = (event: EventType) => {
 		setSelectedEvent(event);
 		const slug = event.id;
-		router.push(`?id=${slug}`);
+		router.push(`?id=${slug}`, { scroll: false });
 		if (window.innerWidth >= 768) setShowDialog(true);
 	};
 
@@ -240,7 +240,7 @@ const EventsPage = () => {
 									if (!isOpen) {
 										setSelectedEvent(null);
 										const params = new URLSearchParams(window.location.search);
-										params.delete("event");
+										params.delete("id");
 										const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
 										window.history.replaceState({}, "", newUrl);
 									}
@@ -248,47 +248,72 @@ const EventsPage = () => {
 							>
 								<Drawer.Portal>
 									<Drawer.Overlay className="fixed inset-0 bg-black/40 z-40" />
-									<Drawer.Content className="bg-white dark:bg-gray-900 rounded-t-xl p-6 fixed bottom-0 left-0 right-0 z-50">
+									<Drawer.Content className="bg-gradient-to-t from-white via-purple-50 to-purple-100 dark:from-gray-900 dark:via-indigo-950 dark:to-indigo-900 rounded-t-3xl p-6 fixed bottom-0 left-0 right-0 z-50 shadow-2xl border-t border-purple-200 dark:border-indigo-800">
 										<Drawer.Title asChild>
 											<VisuallyHidden>{selectedEvent?.name}</VisuallyHidden>
 										</Drawer.Title>
 										<div className="flex flex-col gap-4">
-											<h2 className="text-2xl font-bold">{event.name}</h2>
-											{/** biome-ignore lint/performance/noImgElement: <testing> */}
+											<div className="flex items-center gap-3">
+												<span className="inline-block px-3 py-1 rounded-full bg-purple-200 dark:bg-indigo-800 text-xs font-semibold text-purple-800 dark:text-purple-200">
+													{event.type}
+												</span>
+												<span className="text-black dark:text-white text-xs">
+													{event.date}
+												</span>
+											</div>
+											<h2 className="text-2xl font-bold text-purple-900 dark:text-purple-100">
+												{event.name}
+											</h2>
+											{/** biome-ignore lint/performance/noImgElement: <test> */}
 											<img
 												src={event.image}
 												alt={event.name}
-												className="rounded-xl h-40 object-cover w-full"
+												className="rounded-xl h-40 object-cover w-full border border-purple-100 dark:border-indigo-800 shadow"
 											/>
-											<p>{event.description}</p>
-											<p>
-												<strong>Date:</strong> {event.date}
+											<p className="text-gray-700 dark:text-gray-300">
+												{event.description}
 											</p>
-											<p>
-												<strong>Venue:</strong> {event.venue}
-											</p>
-											<p>
-												<strong>Format:</strong> {event.format}
-											</p>
-											<p>
-												<strong>Team Size:</strong> {event.membersPerTeam}
-											</p>
-											<p>
-												<strong>Entry Fee:</strong> {event.entryFee}
-											</p>
-											<button
-												type="button"
-												className="mt-4 px-4 py-2 bg-black text-white rounded w-fit"
-											>
-												Register
-											</button>
-											<button
-												type="button"
-												onClick={handleCopyLink}
-												className="mt-2 px-4 py-2 bg-white border text-black rounded w-fit dark:bg-black dark:text-white"
-											>
-												Copy Link
-											</button>
+											<div className="grid grid-cols-2 gap-2 text-sm mt-2">
+												<div>
+													<span className="font-semibold text-purple-800 dark:text-purple-200">
+														Venue:
+													</span>{" "}
+													{event.venue}
+												</div>
+												<div>
+													<span className="font-semibold text-purple-800 dark:text-purple-200">
+														Format:
+													</span>{" "}
+													{event.format}
+												</div>
+												<div>
+													<span className="font-semibold text-purple-800 dark:text-purple-200">
+														Team Size:
+													</span>{" "}
+													{event.membersPerTeam}
+												</div>
+												<div>
+													<span className="font-semibold text-purple-800 dark:text-purple-200">
+														Entry Fee:
+													</span>{" "}
+													{event.entryFee}
+												</div>
+											</div>
+											<div className="flex gap-3 mt-6">
+												<button
+													type="button"
+													className="flex-1 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-semibold shadow hover:from-purple-700 hover:to-indigo-700 transition"
+												>
+													Register
+												</button>
+												<button
+													type="button"
+													onClick={handleCopyLink}
+													className="flex-1 px-4 py-2 bg-white border border-purple-300 text-purple-800 rounded-lg font-semibold shadow hover:bg-purple-50 dark:bg-indigo-950 dark:text-purple-100 dark:border-indigo-700 dark:hover:bg-indigo-900 transition"
+												>
+													Copy Link
+												</button>
+											</div>
 										</div>
 									</Drawer.Content>
 								</Drawer.Portal>
