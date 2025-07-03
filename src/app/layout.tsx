@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { ThemeProvider } from "next-themes";
 import Background from "@/components/Background";
 import Footer from "@/components/footer";
 import Navbar from "@/components/Navbar";
+import { Providers } from "@/components/Providers";
 
 export const metadata: Metadata = {
 	title: "Finite Loop Club",
@@ -19,19 +19,14 @@ export default function RootLayout({
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body>
-				<ThemeProvider
-					attribute="class"
-					defaultTheme="system"
-					enableSystem={true}
-					disableTransitionOnChange
-				>
+				<Providers>
 					<Navbar />
 					<div className="fixed inset-0 -z-10">
 						<Background />
 					</div>
 					{children}
 					<Footer />
-				</ThemeProvider>
+				</Providers>
 			</body>
 		</html>
 	);
