@@ -21,9 +21,10 @@ export default function RootLayout({
 			<body>
 				<Providers>
 					<Navbar />
-					<div className="fixed inset-0 -z-10">
+					<div className="fixed inset-0 -z-10 pointer-events-none">
 						<Background />
 					</div>
+
 					{children}
 					<Footer />
 				</Providers>
