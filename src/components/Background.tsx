@@ -21,7 +21,7 @@ export default function BG() {
 				color={color}
 			/>
 
-			<div className="fixed z-20 flex h-screen w-full items-center justify-center bg-[radial-gradient(at_top_right,_#FBCFF4,_#E4CCF8,_#C4E2F7,_#FEF9FF)] dark:bg-[radial-gradient(at_top_right,_#7F439D,_#33107C,_#060329)]"></div>
+			<div className="absolute z-20 flex h-screen w-full items-center justify-center bg-[radial-gradient(at_top_right,_#FBCFF4,_#E4CCF8,_#C4E2F7,_#FEF9FF)] dark:bg-[radial-gradient(at_top_right,_#7F439D,_#33107C,_#060329)]"></div>
 		</section>
 	);
 }
