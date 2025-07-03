@@ -16,7 +16,7 @@ export default function NavBar() {
 	const dropdownRef = useRef<HTMLDivElement>(null);
 	const { theme, setTheme } = useTheme();
 	const pathname = usePathname();
-	const { data: session, status } = useSession();
+	const { data: session } = useSession();
 
 	useEffect(() => {
 		setMounted(true);
