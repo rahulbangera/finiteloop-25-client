@@ -1,9 +1,22 @@
 "use client";
 
-export default function Login() {
+import LoginForm from "@/components/auth/login-form";
+import { Toaster } from "sonner";
+
+export default function LoginPage() {
 	return (
-		<main>
-			<h1>Login</h1>
-		</main>
+		<>
+			<LoginForm />
+			<Toaster
+				position="top-center"
+				toastOptions={{
+					style: {
+						background: "#1e293b",
+						color: "#ffffff",
+						border: "1px solid #475569",
+					},
+				}}
+			/>
+		</>
 	);
 }

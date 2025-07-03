@@ -1,9 +1,7 @@
 "use client";
 
+import ForgotForm from "@/components/auth/forgot-form";
+
 export default function ForgotPassword() {
-	return (
-		<div>
-			<h1>Forgot Password</h1>
-		</div>
-	);
+	return <ForgotForm />;
 }
