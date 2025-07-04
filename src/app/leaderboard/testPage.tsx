@@ -1,38 +1,56 @@
-// app/leaderboard/page.tsx
-export default function LeaderboardPage() {
-	const data = [
-		{ name: "Alice", points: 120 },
-		{ name: "Bob", points: 100 },
-		{ name: "Charlie", points: 90 },
+export default function Podium() {
+	const players = [
+		{
+			name: "Saketh Kumar",
+			points: 40,
+			avatar: "/fox.png",
+			rank: 2,
+		},
+		{
+			name: "Saketh Kumar",
+			points: 45,
+			avatar: "/avatar.png",
+			rank: 1,
+		},
+		{
+			name: "Saketh Kumar",
+			points: 38,
+			avatar: "/panda.png",
+			rank: 3,
+		},
 	];
 
-	return (
-		<div className="min-h-screen pt-20 bg-gray-100 dark:bg-gray-900 p-8 text-black dark:text-white">
-			<h1 className="text-4xl font-bold mb-6 text-center">🏆 Leaderboard</h1>
+	const podiumStyle = {
+		1: "order-2 -mt-8 z-10", // Center and raised
+		2: "order-1 mt-4",
+		3: "order-3 mt-6",
+	};
 
-			<div className="max-w-xl mx-auto bg-white dark:bg-gray-800 shadow-xl rounded-lg overflow-hidden">
-				<table className="w-full text-left">
-					<thead className="bg-gray-200 dark:bg-gray-700">
-						<tr>
-							<th className="px-6 py-3">#</th>
-							<th className="px-6 py-3">Name</th>
-							<th className="px-6 py-3">Points</th>
-						</tr>
-					</thead>
-					<tbody>
-						{data.map((user, index) => (
-							<tr
-								key={user.name}
-								className="border-t border-gray-300 dark:border-gray-600"
-							>
-								<td className="px-6 py-4">{index + 1}</td>
-								<td className="px-6 py-4">{user.name}</td>
-								<td className="px-6 py-4">{user.points}</td>
-							</tr>
-						))}
-					</tbody>
-				</table>
-			</div>
+	return (
+		<div className="flex justify-center items-end gap-4 mt-10">
+			{players
+				.sort((a, b) => a.rank - b.rank)
+				.map((player) => (
+					<div
+						key={player.rank}
+						className={`flex flex-col items-center ${podiumStyle[player.rank as 1 | 2 | 3]}`}
+					>
+						<div className="relative">
+							<img
+								src={player.avatar}
+								alt={player.name}
+								className="w-24 h-24 rounded-full border-4 border-white shadow-lg"
+							/>
+							<span className="absolute bottom-0 right-1 translate-y-1/2 bg-gray-800 text-white text-sm font-bold rounded-full w-6 h-6 flex items-center justify-center">
+								{player.rank}
+							</span>
+						</div>
+						<p className="text-white mt-2 font-semibold text-center">
+							{player.name}
+						</p>
+						<p className="text-gray-300 text-sm">{player.points} pts</p>
+					</div>
+				))}
 		</div>
 	);
 }
