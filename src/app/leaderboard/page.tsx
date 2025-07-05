@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import UserCard from "@/components/elements/userCard";
+import UserCard from "@/components/elements/UserCard";
 
 // biome-ignore format: keeping inline layout for readability
 const users = [
@@ -41,7 +41,7 @@ export default function Leaderboard() {
 	return (
 		<main>
 			{/* Mobile View */}
-			<div className="block md:hidden min-h-screen mt-20 p-2 bg-transparent flex-col items-center justify-center overflow-x-hidden overflow-y-hidden">
+			<div className="block md:hidden  mt-20 p-2 bg-transparent flex-col items-center justify-center overflow-x-hidden overflow-y-hidden">
 				<h1 className="text-center text-2xl p-2 font-[roboto-mono] text-[#FCA410]">
 					LeaderBoard
 				</h1>
@@ -75,7 +75,7 @@ export default function Leaderboard() {
 				</div>
 				<UserCard
 					rank={5}
-					name={"Saketh Kumar"}
+					name={"You"}
 					points={34}
 					className="border-1 border-amber-50 text-[#FCA410] m-2"
 				></UserCard>
@@ -92,10 +92,67 @@ export default function Leaderboard() {
 				</div>
 			</div>
 
-			{/* Tablet View */}
-			<div className="hidden md:block lg:hidden min-h-screen pt-20 p-8 bg-transparent flex-col items-center justify-center overflow-x-hidden overflow-y-auto"></div>
-			{/* Laptop/Desktop View */}
-			<div className="hidden lg:block min-h-screen pt-20 p-8 bg-transparent flex-col items-center justify-center overflow-x-hidden overflow-y-auto"></div>
+			{/* Desktop/Tablet View */}
+			<div className="hidden md:block lg:block  pt-20 p-8 bg-transparent flex-col items-center justify-center overflow-x-hidden overflow-y-auto">
+				<h1 className="text-center text-4xl p-2 font-[roboto-mono] text-[#FCA410]">
+					LeaderBoard
+				</h1>
+				<div className="bg-transparent flex flex-row justify-center items-center gap-3">
+					{topThreeUsers
+						.sort((a, b) => a.rank - b.rank)
+						.map((user) => (
+							<div
+								key={user.rank}
+								className={`flex flex-col items-center  ${podiumStyle[user.rank as 1 | 2 | 3]}`}
+							>
+								<div className="relative">
+									<Image
+										src={user.avatar}
+										alt={user.name}
+										className="rounded-full "
+										width={150}
+										height={150}
+									></Image>
+
+									<span className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 bg-gray-800 text-white text-sm font-bold rounded-full w-6 h-6 flex items-center justify-center">
+										{user.rank}
+									</span>
+								</div>
+								<p className="text-white mt-3 font-semibold text-center">
+									{user.name}
+								</p>
+								<p className="text-gray-300 text-sm">{user.points} pts</p>
+							</div>
+						))}
+				</div>
+				<div className="flex flex-row gap-3 justify-end">
+					<div className="flex flex-col backdrop-blur-sm border-2 border-amber-50 h-125 w-1/2 mt-2 rounded-3xl overflow-y-auto">
+						{restUsers.map((user) => (
+							<UserCard
+								key={user.rank}
+								name={user.name}
+								rank={user.rank}
+								points={user.points}
+								className=""
+							/>
+						))}
+					</div>
+					<div className="flex flex-col gap-1 w-1/2">
+						<div className="flex flex-row">
+							<div className="rounded-lg overflow-hidden shadow-md">
+								<Image
+									src={"/testing/avatar_1.png"}
+									alt={"Saketh Kumar"}
+									className=""
+									width={100}
+									height={100}
+								></Image>
+							</div>
+							<div className=""></div>
+						</div>
+					</div>
+				</div>
+			</div>
 		</main>
 	);
 }

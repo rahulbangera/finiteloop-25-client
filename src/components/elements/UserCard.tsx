@@ -13,7 +13,7 @@ export default function UserCard({
 }: UserCardProps) {
 	return (
 		<div
-			className={`bg-[#0B102A] h-12 p-2 mt-2 rounded-2xl flex flex-row font-[roboto-mono] items-center justify-between text-sm ${className}`}
+			className={`h-12 p-5 rounded-2xl flex flex-row font-[roboto-mono] items-center justify-between text-sm ${className}`}
 		>
 			<span className="flex flex-row gap-1 justify-center">
 				<span>{rank}.</span>
