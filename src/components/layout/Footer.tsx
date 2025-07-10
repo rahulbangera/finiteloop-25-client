@@ -80,7 +80,7 @@ export default function Footer() {
 
 							<div className="flex flex-col lg:flex-row items-center lg:items-start text-center lg:text-right w-7/12 gap-8">
 								<div className="flex flex-col w-full lg:w-1/2 h-full">
-									<div className="flex justify-center lg:justify-between gap-4 mb-8">
+									<div className="flex justify-center lg:justify-between gap-5 mb-8">
 										{social.map((link) => (
 											<Link
 												key={link.name}
@@ -98,18 +98,18 @@ export default function Footer() {
 										<div className="bg-black/30 hover:bg-black/40  dark:bg-white/10  dark:hover:bg-white/20  rounded-2xl w-full h-16 flex justify-center items-center backdrop-blur-sm shadow-md border border-black/10 cursor-pointer">
 											Privacy
 										</div>
-										<div className="bg-black/30  hover:bg-black/40 dark:bg-white/10 dark:hover:bg-white/20 rounded-2xl w-full h-16 flex justify-center items-center backdrop-blur-sm shadow-md border border-black/10 cursor-pointer">
+										<div className="bg-black/30  hover:bg-black/40 dark:bg-white/10 dark:hover:bg-white/20 rounded-2xl w-full h-16 flex justify-center items-center backdrop-blur-sm shadow-md border border-black/10 cursor-pointer text-center">
 											Terms and Conditions
 										</div>
 									</div>
 								</div>
 								<div className="flex flex-col w-full lg:w-1/2">
 									<div className="grid grid-cols-2 gap-x-4 gap-y-8 justify-center items-center">
-										<div className="bg-black/30 hover:bg-black/40  dark:bg-white/10  dark:hover:bg-white/20 rounded-2xl w-full h-16 flex justify-center items-center backdrop-blur-sm shadow-md border border-black/10 cursor-pointer">
+										<div className="bg-black/30 hover:bg-black/40  dark:bg-white/10  dark:hover:bg-white/20 rounded-2xl w-full h-16 flex justify-center items-center backdrop-blur-sm shadow-md border border-black/10 cursor-pointer text-center">
 											Refund and Cancellation
 										</div>
 										<div className="bg-black/30 hover:bg-black/40  dark:bg-white/10  dark:hover:bg-white/20 rounded-2xl w-full h-16 flex justify-center items-center backdrop-blur-sm shadow-md border border-black/10 cursor-pointer">
-											Shopping
+											Shipping
 										</div>
 										<div className="bg-black/30 hover:bg-black/40  dark:bg-white/10  dark:hover:bg-white/20 rounded-2xl w-full h-16 flex justify-center items-center backdrop-blur-sm shadow-md border border-black/10 cursor-pointer">
 											Contact Us
@@ -150,7 +150,7 @@ export default function Footer() {
 						<Link
 							key={link.name}
 							href={link.link}
-							className="bg-black/30 hover:bg-black/60 rounded-xl h-15 w-15 flex justify-center items-center text-white border border-gray-600/30 transition-colors"
+							className="bg-black/30 hover:bg-black/60 rounded-xl h-12 w-12 flex justify-center items-center text-white border border-gray-600/30 transition-colors"
 							title={link.name}
 							target="_blank"
 							rel="noopener noreferrer"
