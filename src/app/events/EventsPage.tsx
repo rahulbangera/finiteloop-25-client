@@ -1,12 +1,12 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import Card from "@/components/elements/Card";
-import Radio from "@/components/elements/Radio";
-import { Drawer } from "vaul";
-import gsap from "gsap";
 import * as Dialog from "@radix-ui/react-dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import gsap from "gsap";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { Drawer } from "vaul";
+import Card from "@/components/elements/Card";
+import Radio from "@/components/elements/Radio";
 
 type EventYear = "2023-24" | "2024-25" | "2025-26";
 
