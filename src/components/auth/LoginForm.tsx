@@ -11,6 +11,18 @@ import { Password } from "@/components/ui/custom/password";
 import * as Form from "@radix-ui/react-form";
 import { Input } from "@/components/ui/input";
 import { loginZ } from "@/lib/validation";
+import bcrypt from "bcryptjs";
+
+const hashPassword = async (password: string): Promise<string | null> => {
+	try {
+		const hashedPassword = await bcrypt.hash(password, 12);
+		if (!hashedPassword) return null;
+		return hashedPassword;
+	} catch (error) {
+		console.log(error);
+		return null;
+	}
+};
 
 const LoginForm: FunctionComponent = () => {
 	const router = useRouter();
@@ -26,10 +38,12 @@ const LoginForm: FunctionComponent = () => {
 	});
 
 	const onSubmit = async (data: { email: string; password: string }) => {
+		const hashedPassword = hashPassword(data.password);
+
 		const res = await signIn("credentials", {
 			redirect: false,
 			email: data.email,
-			password: data.password,
+			password: hashedPassword,
 		});
 
 		if (res?.ok) {
