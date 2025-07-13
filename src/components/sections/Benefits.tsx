@@ -1,18 +1,17 @@
 "use client";
-
 import {
-	Code2,
-	Users,
-	Search,
-	Gift,
-	Zap,
 	BookOpen,
-	Trophy,
+	Code2,
 	Download,
+	Gift,
 	Rocket,
+	Search,
+	Trophy,
+	Users,
+	Zap,
 } from "lucide-react";
 import Image from "next/image";
-import { Meteors } from "../magicui/meteors";
+import { Meteors } from "@/components/elements/Meteors";
 
 const Benefits = () => {
 	const benefits = [
