@@ -187,7 +187,9 @@ const EventsPage = () => {
 
 	return (
 		<div className="p-8 h-full w-full bg-transparent flex flex-col items-center justify-center overflow-x-hidden overflow-y-auto">
-			<div className="text-7xl mt-20 select-none">Events</div>
+			<div className="lilita-font text-5xl md:text-8xl font-bold text-flc-yellow relative mt-20 select-none">
+				Events
+			</div>
 			<div className="m-8 select-none" onChange={handleToggleChange}>
 				<Radio
 					plans={[
