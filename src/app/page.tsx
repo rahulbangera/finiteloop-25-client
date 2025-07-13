@@ -1,3 +1,5 @@
+import Benefits from "@/components/sections/Benefits";
+
 const page = () => {
 	return (
 		<div className="min-h-screen relative">
@@ -9,7 +11,7 @@ const page = () => {
 			/>
 
 			<div
-				className="md:hidden absolute top-1/2 right-0 w-4/5 h-4/5 pointer-events-none z-0 transform -translate-y-1/2"
+				className="md:hidden fixed top-1/2 right-0 w-3/5 h-3/5 pointer-events-none z-0 transform -translate-y-1/2"
 				style={{
 					backgroundImage: "url('/mobile_rocket2.png')",
 					backgroundSize: "contain",
@@ -19,9 +21,9 @@ const page = () => {
 			/>
 
 			<div className="h-screen flex items-center justify-center md:justify-start relative z-10">
-				<div className="w-full px-8 pr-4 pl-8 text-left md:w-3/5 md:px-16 md:pr-6 md:pl-16 lg:w-2/3 lg:px-20 xl:w-3/5">
+				<div className="w-full md:w-3/5 lg:w-2/3 xl:w-3/5 px-8 pr-4 pl-8 sm:px-10 sm:pr-6 sm:pl-10 md:px-16 lg:px-20 text-left">
 					<div className="space-y-4 lg:space-y-6">
-						<h1 className="lilita-font font-bold text-flc-yellow leading-tight tracking-wide text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl">
+						<h1 className="lilita-font text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-flc-yellow leading-tight tracking-wide">
 							<span className="md:hidden">
 								Finite
 								<br />
@@ -38,7 +40,7 @@ const page = () => {
 					</div>
 
 					<div className="mt-4 sm:mt-6 lg:mt-8">
-						<p className="comic-font font-medium leading-relaxed max-w-2xl text-base sm:text-lg md:text-2xl lg:text-3xl">
+						<p className="comic-font text-base sm:text-lg md:text-2xl lg:text-3xl leading-relaxed font-medium max-w-2xl text-black dark:text-white">
 							<span className="md:hidden">
 								NMAMIT's premier
 								<br />
@@ -57,6 +59,8 @@ const page = () => {
 					</div>
 				</div>
 			</div>
+
+			<Benefits />
 		</div>
 	);
 };
