@@ -2,29 +2,34 @@
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
+import type { z } from "zod";
+import { loginZ } from "@/lib/validation";
 
 const LoginForm = () => {
 	const router = useRouter();
-	const [email, setEmail] = useState("");
-	const [password, setPassword] = useState("");
-	const [error, setError] = useState("");
 
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		setError("");
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+	} = useForm<z.infer<typeof loginZ>>({
+		resolver: zodResolver(loginZ),
+		mode: "onChange",
+	});
 
+	const onSubmit = async (data: z.infer<typeof loginZ>) => {
 		const res = await signIn("credentials", {
 			redirect: false,
-			email,
-			password,
+			...data,
 		});
 
 		if (res?.ok) {
 			router.push("/profile");
 		} else {
-			setError("Invalid email or password");
+			alert(res?.error || "Login failed. Please try again.");
 		}
 	};
 
@@ -53,7 +58,7 @@ const LoginForm = () => {
 						</div>
 
 						<div className="flex flex-col justify-center md:w-1/2 w-full">
-							<form onSubmit={handleSubmit} className="space-y-5">
+							<form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
 								<div className="text-center mb-4 md:mb-6">
 									<h2 className="text-slate-800 dark:text-white text-xl md:text-2xl font-medium">
 										Login
@@ -65,13 +70,14 @@ const LoginForm = () => {
 										Email
 										<input
 											type="email"
+											{...register("email")}
 											className="w-full bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 h-11 rounded-lg focus:border-orange-500 focus:ring-1 focus:ring-orange-500 text-sm px-3"
 											placeholder="Enter your email"
-											value={email}
-											onChange={(e) => setEmail(e.target.value)}
-											required
 										/>
 									</label>
+									<div className="text-red-500 text-sm min-h-[1rem]">
+										{errors.email?.message}
+									</div>
 								</div>
 
 								<div>
@@ -79,16 +85,14 @@ const LoginForm = () => {
 										Password
 										<input
 											type="password"
+											{...register("password")}
 											className="w-full bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 h-11 rounded-lg focus:border-orange-500 focus:ring-1 focus:ring-orange-500 text-sm px-3"
 											placeholder="Enter your password"
-											value={password}
-											onChange={(e) => setPassword(e.target.value)}
-											required
 										/>
 									</label>
-								</div>
-								<div className="min-h-8">
-									{error && <p className="text-red-500 text-lg">{error}</p>}
+									<div className="text-red-500 text-sm min-h-[1rem]">
+										{errors.password?.message}
+									</div>
 								</div>
 
 								<div className="text-left">
