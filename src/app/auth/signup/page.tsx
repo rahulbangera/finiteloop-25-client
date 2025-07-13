@@ -1,18 +1,17 @@
 "use client";
-
-import { zodResolver } from "@hookform/resolvers/zod";
+import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import type { FunctionComponent } from "react";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import type { z } from "zod";
-import Image from "next/image";
-import { Password } from "@/components/ui/custom/password";
+import { cn } from "@/lib/utils";
 import * as Form from "@radix-ui/react-form";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { Password } from "@/components/ui/custom/password";
 import { signUpZ } from "@/lib/validation";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 interface Props {
 	className?: string;
