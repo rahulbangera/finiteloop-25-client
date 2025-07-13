@@ -3,7 +3,6 @@ import { signUpZ } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
@@ -18,7 +17,6 @@ const graduationYears = [
 ];
 
 export default function SignUpForm() {
-	const router = useRouter();
 	const [branches, setBranches] = useState<{ id: string; name: string }[]>([]);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -58,11 +56,31 @@ export default function SignUpForm() {
 					body: JSON.stringify(data),
 				},
 			);
-			if (res.ok) {
-				alert("Signup successful! Please verify your email.");
-				router.push("/auth/verify-email");
+
+			if (!res.ok) {
+				const errorData = await res.json();
+				console.error("Signup failed", errorData);
+				alert(`Signup failed: ${errorData.message || "Unknown error"}`);
+				return;
+			}
+
+			const verifyRes = await fetch(
+				`${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/send-verify-email`,
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ email: data.email }),
+				},
+			);
+
+			if (!verifyRes.ok) {
+				const errorVerify = await verifyRes.json();
+				console.error("Verification email error", errorVerify);
+				alert("Account created but verification email failed.");
 			} else {
-				alert("Signup failed");
+				alert(
+					"Signup successful! Please check your email to verify your account.",
+				);
 			}
 		} catch (error) {
 			console.error("Signup error:", error);
