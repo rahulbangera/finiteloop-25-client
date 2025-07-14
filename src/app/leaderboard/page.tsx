@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { Scrollbar } from "react-scrollbars-custom";
 import UserCard from "@/components/elements/UserCard";
 
 // biome-ignore format: keeping inline layout for readability
@@ -42,7 +43,9 @@ export default function Leaderboard() {
 		<main>
 			{/* Mobile View */}
 			<div className="block md:hidden  mt-20 p-2 bg-transparent flex-col items-center justify-center overflow-x-hidden overflow-y-hidden">
-				<p className="text-center text-2xl p-2 text-[#FCA410]">LeaderBoard</p>
+				<p className="text-center text-2xl p-2 font-[roboto-mono] text-[#FCA410]">
+					LeaderBoard
+				</p>
 				<div className="bg-transparent flex flex-row justify-center items-center gap-1">
 					{topThreeUsers
 						.sort((a, b) => a.rank - b.rank)
@@ -91,8 +94,8 @@ export default function Leaderboard() {
 			</div>
 
 			{/* Desktop/Tablet View */}
-			<div className="hidden md:block lg:block  pt-20 p-8  flex-col items-center justify-center overflow-x-hidden overflow-y-auto">
-				<p className="text-center text-4xl font-extrabold p-2 font-mono text-[#FCA410]">
+			<div className="hidden md:block lg:block pt-20 m-8 mb-15 flex-col items-center justify-center overflow-x-hidden">
+				<p className="text-center text-5xl font-extrabold p-2 font-roboto-mono text-[#FCA410]">
 					LeaderBoard
 				</p>
 
@@ -117,10 +120,10 @@ export default function Leaderboard() {
 										{user.rank}
 									</span>
 								</div>
-								<p className="dark:text-white mt-3 font-semibold text-center">
+								<p className="dark:text-white mt-3 font-semibold text-center text-xl">
 									{user.name}
 								</p>
-								<p className="dark:text-gray-300 text-sm">{user.points} pts</p>
+								<p className="dark:text-gray-300 text-m">{user.points} pts</p>
 							</div>
 						))}
 				</div>
@@ -128,24 +131,26 @@ export default function Leaderboard() {
 					<div className="flex flex-col backdrop-blur-sm  bg-white/20 h-125 w-1/2 mt-2 rounded-2xl">
 						<div
 							className={
-								"flex flex-row gap-4 h-12 p-5 rounded-2xl justify-between font-mono items-center text-2xl bg-white/30"
+								"flex flex-row gap-4 h-12 p-5 rounded-2xl justify-between font-mono items-center text-2xl bg-white/20 dark:text-white"
 							}
 						>
 							<span>{"Rank"}</span>
 							<span>{"Name"}</span>
 							<span>{"Points"}</span>
 						</div>
-						<div className=" overflow-y-auto">
-							{restUsers.map((user) => (
-								<UserCard
-									key={user.rank}
-									name={user.name}
-									rank={user.rank}
-									points={user.points}
-									className="h-12 p-5 pl-8 pr-8 rounded-2xl justify-between font-mono items-center text-xl"
-								/>
-							))}
-						</div>
+						<Scrollbar permanentTrackY={false}>
+							<div className=" overflow-y-auto">
+								{restUsers.map((user) => (
+									<UserCard
+										key={user.rank}
+										name={user.name}
+										rank={user.rank}
+										points={user.points}
+										className="h-12 p-5 pl-8 pr-8 rounded-2xl justify-between font-mono items-center text-xl dark:text-white"
+									/>
+								))}
+							</div>
+						</Scrollbar>
 					</div>
 					<div className="flex flex-col m-5  gap-5 w-1/2">
 						<div className="flex flex-row gap-5">
@@ -180,7 +185,7 @@ export default function Leaderboard() {
 								NAME
 							</p>
 							<div className="flex h-full justify-center items-center wrap-break text-center">
-								<p className="text-8xl font-medium ">Alice Smith</p>
+								<p className="text-5xl font-medium">Parimi Saketh Kumar</p>
 							</div>
 						</div>
 					</div>
