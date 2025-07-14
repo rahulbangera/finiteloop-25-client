@@ -5,6 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { z } from "zod";
 
 const sendPasswordResetZ = z.object({
@@ -12,7 +14,6 @@ const sendPasswordResetZ = z.object({
 });
 
 export default function Forgot() {
-	const [successMessage, setSuccessMessage] = useState("");
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [email, setEmail] = useState("");
 
@@ -27,7 +28,6 @@ export default function Forgot() {
 
 	const onSubmit = async () => {
 		setIsSubmitting(true);
-		setSuccessMessage("");
 
 		const response = await fetch(
 			`${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/send-password-reset-email`,
@@ -42,11 +42,11 @@ export default function Forgot() {
 
 		if (!response.ok) {
 			const errorData = await response.json();
-			setSuccessMessage(errorData.message || "Failed to send reset link");
+			toast.error(errorData.message || "Failed to send reset link");
 			setIsSubmitting(false);
 			return;
 		} else {
-			setSuccessMessage(`Reset link sent to ${email}`);
+			toast.success(`Reset link sent to ${email}`);
 			setIsSubmitting(false);
 		}
 	};
@@ -117,12 +117,6 @@ export default function Forgot() {
 							>
 								{isSubmitting ? "Submitting..." : "Send Reset Link"}
 							</button>
-
-							{successMessage && (
-								<p className="text-black dark:text-white font-semibold text-sm text-center">
-									{successMessage}
-								</p>
-							)}
 
 							<div className="text-center mt-2">
 								<Link

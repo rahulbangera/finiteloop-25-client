@@ -7,6 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import Image from "next/image";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const resetPasswordZ = z
 	.object({
@@ -29,7 +31,6 @@ export default function ResetPasswordForm({
 }) {
 	const router = useRouter();
 	const [isSubmitting, setIsSubmitting] = useState(false);
-	const [message, setMessage] = useState("");
 
 	const {
 		register,
@@ -42,7 +43,6 @@ export default function ResetPasswordForm({
 
 	const onSubmit = async (values: ResetPasswordFormData) => {
 		setIsSubmitting(true);
-		setMessage("");
 
 		const res = await fetch(
 			`${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/reset-password`,
@@ -60,10 +60,10 @@ export default function ResetPasswordForm({
 		const data = await res.json();
 
 		if (res.ok) {
-			setMessage("Password reset successful. Redirecting to login...");
+			toast.success("Password reset successful. Redirecting to login...");
 			setTimeout(() => router.push("/auth/login"), 2000);
 		} else {
-			setMessage(data.message || "Something went wrong");
+			toast.error(data.message || "Something went wrong");
 			setTimeout(() => router.push("/auth/login"), 3000);
 		}
 
@@ -151,12 +151,6 @@ export default function ResetPasswordForm({
 							>
 								{isSubmitting ? "Submitting..." : "Submit"}
 							</button>
-
-							{message && (
-								<p className="text-black dark:text-white font-semibold text-sm text-center">
-									{message}
-								</p>
-							)}
 
 							<div className="text-center mt-2">
 								<Link
