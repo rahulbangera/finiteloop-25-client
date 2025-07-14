@@ -13,10 +13,10 @@ export const signUpZ = z
 		phone: z.string().length(10, "Phone number must be 10 digits"),
 		branchId: z.string().min(1, "Please select a branch"),
 		year: z.string().min(1, "Please select graduation year"),
-		password: z.string().min(6, "Password must be at least 6 characters"),
+		password: z.string().min(8, "Password must be at least 8 characters"),
 		confirmPassword: z
 			.string()
-			.min(6, "Password must be at least 6 characters"),
+			.min(8, "Password must be at least 6 characters"),
 	})
 	.refine((data) => data.password === data.confirmPassword, {
 		message: "Passwords don't match",
