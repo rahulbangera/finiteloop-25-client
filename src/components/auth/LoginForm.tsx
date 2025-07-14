@@ -7,6 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import type { z } from "zod";
 import { loginZ } from "@/lib/validation";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const LoginForm = () => {
 	const router = useRouter();
@@ -27,9 +29,10 @@ const LoginForm = () => {
 		});
 
 		if (res?.ok) {
-			router.push("/profile");
+			toast.success("Login successful! Redirecting", { autoClose: 1500 });
+			setTimeout(() => router.push("/profile"), 1600);
 		} else {
-			alert(res?.error || "Login failed. Please try again.");
+			toast.error(res?.error || "Login failed. Please try again.");
 		}
 	};
 

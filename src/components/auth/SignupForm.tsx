@@ -6,6 +6,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 type SignUpFormData = z.infer<typeof signUpZ>;
 
@@ -60,7 +62,7 @@ export default function SignUpForm() {
 			if (!res.ok) {
 				const errorData = await res.json();
 				console.error("Signup failed", errorData);
-				alert(`Signup failed: ${errorData.message || "Unknown error"}`);
+				toast.error(`Signup failed: ${errorData.message || "Unknown error"}`);
 				return;
 			}
 
@@ -76,15 +78,15 @@ export default function SignUpForm() {
 			if (!verifyRes.ok) {
 				const errorVerify = await verifyRes.json();
 				console.error("Verification email error", errorVerify);
-				alert("Account created but verification email failed.");
+				toast.warn("Account created but verification email failed.");
 			} else {
-				alert(
+				toast.success(
 					"Signup successful! Please check your email to verify your account.",
 				);
 			}
 		} catch (error) {
 			console.error("Signup error:", error);
-			alert("An unexpected error occurred");
+			toast.error("An unexpected error occurred");
 		} finally {
 			setIsSubmitting(false);
 		}
