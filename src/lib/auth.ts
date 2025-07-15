@@ -1,6 +1,29 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
+declare module "next-auth" {
+	interface Session {
+		user: {
+			id: string;
+			name?: string;
+			email: string;
+			role: string;
+		};
+	}
+	interface User {
+		id: string;
+		name?: string;
+		email: string;
+		role: string;
+	}
+}
+
+declare module "next-auth/jwt" {
+	interface JWT {
+		[key: string]: unknown;
+	}
+}
+
 export const authOptions: NextAuthOptions = {
 	providers: [
 		CredentialsProvider({
@@ -20,10 +43,7 @@ export const authOptions: NextAuthOptions = {
 						headers: {
 							"Content-Type": "application/json",
 						},
-						body: JSON.stringify({
-							email,
-							password,
-						}),
+						body: JSON.stringify({ email, password }),
 					},
 				);
 
@@ -33,7 +53,7 @@ export const authOptions: NextAuthOptions = {
 					throw new Error(data.message || "Login failed");
 				}
 
-				return data.user ?? null;
+				return data.user;
 			},
 		}),
 	],
@@ -44,4 +64,19 @@ export const authOptions: NextAuthOptions = {
 		strategy: "jwt",
 	},
 	secret: process.env.AUTH_SECRET,
+
+	callbacks: {
+		async jwt({ token, user }) {
+			if (user) {
+				Object.assign(token, user);
+			}
+			return token;
+		},
+		async session({ session, token }) {
+			if (session.user) {
+				Object.assign(session.user, token);
+			}
+			return session;
+		},
+	},
 };

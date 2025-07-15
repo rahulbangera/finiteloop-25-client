@@ -1,10 +1,9 @@
-import Script from "next/script";
 import { forwardRef } from "react";
-
-import { Button, type ButtonProps } from "../ui/button";
 import { useSession } from "next-auth/react";
-
+import Script from "next/script";
+import { Button, type ButtonProps } from "../ui/button";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+
 type PaymentType = "EVENT" | "MEMBERSHIP";
 
 const PaymentButton = forwardRef<

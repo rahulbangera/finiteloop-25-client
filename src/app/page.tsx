@@ -11,12 +11,10 @@ const page = () => {
 			/>
 
 			<div
-				className="md:hidden fixed top-1/2 right-0 w-3/5 h-3/5 pointer-events-none z-0 transform -translate-y-1/2"
+				className="md:hidden absolute top-[10%] right-0 w-[40rem] h-[40rem] pointer-events-none z-0 transform -translate-y-1/2 bg-contain bg-no-repeat"
 				style={{
-					backgroundImage: "url('/mobile_rocket2.png')",
-					backgroundSize: "contain",
-					backgroundRepeat: "no-repeat",
-					backgroundPosition: "center",
+					backgroundImage: "url('/mobile_rocket1.png')",
+					backgroundPosition: "center right",
 				}}
 			/>
 

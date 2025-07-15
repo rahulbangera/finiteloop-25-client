@@ -232,99 +232,95 @@ const EventsPage = () => {
 									</div>
 								</div>
 							</Card>
-
-							{/* Drawer for mobile view */}
-							<Drawer.Root
-								open={
-									selectedEvent?.name === event.name && window.innerWidth < 768
-								}
-								onOpenChange={(isOpen) => {
-									if (!isOpen) {
-										setSelectedEvent(null);
-										const params = new URLSearchParams(window.location.search);
-										params.delete("id");
-										const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
-										window.history.replaceState({}, "", newUrl);
-									}
-								}}
-							>
-								<Drawer.Portal>
-									<Drawer.Overlay className="fixed inset-0 bg-black/40 z-40" />
-									<Drawer.Content className="bg-gradient-to-t from-white via-purple-50 to-purple-100 dark:from-gray-900 dark:via-indigo-950 dark:to-indigo-900 rounded-t-3xl p-6 fixed bottom-0 left-0 right-0 z-50 shadow-2xl border-t border-purple-200 dark:border-indigo-800">
-										<Drawer.Title asChild>
-											<VisuallyHidden>{selectedEvent?.name}</VisuallyHidden>
-										</Drawer.Title>
-										<div className="flex flex-col gap-4">
-											<div className="flex items-center gap-3">
-												<span className="inline-block px-3 py-1 rounded-full bg-purple-200 dark:bg-indigo-800 text-xs font-semibold text-purple-800 dark:text-purple-200">
-													{event.type}
-												</span>
-												<span className="text-black dark:text-white text-xs">
-													{event.date}
-												</span>
-											</div>
-											<h2 className="text-2xl font-bold text-purple-900 dark:text-purple-100">
-												{event.name}
-											</h2>
-											{/** biome-ignore lint/performance/noImgElement: <test> */}
-											<img
-												src={event.image}
-												alt={event.name}
-												className="rounded-xl h-40 object-cover w-full border border-purple-100 dark:border-indigo-800 shadow"
-											/>
-											<p className="text-gray-700 dark:text-gray-300">
-												{event.description}
-											</p>
-											<div className="grid grid-cols-2 gap-2 text-sm mt-2">
-												<div>
-													<span className="font-semibold text-purple-800 dark:text-purple-200">
-														Venue:
-													</span>{" "}
-													{event.venue}
-												</div>
-												<div>
-													<span className="font-semibold text-purple-800 dark:text-purple-200">
-														Format:
-													</span>{" "}
-													{event.format}
-												</div>
-												<div>
-													<span className="font-semibold text-purple-800 dark:text-purple-200">
-														Team Size:
-													</span>{" "}
-													{event.membersPerTeam}
-												</div>
-												<div>
-													<span className="font-semibold text-purple-800 dark:text-purple-200">
-														Entry Fee:
-													</span>{" "}
-													{event.entryFee}
-												</div>
-											</div>
-											<div className="flex gap-3 mt-6">
-												<button
-													type="button"
-													className="flex-1 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-semibold shadow hover:from-purple-700 hover:to-indigo-700 transition"
-												>
-													Register
-												</button>
-												<button
-													type="button"
-													onClick={handleCopyLink}
-													className="flex-1 px-4 py-2 bg-white border border-purple-300 text-purple-800 rounded-lg font-semibold shadow hover:bg-purple-50 dark:bg-indigo-950 dark:text-purple-100 dark:border-indigo-700 dark:hover:bg-indigo-900 transition"
-												>
-													Copy Link
-												</button>
-											</div>
-										</div>
-									</Drawer.Content>
-								</Drawer.Portal>
-							</Drawer.Root>
 						</button>
 					))
 				)}
 			</div>
 
+			<Drawer.Root
+				open={!!selectedEvent && window.innerWidth < 768}
+				onOpenChange={(isOpen) => {
+					if (!isOpen) {
+						setSelectedEvent(null);
+						const params = new URLSearchParams(window.location.search);
+						params.delete("id");
+						const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+						window.history.replaceState({}, "", newUrl);
+					}
+				}}
+			>
+				<Drawer.Portal>
+					<Drawer.Overlay className="fixed inset-0 bg-black/40 z-40" />
+					<Drawer.Content className="bg-gradient-to-t from-white via-purple-50 to-purple-100 dark:from-gray-900 dark:via-indigo-950 dark:to-indigo-900 rounded-t-3xl p-6 fixed bottom-0 left-0 right-0 z-50 shadow-2xl border-t border-purple-200 dark:border-indigo-800">
+						<Drawer.Title asChild>
+							<VisuallyHidden>{selectedEvent?.name}</VisuallyHidden>
+						</Drawer.Title>
+						<div className="flex flex-col gap-4">
+							<div className="flex items-center gap-3">
+								<span className="inline-block px-3 py-1 rounded-full bg-purple-200 dark:bg-indigo-800 text-xs font-semibold text-purple-800 dark:text-purple-200">
+									{selectedEvent?.type}
+								</span>
+								<span className="text-black dark:text-white text-xs">
+									{selectedEvent?.date}
+								</span>
+							</div>
+							<h2 className="text-2xl font-bold text-purple-900 dark:text-purple-100">
+								{selectedEvent?.name}
+							</h2>
+							{/** biome-ignore lint/performance/noImgElement: <test> */}
+							<img
+								src={selectedEvent?.image}
+								alt={selectedEvent?.name}
+								className="rounded-xl h-40 object-cover w-full border border-purple-100 dark:border-indigo-800 shadow"
+							/>
+							<p className="text-gray-700 dark:text-gray-300">
+								{selectedEvent?.description}
+							</p>
+							<div className="grid grid-cols-2 gap-2 text-sm mt-2">
+								<div>
+									<span className="font-semibold text-purple-800 dark:text-purple-200">
+										Venue:
+									</span>{" "}
+									{selectedEvent?.venue}
+								</div>
+								<div>
+									<span className="font-semibold text-purple-800 dark:text-purple-200">
+										Format:
+									</span>{" "}
+									{selectedEvent?.format}
+								</div>
+								<div>
+									<span className="font-semibold text-purple-800 dark:text-purple-200">
+										Team Size:
+									</span>{" "}
+									{selectedEvent?.membersPerTeam}
+								</div>
+								<div>
+									<span className="font-semibold text-purple-800 dark:text-purple-200">
+										Entry Fee:
+									</span>{" "}
+									{selectedEvent?.entryFee}
+								</div>
+							</div>
+							<div className="flex gap-3 mt-6">
+								<button
+									type="button"
+									className="flex-1 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-semibold shadow hover:from-purple-700 hover:to-indigo-700 transition"
+								>
+									Register
+								</button>
+								<button
+									type="button"
+									onClick={handleCopyLink}
+									className="flex-1 px-4 py-2 bg-white border border-purple-300 text-purple-800 rounded-lg font-semibold shadow hover:bg-purple-50 dark:bg-indigo-950 dark:text-purple-100 dark:border-indigo-700 dark:hover:bg-indigo-900 transition"
+								>
+									Copy Link
+								</button>
+							</div>
+						</div>
+					</Drawer.Content>
+				</Drawer.Portal>
+			</Drawer.Root>
 			{/* Desktop Modal */}
 			<Dialog.Root open={showDialog} onOpenChange={setShowDialog}>
 				<Dialog.Portal>
