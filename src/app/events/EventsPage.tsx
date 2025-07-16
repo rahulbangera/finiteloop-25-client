@@ -41,6 +41,7 @@ type EventsByYear = Record<EventYear, Event[]>;
 type TeamState = {
 	registering: boolean;
 	isConfirmed: boolean;
+	isLeader: boolean;
 	action: "NONE" | "CREATE" | "JOIN";
 	teamName: string;
 	teamId: string;
@@ -95,6 +96,7 @@ const EventsPage = () => {
 		teamName: "",
 		registering: false,
 		action: "NONE",
+		isLeader: false,
 		teamId: "",
 		isConfirmed: false,
 		createdTeamId: "",
@@ -194,6 +196,7 @@ const EventsPage = () => {
 				isConfirmed: false,
 				registering: false,
 				action: "NONE",
+				isLeader: false,
 				teamId: "",
 				createdTeamId: "",
 				members: [],
@@ -268,6 +271,7 @@ const EventsPage = () => {
 							...prev,
 							isConfirmed: json.data.isConfirmed || false,
 							teamName: json.data.teamName || "",
+							isLeader: json.data.isLeader || false,
 							registering: true,
 							createdTeamId: json.data.teamId,
 							members,
@@ -278,6 +282,7 @@ const EventsPage = () => {
 							...prev,
 							teamName: "",
 							isConfirmed: false,
+							isLeader: false,
 							registering: true,
 							createdTeamId: "",
 							members: [],
@@ -292,6 +297,7 @@ const EventsPage = () => {
 				setLoading((prev) => ({ ...prev, checkingRegistration: false }));
 			}
 		};
+
 		checkRegistration();
 	}, [selectedEvent, userId]);
 
@@ -550,7 +556,7 @@ const EventsPage = () => {
 								Team has been confirmed!
 							</span>
 						</div>
-					) : (
+					) : teamState.isLeader ? (
 						<div className="flex gap-2">
 							{selectedEvent &&
 							(selectedEvent?.flcAmount > 0 ||
@@ -602,6 +608,10 @@ const EventsPage = () => {
 							>
 								{loading.deleteTeam ? "Deleting..." : "Delete Team"}
 							</button>
+						</div>
+					) : (
+						<div className="text-sm text-gray-500">
+							Only the team leader can confirm the team.
 						</div>
 					)}
 					<div className="text-xs text-gray-400 mt-2">Members:</div>
