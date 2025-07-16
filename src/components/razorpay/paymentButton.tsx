@@ -9,6 +9,7 @@ type PaymentType = "EVENT" | "MEMBERSHIP";
 const PaymentButton = forwardRef<
 	HTMLButtonElement,
 	ButtonProps & {
+		title: string;
 		description: string;
 		onSuccess: (paymentId: string) => void;
 		onFailure: () => void;
@@ -27,6 +28,7 @@ const PaymentButton = forwardRef<
 >(
 	(
 		{
+			title,
 			description,
 			paymentType,
 			amountInINR,
@@ -38,6 +40,7 @@ const PaymentButton = forwardRef<
 		ref,
 	) => {
 		const session = useSession();
+		session.data?.user.role;
 
 		if (!session || !session.data?.user) {
 			return (
@@ -68,12 +71,15 @@ const PaymentButton = forwardRef<
 							},
 							body: JSON.stringify(
 								paymentType === "MEMBERSHIP"
-									? { paymentType: paymentType, sessionUserId: 100 } // TODO [RAHUL] : ADD USER ID TO SESSION
+									? {
+											paymentType: paymentType,
+											sessionUserId: session.data.user.id,
+										} // TODO [RAHUL] : ADD USER ID TO SESSION
 									: {
 											paymentType: paymentType,
 											amountInINR: amountInINR,
 											teamId: teamId,
-											sessionUserId: 100, // TODO [RAHUL] : ADD USER ID TO SESSION
+											sessionUserId: session.data.user.id, // TODO [RAHUL] : ADD USER ID TO SESSION
 										},
 							),
 						});
@@ -106,7 +112,7 @@ const PaymentButton = forwardRef<
 							prefill: {
 								name: session.data.user?.name || "",
 								email: session.data.user?.email || "",
-								contact: "2121212122", // TODO [RAHUL] : ADD USER PHONE NUMBER TO SESSION
+								contact: session.data.user.phone || "", // TODO [RAHUL] : ADD USER PHONE NUMBER TO SESSION
 							},
 							handler: async (response) => {
 								console.log("Payment response received", response);
@@ -126,7 +132,7 @@ const PaymentButton = forwardRef<
 															razorpayOrderId: response.razorpay_order_id,
 															razorpayPaymentId: response.razorpay_payment_id,
 															razorpaySignature: response.razorpay_signature,
-															sessionUserId: 100, // TODO [RAHUL] : ADD USER ID TO SESSION
+															sessionUserId: session.data.user.id, // TODO [RAHUL] : ADD USER ID TO SESSION
 														}
 													: {
 															paymentType: paymentType,
@@ -136,7 +142,7 @@ const PaymentButton = forwardRef<
 															razorpayOrderId: response.razorpay_order_id,
 															razorpayPaymentId: response.razorpay_payment_id,
 															razorpaySignature: response.razorpay_signature,
-															sessionUserId: 100, // TODO [RAHUL] : ADD USER ID TO SESSION
+															sessionUserId: session.data.user.id, // TODO [RAHUL] : ADD USER ID TO SESSION
 														},
 											),
 										},
@@ -163,7 +169,7 @@ const PaymentButton = forwardRef<
 					}}
 					{...props}
 				>
-					Pay Now
+					{title || "Pay Now"}
 				</Button>
 			</>
 		);

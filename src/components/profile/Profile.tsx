@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useEffect } from "react";
 import PaymentButton from "../razorpay/paymentButton";
 import { toast } from "react-toastify";
+import { useSession } from "next-auth/react";
 
 const mockProfile = {
 	name: "Nandan R Pai",
@@ -39,6 +40,7 @@ function StatItem({ label, value }: { label: string; value: string | number }) {
 }
 
 export default function Profile() {
+	const session = useSession();
 	useEffect(() => {
 		// biome-ignore lint/suspicious/noExplicitAny: testing
 		const rippleHandler = (e: any) => {
@@ -92,24 +94,28 @@ export default function Profile() {
 									{mockProfile.name}
 								</h1>
 								<div className="interactive inline-block mt-2 px-2 py-1 bg-[#1a4d3a] border border-green-500 text-green-400 rounded-full text-sm font-medium hover:bg-green-500 hover:text-black">
-									● Member
+									● {session.data?.user.role}
 								</div>
 							</div>
 
 							<div className="mt-4 sm:mt-0">
-								<PaymentButton
-									className="w-24"
-									paymentType="MEMBERSHIP"
-									description="Club Membership"
-									onSuccess={async (paymentId) => {
-										toast.success("Payment successful");
-										console.log("Payment ID:", paymentId);
-									}}
-									onFailure={() => {
-										toast.error("Payment failed");
-									}}
-									type="submit"
-								/>
+								{session.data?.user.role === "USER" && (
+									<PaymentButton
+										className="w-24"
+										title="Pay Membership"
+										paymentType="MEMBERSHIP"
+										description="Club Membership"
+										onSuccess={async (paymentId) => {
+											await session.update();
+											toast.success("Payment successful");
+											console.log("Payment ID:", paymentId);
+										}}
+										onFailure={() => {
+											toast.error("Payment failed");
+										}}
+										type="submit"
+									/>
+								)}
 							</div>
 						</div>
 					</div>
