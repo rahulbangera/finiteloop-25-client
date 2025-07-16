@@ -1,12 +1,13 @@
 "use client";
-import Image from "next/image";
-import { Sun, Moon, LogIn, User, LogOut } from "lucide-react";
+import { LogIn, LogOut, Moon, Sun, User } from "lucide-react";
+import { signOut, useSession } from "next-auth/react";
 import { useTheme } from "next-themes";
-import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
-import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useSession, signOut } from "next-auth/react";
+import { useEffect, useRef, useState } from "react";
+import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
+import { toast } from "react-toastify";
 
 export default function NavBar() {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -45,8 +46,20 @@ export default function NavBar() {
 		setTheme(theme === "dark" ? "light" : "dark");
 	};
 
-	const handleSignOut = () => {
+	const handleSignOut = async () => {
+		if (!session?.user?.id) return;
+
+		await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/signout`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ userId: session.user.id }),
+			credentials: "include",
+		});
+
 		signOut();
+		toast.success("Logged out successfully!", { autoClose: 1500 });
 	};
 
 	const toggleProfileDropdown = () => {
