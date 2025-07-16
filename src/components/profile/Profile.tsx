@@ -1,6 +1,8 @@
 "use client";
 import Link from "next/link";
 import { useEffect } from "react";
+import PaymentButton from "../razorpay/paymentButton";
+import { toast } from "react-toastify";
 
 const mockProfile = {
 	name: "Nandan R Pai",
@@ -35,8 +37,6 @@ function StatItem({ label, value }: { label: string; value: string | number }) {
 		</div>
 	);
 }
-import { useSession } from "next-auth/react";
-import PaymentButton from "../razorpay/paymentButton";
 
 export default function Profile() {
 	useEffect(() => {
@@ -73,39 +73,43 @@ export default function Profile() {
 
 	return (
 		<section className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-8 px-6 py-10 max-w-6xl mx-auto mt-20">
-			<PaymentButton
-				className="flex cursor-pointer"
-				paymentType="MEMBERSHIP"
-				description="Club Membership"
-				onSuccess={async (paymentId) => {
-					// toast.success("Payment successful");
-					alert("Payment successful");
-					console.log("Payment ID:", paymentId);
-				}}
-				onFailure={() => {
-					alert("Payment failed");
-					// toast.error("Payment failed")
-				}}
-				type="submit"
-			/>
 			{/* Profile Card */}
 			<div className="card profile-card bg-white/35 dark:bg-white/20 border border-black dark:border-white rounded-3xl overflow-hidden transition">
 				<div className="p-6 space-y-6 text-black dark:text-white">
-					<div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-						<div className="relative">
-							{/** biome-ignore lint/performance/noImgElement: testing */}
+					<div className="flex flex-col sm:flex-row sm:items-start gap-6">
+						<div className="relative flex-shrink-0">
+							{/* biome-ignore lint/performance/noImgElement: testing */}
 							<img
 								src="https://placehold.co/100x100"
 								alt="Profile"
 								className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-2 border-black dark:border-white object-cover transition-transform hover:scale-110"
 							/>
 						</div>
-						<div className="text-center sm:text-left">
-							<h1 className="text-2xl sm:text-3xl font-bold">
-								{mockProfile.name}
-							</h1>
-							<div className="interactive inline-block mt-2 px-4 py-1 bg-[#1a4d3a] border border-green-500 text-green-400 rounded-full text-sm font-medium hover:bg-green-500 hover:text-black">
-								● Member
+
+						<div className="flex flex-col sm:flex-row w-full justify-between items-start sm:items-center">
+							<div className="flex flex-col text-center sm:text-left">
+								<h1 className="text-2xl sm:text-3xl font-bold">
+									{mockProfile.name}
+								</h1>
+								<div className="interactive inline-block mt-2 px-2 py-1 bg-[#1a4d3a] border border-green-500 text-green-400 rounded-full text-sm font-medium hover:bg-green-500 hover:text-black">
+									● Member
+								</div>
+							</div>
+
+							<div className="mt-4 sm:mt-0">
+								<PaymentButton
+									className="w-24"
+									paymentType="MEMBERSHIP"
+									description="Club Membership"
+									onSuccess={async (paymentId) => {
+										toast.success("Payment successful");
+										console.log("Payment ID:", paymentId);
+									}}
+									onFailure={() => {
+										toast.error("Payment failed");
+									}}
+									type="submit"
+								/>
 							</div>
 						</div>
 					</div>
