@@ -1,10 +1,10 @@
 "use client";
 import VerifyEmailForm from "@/components/auth/VerifyEmailForm";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { toast } from "react-toastify";
 
-export default function VerifyEmailPage() {
+function VerifyEmailContent() {
 	const searchParams = useSearchParams();
 	const token = searchParams.get("token");
 	const [status, setStatus] = useState<
@@ -77,5 +77,17 @@ export default function VerifyEmailPage() {
 				)}
 			</div>
 		</div>
+	);
+}
+
+export default function VerifyEmailPage() {
+	return (
+		<Suspense
+			fallback={
+				<div className="text-center mt-20 text-xl">Loading Verification...</div>
+			}
+		>
+			<VerifyEmailContent />
+		</Suspense>
 	);
 }

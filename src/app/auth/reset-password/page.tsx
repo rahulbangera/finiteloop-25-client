@@ -1,8 +1,9 @@
 "use client";
-import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import ResetPasswordForm from "@/components/auth/ResetPasswordForm";
+import { useSearchParams } from "next/navigation";
 
-export default function ResetPasswordPage() {
+function ResetPasswordPageContent() {
 	const searchParams = useSearchParams();
 	const token = searchParams.get("token");
 
@@ -14,5 +15,17 @@ export default function ResetPasswordPage() {
 				<div className="text-center text-xl text-white">Invalid Token</div>
 			)}
 		</div>
+	);
+}
+
+export default function ResetPasswordPage() {
+	return (
+		<Suspense
+			fallback={
+				<div className="text-center text-xl text-white">Loading...</div>
+			}
+		>
+			<ResetPasswordPageContent />
+		</Suspense>
 	);
 }
