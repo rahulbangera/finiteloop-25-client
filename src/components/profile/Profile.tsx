@@ -41,6 +41,12 @@ function StatItem({ label, value }: { label: string; value: string | number }) {
 
 export default function Profile() {
 	const session = useSession();
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <no need of exhaustive deps here>
+	useEffect(() => {
+		session.update();
+	}, []);
+
 	useEffect(() => {
 		// biome-ignore lint/suspicious/noExplicitAny: testing
 		const rippleHandler = (e: any) => {
@@ -101,7 +107,6 @@ export default function Profile() {
 							<div className="mt-4 sm:mt-0">
 								{session.data?.user.role === "USER" && (
 									<PaymentButton
-										className="w-24"
 										title="Pay Membership"
 										paymentType="MEMBERSHIP"
 										description="Club Membership"

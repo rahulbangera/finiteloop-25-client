@@ -6,6 +6,7 @@ export interface AppUser {
 	name?: string;
 	email: string;
 	role: string;
+	phone: string;
 	accessToken?: string;
 	refreshToken?: string;
 	accessTokenExpiry?: number;
@@ -13,20 +14,6 @@ export interface AppUser {
 }
 declare module "next-auth" {
 	interface Session {
-		user: {
-			id: string;
-			name?: string;
-			email: string;
-			role: string;
-			phone?: string;
-		};
-	}
-	interface User {
-		id: string;
-		name?: string;
-		email: string;
-		role: string;
-		phone?: string;
 		user: AppUser;
 		accessToken?: string;
 		refreshToken?: string;
@@ -156,6 +143,7 @@ export const authOptions: NextAuthOptions = {
 				name: token.name ?? "",
 				email: token.email ?? "",
 				role: token.role ?? "",
+				phone: token.phone ?? "",
 				accessToken: token.accessToken,
 				refreshToken: token.refreshToken,
 				accessTokenExpiry: token.accessTokenExpiry,
