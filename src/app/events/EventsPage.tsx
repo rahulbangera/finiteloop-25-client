@@ -2,7 +2,7 @@
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import gsap from "gsap";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { Drawer } from "vaul";
 import Card from "@/components/elements/Card";
 import { useSession } from "next-auth/react";
@@ -76,7 +76,15 @@ const EventsPage = () => {
 		"2024-25": [],
 		"2025-26": [],
 	});
-	const [loading, setLoading] = useState(true);
+	const [loading, setLoading] = useState({
+		events: true,
+		checkingRegistration: false,
+		register: false,
+		createTeam: false,
+		confirmTeam: false,
+		deleteTeam: false,
+		joinTeam: false,
+	});
 	const [teamState, setTeamState] = useState<TeamState>({
 		registering: false,
 		action: "NONE",
@@ -87,7 +95,6 @@ const EventsPage = () => {
 	const [registered, setRegistered] = useState(false);
 	const [joining, setJoining] = useState(false);
 	const [teamInitialized, setTeamInitialized] = useState(false);
-	const [checkingRegistration, setCheckingRegistration] = useState(false);
 	const imageRef = useRef<HTMLImageElement>(null);
 	const router = useRouter();
 	const searchParams = useSearchParams();
@@ -100,7 +107,7 @@ const EventsPage = () => {
 	// Fetch events
 	useEffect(() => {
 		const fetchEvents = async () => {
-			setLoading(true);
+			setLoading((prev) => ({ ...prev, events: true }));
 			try {
 				const res = await fetch(
 					`${process.env.NEXT_PUBLIC_SERVER_URL}/api/events/getAll`,
@@ -125,7 +132,7 @@ const EventsPage = () => {
 			} catch (error) {
 				console.error("Failed to fetch events:", error);
 			} finally {
-				setLoading(false);
+				setLoading((prev) => ({ ...prev, events: false }));
 			}
 		};
 		fetchEvents();
@@ -139,7 +146,7 @@ const EventsPage = () => {
 
 	// Open drawer if slug present
 	useEffect(() => {
-		if (!initialSlug || loading) return;
+		if (!initialSlug || loading.events) return;
 		let found: { event: Event; year: EventYear } | null = null;
 		for (const year in eventsByYear) {
 			const yearKey = year as EventYear;
@@ -158,7 +165,7 @@ const EventsPage = () => {
 				found.year === "2023-24" ? 0 : found.year === "2024-25" ? 1 : 2;
 			setSelectedYearData({ year: found.year, index: yearIndex });
 		}
-	}, [initialSlug, eventsByYear, loading]);
+	}, [initialSlug, eventsByYear, loading.events]);
 
 	// Remove slug from URL when drawer closes
 	useEffect(() => {
@@ -201,11 +208,15 @@ const EventsPage = () => {
 		}
 	}, [drawerOpen]);
 
+	// Check registration/team
 	useEffect(() => {
-		if (!selectedEvent || !userId) return;
+		if (!selectedEvent || !userId) {
+			setTeamInitialized(true);
+			return;
+		}
 
 		const checkRegistration = async () => {
-			setCheckingRegistration(true);
+			setLoading((prev) => ({ ...prev, checkingRegistration: true }));
 			try {
 				if (selectedEvent.eventType === "SOLO") {
 					const res = await fetch(
@@ -259,7 +270,7 @@ const EventsPage = () => {
 				console.error("Error checking registration/team:", err);
 			} finally {
 				setTeamInitialized(true);
-				setCheckingRegistration(false);
+				setLoading((prev) => ({ ...prev, checkingRegistration: false }));
 			}
 		};
 
@@ -282,10 +293,6 @@ const EventsPage = () => {
 		setDrawerOpen(true);
 	};
 
-	useEffect(() => {
-		console.log("registered:", registered);
-	}, [registered]);
-
 	const handleCopyLink = () => {
 		if (selectedEvent) {
 			const url = `${window.location.origin}/events?id=${selectedEvent.id}`;
@@ -295,9 +302,14 @@ const EventsPage = () => {
 	};
 
 	const handleRegister = async () => {
-		if (!selectedEvent || !userId) return;
+		if (!selectedEvent) return;
+		if (!userId) {
+			toast.error("Login to register");
+			return;
+		}
 		if (selectedEvent.eventType === "SOLO") {
 			try {
+				setLoading((prev) => ({ ...prev, register: true }));
 				setTeamState((prev) => ({ ...prev, registering: true }));
 				const res = await fetch(
 					`${process.env.NEXT_PUBLIC_SERVER_URL}/api/events/registerSolo`,
@@ -317,13 +329,20 @@ const EventsPage = () => {
 				toast.error("Something went wrong.");
 			} finally {
 				setTeamState((prev) => ({ ...prev, registering: false }));
+				setLoading((prev) => ({ ...prev, register: false }));
 			}
 		}
 	};
 
-	const createTeam = async () => {
-		if (!selectedEvent || !userId) return;
+	const createTeam = useCallback(async () => {
+		if (!selectedEvent) return;
+		if (!userId) {
+			toast.error("Login to register");
+			setLoading((prev) => ({ ...prev, createTeam: false }));
+			return;
+		}
 		try {
+			setLoading((prev) => ({ ...prev, createTeam: true }));
 			const res = await fetch(
 				`${process.env.NEXT_PUBLIC_SERVER_URL}/api/events/createTeam`,
 				{
@@ -349,12 +368,21 @@ const EventsPage = () => {
 			} else toast.error(json.error || "Failed to create team");
 		} catch {
 			toast.error("Error creating team");
+		} finally {
+			setLoading((prev) => ({ ...prev, createTeam: false }));
 		}
-	};
+	}, [selectedEvent, userId, session]);
 
-	const joinTeam = async () => {
-		if (!selectedEvent || !userId || !teamState.teamId) return;
+	const joinTeam = useCallback(async () => {
+		if (!selectedEvent) return;
+		if (!userId) {
+			toast.error("Login to register");
+			setLoading((prev) => ({ ...prev, joinTeam: false }));
+			return;
+		}
+		if (!teamState.teamId) return;
 		try {
+			setLoading((prev) => ({ ...prev, joinTeam: true }));
 			const res = await fetch(
 				`${process.env.NEXT_PUBLIC_SERVER_URL}/api/events/joinTeam`,
 				{
@@ -364,8 +392,6 @@ const EventsPage = () => {
 				},
 			);
 			const json = await res.json();
-			console.log("Join team response:", json);
-
 			if (json.success) {
 				toast.success("Joined team successfully!");
 				setTeamState((prev) => ({
@@ -382,12 +408,21 @@ const EventsPage = () => {
 			} else toast.error(json.error || "Failed to join team");
 		} catch {
 			toast.error("Error joining team");
+		} finally {
+			setLoading((prev) => ({ ...prev, joinTeam: false }));
 		}
-	};
+	}, [selectedEvent, userId, teamState.teamId, session]);
 
 	const confirmTeam = async () => {
-		if (!selectedEvent || !userId || !teamState.createdTeamId) return;
+		if (!selectedEvent) return;
+		if (!userId) {
+			toast.error("Login to register");
+			setLoading((prev) => ({ ...prev, confirmTeam: false }));
+			return;
+		}
+		if (!teamState.createdTeamId) return;
 		try {
+			setLoading((prev) => ({ ...prev, confirmTeam: true }));
 			const res = await fetch(
 				`${process.env.NEXT_PUBLIC_SERVER_URL}/api/events/confirmTeam`,
 				{
@@ -401,12 +436,21 @@ const EventsPage = () => {
 			else toast.error(json.error || "Failed to confirm team");
 		} catch {
 			toast.error("Error confirming team");
+		} finally {
+			setLoading((prev) => ({ ...prev, confirmTeam: false }));
 		}
 	};
 
 	const deleteTeam = async () => {
-		if (!selectedEvent || !userId || !teamState.createdTeamId) return;
+		if (!selectedEvent) return;
+		if (!userId) {
+			toast.error("Login to register");
+			setLoading((prev) => ({ ...prev, deleteTeam: false }));
+			return;
+		}
+		if (!teamState.createdTeamId) return;
 		try {
+			setLoading((prev) => ({ ...prev, deleteTeam: true }));
 			const res = await fetch(
 				`${process.env.NEXT_PUBLIC_SERVER_URL}/api/events/deleteTeam`,
 				{
@@ -427,6 +471,8 @@ const EventsPage = () => {
 			} else toast.error(json.error || "Failed to delete");
 		} catch {
 			toast.error("Error deleting team");
+		} finally {
+			setLoading((prev) => ({ ...prev, deleteTeam: false }));
 		}
 	};
 
@@ -458,15 +504,17 @@ const EventsPage = () => {
 							type="button"
 							onClick={confirmTeam}
 							className={`${BUTTON_CLASSES.primary} flex-1`}
+							disabled={loading.confirmTeam || !userId}
 						>
-							Confirm Team
+							{loading.confirmTeam ? "Confirming..." : "Confirm Team"}
 						</button>
 						<button
 							type="button"
 							onClick={deleteTeam}
 							className={`${BUTTON_CLASSES.destructive} flex-1`}
+							disabled={loading.deleteTeam || !userId}
 						>
-							Delete Team
+							{loading.deleteTeam ? "Deleting..." : "Delete Team"}
 						</button>
 					</div>
 					<div className="text-xs text-gray-400 mt-2">Members:</div>
@@ -495,7 +543,12 @@ const EventsPage = () => {
 		}
 
 		if (teamState.action === "CREATE") {
-			createTeam();
+			if (!userId) {
+				toast.error("Login to register");
+				setTeamState((prev) => ({ ...prev, action: "NONE" }));
+				return null;
+			}
+			if (!loading.createTeam) createTeam();
 			return (
 				<div className="flex flex-col gap-3 mt-4">
 					<button type="button" className={BUTTON_CLASSES.primary} disabled>
@@ -506,6 +559,10 @@ const EventsPage = () => {
 		}
 		if (teamState.action === "JOIN") {
 			const handleJoin = async () => {
+				if (!userId) {
+					toast.error("Login to register");
+					return;
+				}
 				setJoining(true);
 				await joinTeam();
 				setJoining(false);
@@ -521,15 +578,15 @@ const EventsPage = () => {
 							setTeamState((prev) => ({ ...prev, teamId: e.target.value }))
 						}
 						className={BUTTON_CLASSES.input}
-						disabled={joining}
+						disabled={joining || loading.joinTeam}
 					/>
 					<button
 						type="button"
 						onClick={handleJoin}
 						className={BUTTON_CLASSES.primary}
-						disabled={!teamState.teamId || joining}
+						disabled={!teamState.teamId || joining || loading.joinTeam}
 					>
-						{joining ? "Joining..." : "Join"}
+						{joining || loading.joinTeam ? "Joining..." : "Join"}
 					</button>
 					<button
 						type="button"
@@ -537,7 +594,7 @@ const EventsPage = () => {
 							setTeamState((prev) => ({ ...prev, action: "NONE" }))
 						}
 						className={BUTTON_CLASSES.secondary}
-						disabled={joining}
+						disabled={joining || loading.joinTeam}
 					>
 						Back
 					</button>
@@ -549,19 +606,31 @@ const EventsPage = () => {
 			<div className="flex flex-col gap-3 mt-4">
 				<button
 					type="button"
-					onClick={() =>
-						setTeamState((prev) => ({ ...prev, action: "CREATE" }))
-					}
+					onClick={() => {
+						if (!userId) {
+							toast.error("Login to register");
+							return;
+						}
+						setTeamState((prev) => ({ ...prev, action: "CREATE" }));
+					}}
 					className={BUTTON_CLASSES.primary}
+					disabled={loading.createTeam}
 				>
-					Create Team
+					{loading.createTeam ? "Creating Team..." : "Create Team"}
 				</button>
 				<button
 					type="button"
-					onClick={() => setTeamState((prev) => ({ ...prev, action: "JOIN" }))}
+					onClick={() => {
+						if (!userId) {
+							toast.error("Login to register");
+							return;
+						}
+						setTeamState((prev) => ({ ...prev, action: "JOIN" }));
+					}}
 					className={BUTTON_CLASSES.secondary}
+					disabled={loading.joinTeam}
 				>
-					Join Team
+					{loading.joinTeam ? "Joining..." : "Join Team"}
 				</button>
 			</div>
 		);
@@ -591,7 +660,7 @@ const EventsPage = () => {
 				/>
 			</div>
 			<div className="min-h-screen w-[90%] grid justify-center items-start grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mt-2 md:mt-5 md:px-0">
-				{loading ? (
+				{loading.events ? (
 					<div className="lilita-font w-full text-4xl md:text-6xl font-bold text-flc-yellow text-center col-span-full mt-20 md:mt-40">
 						Loading...
 					</div>
@@ -656,7 +725,7 @@ const EventsPage = () => {
 							</h2>
 							{selectedEvent?.imgSrc && (
 								<div className="flex justify-center">
-									{/** biome-ignore lint/performance/noImgElement: <testong> */}
+									{/* biome-ignore lint/performance/noImgElement: <testong> */}
 									<img
 										ref={imageRef}
 										src={selectedEvent.imgSrc}
@@ -695,39 +764,52 @@ const EventsPage = () => {
 								</div>
 							</div>
 							<div className="flex flex-col gap-3 mt-6">
-								{selectedEvent?.eventType === "SOLO" && teamInitialized && (
+								{loading.events ? (
 									<button
 										type="button"
-										onClick={handleRegister}
-										disabled={
-											teamState.registering ||
-											checkingRegistration ||
-											registered
-										}
-										className={
-											registered
-												? BUTTON_CLASSES.disabled
-												: BUTTON_CLASSES.primary
-										}
+										disabled
+										className={BUTTON_CLASSES.primary}
 									>
-										{checkingRegistration
-											? "Checking..."
-											: teamState.registering
-												? "Processing..."
-												: registered
-													? "Registered"
-													: "Register"}
+										Loading...
 									</button>
+								) : (
+									<>
+										{selectedEvent?.eventType === "SOLO" && teamInitialized && (
+											<button
+												type="button"
+												onClick={handleRegister}
+												disabled={
+													teamState.registering ||
+													loading.checkingRegistration ||
+													registered ||
+													loading.register
+												}
+												className={
+													registered
+														? BUTTON_CLASSES.disabled
+														: BUTTON_CLASSES.primary
+												}
+											>
+												{loading.checkingRegistration
+													? "Checking..."
+													: teamState.registering || loading.register
+														? "Processing..."
+														: registered
+															? "Registered"
+															: "Register"}
+											</button>
+										)}
+										{selectedEvent?.eventType === "TEAM" &&
+											renderTeamRegistration()}
+										<button
+											type="button"
+											onClick={handleCopyLink}
+											className={BUTTON_CLASSES.secondary}
+										>
+											Copy Link
+										</button>
+									</>
 								)}
-								{selectedEvent?.eventType === "TEAM" &&
-									renderTeamRegistration()}
-								<button
-									type="button"
-									onClick={handleCopyLink}
-									className={BUTTON_CLASSES.secondary}
-								>
-									Copy Link
-								</button>
 							</div>
 						</div>
 					</Drawer.Content>
