@@ -1,13 +1,20 @@
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 interface CardProps {
 	image?: string;
 	children: React.ReactNode;
+	className?: string;
 }
 
-export default function Card({ image, children }: CardProps) {
+export default function Card({ image, children, className }: CardProps) {
 	return (
-		<div className="h-[430px] min-w-[20rem] md:min-w-[22rem] mx-auto rounded-3xl p-1.5 shadow-[0_15px_30px_-5px_rgba(151,65,252,0.2)] bg-[linear-gradient(144deg,#FBCFF4,#E4CCF8,#C4E2F7,#FEF9FF)] dark:bg-[linear-gradient(144deg,#7F439D,#33107C,#060329)] transition-transform hover:-translate-y-1 duration-200">
+		<div
+			className={cn(
+				"h-[430px] min-w-[20rem] md:min-w-[22rem] mx-auto rounded-3xl p-1.5 shadow-[0_15px_30px_-5px_rgba(151,65,252,0.2)] bg-[linear-gradient(144deg,#FBCFF4,#E4CCF8,#C4E2F7,#FEF9FF)] dark:bg-[linear-gradient(144deg,#7F439D,#33107C,#060329)] transition-transform hover:-translate-y-1 duration-200",
+				className,
+			)}
+		>
 			<div className="h-full w-full rounded-2xl bg-white/35 dark:bg-white/15 flex flex-col items-center overflow-hidden">
 				{image && (
 					<Image
