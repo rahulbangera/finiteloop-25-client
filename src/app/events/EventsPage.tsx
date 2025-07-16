@@ -127,6 +127,12 @@ const EventsPage = () => {
 						const yearKey = getEventYear(event.fromDate);
 						grouped[yearKey].push(event);
 					}
+					for (const year in grouped) {
+						grouped[year as EventYear].sort(
+							(a, b) =>
+								new Date(b.fromDate).getTime() - new Date(a.fromDate).getTime(),
+						);
+					}
 					setEventsByYear(grouped);
 				}
 			} catch (error) {
