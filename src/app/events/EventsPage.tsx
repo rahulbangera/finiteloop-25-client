@@ -484,6 +484,17 @@ const EventsPage = () => {
 
 	const renderTeamRegistration = () => {
 		if (!teamInitialized) return null;
+
+		if (loading.checkingRegistration) {
+			return (
+				<div className="flex flex-col gap-3 mt-4">
+					<button type="button" className={BUTTON_CLASSES.primary} disabled>
+						Checking...
+					</button>
+				</div>
+			);
+		}
+
 		if (teamState.createdTeamId) {
 			return (
 				<div className="flex flex-col gap-3 mt-4">
