@@ -26,3 +26,10 @@ export const signUpZ = z
 export const sendPasswordResetZ = z.object({
 	email: z.string().email("Please enter a valid email address"),
 });
+
+export const registerZ = z.object({
+	reasonToJoin: z.string().optional(),
+	expectations: z.string().optional(),
+	contribution: z.string().optional(),
+	githubLink: z.string().url("Invalid GitHub URL").optional(),
+});
