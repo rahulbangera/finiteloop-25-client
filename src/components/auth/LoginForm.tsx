@@ -30,7 +30,7 @@ const LoginForm = () => {
 
 		if (res?.ok) {
 			toast.success("Login successful! Redirecting", { autoClose: 1500 });
-			setTimeout(() => router.push("/profile"), 1600);
+			setTimeout(() => router.push("/"), 1600);
 		} else {
 			toast.error(res?.error || "Login failed. Please try again.");
 		}
