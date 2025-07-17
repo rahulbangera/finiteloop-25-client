@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -12,7 +12,26 @@ import type { z } from "zod";
 
 export default function JoinFLCForm() {
 	const router = useRouter();
-	const { data: session, status, update } = useSession();
+	const { data: session, update } = useSession();
+
+	const [registrationOpen, setRegistrationOpen] = useState<boolean | null>(
+		null,
+	);
+
+	useEffect(() => {
+		const checkRegistrationStatus = async () => {
+			try {
+				const res = await fetch(
+					`${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/register/status`,
+				);
+				const data = await res.json();
+				setRegistrationOpen(data.status);
+			} catch {
+				setRegistrationOpen(false);
+			}
+		};
+		checkRegistrationStatus();
+	}, []);
 
 	const {
 		register,
@@ -26,7 +45,7 @@ export default function JoinFLCForm() {
 	const onSubmit = async (data: z.infer<typeof registerZ>) => {
 		try {
 			const res = await fetch(
-				`${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/register`,
+				`${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/register/join-flc`,
 				{
 					method: "POST",
 					headers: {
@@ -53,20 +72,9 @@ export default function JoinFLCForm() {
 		}
 	};
 
-	useEffect(() => {
-		if (status === "authenticated" && session?.user?.role !== "USER") {
-			const timeout = setTimeout(() => {
-				router.push("/");
-			}, 3000);
-			return () => clearTimeout(timeout);
-		}
-	}, [status, session, router]);
-
-	console.log("Session:", session);
-
 	return (
 		<div className="flex items-center justify-center py-20 px-4 z-40 relative min-h-[calc(100vh-80px-150px)]">
-			<div className="w-full max-w-md md:max-w-5xl mx-auto mt-10">
+			<div className="w-full max-w-md md:max-w-4xl mx-auto mt-10">
 				<div className="border border-slate-200 dark:border-white/30 rounded-2xl p-5 md:p-8 bg-white/20 dark:bg-black/30 backdrop-blur-sm shadow-lg">
 					<div className="flex flex-col md:flex-row md:gap-8">
 						<div className="relative flex justify-center items-center mb-6 md:mb-0 md:w-1/2">
@@ -88,7 +96,25 @@ export default function JoinFLCForm() {
 							</div>
 						</div>
 						<div className="flex flex-col justify-center md:w-1/2 w-full">
-							{status === "loading" ? null : session?.user?.role === "USER" ? (
+							{registrationOpen === null ? (
+								<div className="flex flex-col items-center justify-center h-full">
+									<p className="text-2xl text-slate-800 dark:text-white mb-2 text-center">
+										Checking registration status...
+									</p>
+								</div>
+							) : session?.user?.role !== "USER" ? (
+								<div className="flex flex-col items-center justify-center h-full">
+									<p className="text-4xl text-slate-800 dark:text-white mb-2 text-center">
+										You have already registered.
+									</p>
+									<p className="text-xl text-slate-600 dark:text-white/80 text-center mt-5">
+										You are logged in as{" "}
+										<span className="font-bold">
+											{session?.user?.name} {session?.user?.email}
+										</span>
+									</p>
+								</div>
+							) : (
 								<form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
 									<div className="text-center mb-4 md:mb-6">
 										<h2 className="text-slate-800 dark:text-white text-xl md:text-2xl font-medium">
@@ -102,7 +128,7 @@ export default function JoinFLCForm() {
 													Name
 													<input
 														type="text"
-														value="John Doe"
+														value={session?.user?.name || ""}
 														readOnly
 														className="w-full bg-gray-100 dark:bg-slate-800/60 border border-slate-300 dark:border-slate-600 text-slate-800 dark:text-white h-10 rounded-lg px-3 text-sm"
 													/>
@@ -113,7 +139,7 @@ export default function JoinFLCForm() {
 													USN
 													<input
 														type="text"
-														value="1RV21CS001"
+														value={session?.user?.usn || ""}
 														readOnly
 														className="w-full bg-gray-100 dark:bg-slate-800/60 border border-slate-300 dark:border-slate-600 text-slate-800 dark:text-white h-10 rounded-lg px-3 text-sm"
 													/>
@@ -124,7 +150,7 @@ export default function JoinFLCForm() {
 													Phone
 													<input
 														type="text"
-														value="+91 9876543210"
+														value={session?.user?.phone || ""}
 														readOnly
 														className="w-full bg-gray-100 dark:bg-slate-800/60 border border-slate-300 dark:border-slate-600 text-slate-800 dark:text-white h-10 rounded-lg px-3 text-sm"
 													/>
@@ -135,7 +161,7 @@ export default function JoinFLCForm() {
 													Email
 													<input
 														type="email"
-														value="john.doe@example.com"
+														value={session?.user?.email || ""}
 														readOnly
 														className="w-full bg-gray-100 dark:bg-slate-800/60 border border-slate-300 dark:border-slate-600 text-slate-800 dark:text-white h-10 rounded-lg px-3 text-sm"
 													/>
@@ -146,7 +172,7 @@ export default function JoinFLCForm() {
 													Branch
 													<input
 														type="text"
-														value="Computer Science"
+														value={session?.user?.branch || ""}
 														readOnly
 														className="w-full bg-gray-100 dark:bg-slate-800/60 border border-slate-300 dark:border-slate-600 text-slate-800 dark:text-white h-10 rounded-lg px-3 text-sm"
 													/>
@@ -157,7 +183,7 @@ export default function JoinFLCForm() {
 													Year of Graduation
 													<input
 														type="text"
-														value="2025"
+														value={session?.user?.year || ""}
 														readOnly
 														className="w-full bg-gray-100 dark:bg-slate-800/60 border border-slate-300 dark:border-slate-600 text-slate-800 dark:text-white h-10 rounded-lg px-3 text-sm"
 													/>
@@ -224,15 +250,6 @@ export default function JoinFLCForm() {
 										{isSubmitting ? "Submitting..." : "Register"}
 									</button>
 								</form>
-							) : (
-								<div className="flex flex-col items-center justify-center h-full">
-									<p className="text-4xl text-slate-800 dark:text-white mb-2 text-center">
-										You have already registered.
-									</p>
-									<p className="text-xl text-slate-600 dark:text-white/80 text-center">
-										Redirecting to home...
-									</p>
-								</div>
 							)}
 						</div>
 					</div>
