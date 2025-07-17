@@ -395,7 +395,14 @@ const EventsPage = () => {
 					action: "NONE",
 				}));
 				toast.success("Team created successfully!");
-			} else toast.error(json.error || "Failed to create team");
+			} else {
+				toast.error(json.error || "Failed to create team");
+				setTeamState((prev) => ({
+					...prev,
+					action: "NONE",
+				}));
+				return null;
+			}
 		} catch {
 			toast.error("Error creating team");
 		} finally {
@@ -439,7 +446,13 @@ const EventsPage = () => {
 							}))
 						: [{ id: userId, name: session?.user?.name || "You" }],
 				}));
-			} else toast.error(json.error || "Failed to join team");
+			} else {
+				toast.error(json.error || "Failed to join team");
+				setTeamState((prev) => ({
+					...prev,
+					action: "NONE",
+				}));
+			}
 		} catch {
 			toast.error("Error joining team");
 		} finally {
@@ -586,6 +599,7 @@ const EventsPage = () => {
 										teamState.members.length + 1 > selectedEvent.maxTeamSize
 									}
 									onSuccess={async (paymentId) => {
+										console.log("Payment successful:", paymentId);
 										toast.success("Payment successful");
 									}}
 									onFailure={() => {
