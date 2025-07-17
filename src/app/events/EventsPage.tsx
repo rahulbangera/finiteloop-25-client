@@ -1,17 +1,16 @@
 "use client";
+import Card from "@/components/elements/Card";
+import Radio from "@/components/elements/Radio";
+import PaymentButton from "@/components/razorpay/paymentButton";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import gsap from "gsap";
-import * as Dialog from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState, useCallback } from "react";
-import { Drawer } from "vaul";
-import Card from "@/components/elements/Card";
 import { useSession } from "next-auth/react";
-import Radio from "@/components/elements/Radio";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import PaymentButton from "@/components/razorpay/paymentButton";
+import { Drawer } from "vaul";
 
 type EventYear = "2023-24" | "2024-25" | "2025-26";
 type Event = {
@@ -75,7 +74,7 @@ const EventsPage = () => {
 		index: number;
 	}>({ year: "2025-26", index: 2 });
 	const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-	const [payableAmount, setPayableAmount] = useState<number>(0);
+	// const [payableAmount, setPayableAmount] = useState<number>(0);
 	const [showSoloConfirm, setSoloConfirm] = useState(false);
 	const [showTeamDialog, setShowTeamDialog] = useState(false);
 	const [drawerOpen, setDrawerOpen] = useState(false);
