@@ -114,7 +114,7 @@ export default function JoinFLCForm() {
 										</span>
 									</p>
 								</div>
-							) : (
+							) : registrationOpen === true ? (
 								<form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
 									<div className="text-center mb-4 md:mb-6">
 										<h2 className="text-slate-800 dark:text-white text-xl md:text-2xl font-medium">
@@ -250,6 +250,12 @@ export default function JoinFLCForm() {
 										{isSubmitting ? "Submitting..." : "Register"}
 									</button>
 								</form>
+							) : (
+								<div className="flex flex-col items-center justify-center h-full">
+									<p className="text-2xl text-slate-800 dark:text-white mb-2 text-center">
+										Registration is currently closed.
+									</p>
+								</div>
 							)}
 						</div>
 					</div>
