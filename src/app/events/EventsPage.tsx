@@ -592,7 +592,7 @@ const EventsPage = () => {
 								value={teamState.createdTeamId}
 								size={112}
 								bgColor="#F3E8FF"
-								fgColor="#7C3AED"
+								fgColor="#6e11b0"
 								className="w-20 h-20 md:w-28 md:h-28 object-contain rounded-xl"
 							/>
 						</button>
@@ -949,7 +949,21 @@ const EventsPage = () => {
 								</div>
 							</div>
 							<div className="flex flex-col gap-4 mt-6">
-								{loading.events ? (
+								{selectedEvent?.toDate &&
+								new Date(selectedEvent.toDate) < new Date() ? (
+									<div className="w-full rounded-xl border border-gray-400 bg-gray-100 dark:bg-gray-900 dark:border-gray-700 p-4 text-center">
+										<span className="text-gray-800 dark:text-gray-300 font-semibold text-lg md:text-xl">
+											Event has been completed
+										</span>
+									</div>
+								) : selectedEvent?.deadline &&
+									new Date(selectedEvent.deadline) < new Date() ? (
+									<div className="w-full rounded-xl border border-red-500 bg-red-100 dark:bg-red-950 dark:border-red-400 p-4 text-center">
+										<span className="text-red-800 dark:text-red-300 font-semibold text-lg md:text-xl">
+											Registrations are Closed
+										</span>
+									</div>
+								) : loading.events ? (
 									<button
 										type="button"
 										disabled
