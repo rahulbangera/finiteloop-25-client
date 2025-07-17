@@ -7,6 +7,7 @@ import gsap from "gsap";
 import { X } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { QRCodeSVG } from "qrcode.react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -105,7 +106,9 @@ const EventsPage = () => {
 	});
 	const [registered, setRegistered] = useState(false);
 	const [joining, setJoining] = useState(false);
+	const [showQrModal, setShowQrModal] = useState(false);
 	const [teamInitialized, setTeamInitialized] = useState(false);
+	const [teamSize, setTeamSize] = useState("");
 	const imageRef = useRef<HTMLImageElement>(null);
 	const router = useRouter();
 	const searchParams = useSearchParams();
@@ -114,7 +117,7 @@ const EventsPage = () => {
 	const [drawerDirection, setDrawerDirection] = useState<"right" | "bottom">(
 		"right",
 	);
-	// Fetch events
+
 	useEffect(() => {
 		const fetchEvents = async () => {
 			setLoading((prev) => ({ ...prev, events: true }));
@@ -154,13 +157,11 @@ const EventsPage = () => {
 		fetchEvents();
 	}, []);
 
-	// Handle slug in URL
 	useEffect(() => {
 		const slug = searchParams.get("id");
 		if (slug && !initialSlug) setInitialSlug(slug);
 	}, [searchParams, initialSlug]);
 
-	// Open drawer if slug present
 	useEffect(() => {
 		if (!initialSlug || loading.events) return;
 		let found: { event: Event; year: EventYear } | null = null;
@@ -183,7 +184,6 @@ const EventsPage = () => {
 		}
 	}, [initialSlug, eventsByYear, loading.events]);
 
-	// Remove slug from URL when drawer closes
 	useEffect(() => {
 		if (!drawerOpen) {
 			const params = new URLSearchParams(window.location.search);
@@ -216,7 +216,6 @@ const EventsPage = () => {
 		return () => window.removeEventListener("resize", checkMobile);
 	}, []);
 
-	// Animate image on drawer open
 	useEffect(() => {
 		if (drawerOpen && imageRef.current) {
 			gsap.fromTo(
@@ -227,7 +226,6 @@ const EventsPage = () => {
 		}
 	}, [drawerOpen]);
 
-	// Check registration/team
 	useEffect(() => {
 		if (!selectedEvent || !userId) {
 			setTeamInitialized(true);
@@ -301,6 +299,16 @@ const EventsPage = () => {
 
 		checkRegistration();
 	}, [selectedEvent, userId]);
+
+	useEffect(() => {
+		if (selectedEvent) {
+			const size =
+				selectedEvent.eventType === "SOLO"
+					? "SOLO"
+					: `${selectedEvent.minTeamSize} - ${selectedEvent.maxTeamSize}  `;
+			setTeamSize(size);
+		}
+	}, [selectedEvent]);
 
 	const handleToggleChange = (e: React.ChangeEvent<HTMLDivElement>) => {
 		const id = (e.target as HTMLElement).id;
@@ -538,35 +546,84 @@ const EventsPage = () => {
 		if (teamState.createdTeamId) {
 			return (
 				<div className="flex flex-col gap-3 mt-4">
-					<div className="flex items-center gap-2">
-						<span className="font-semibold text-purple-900 dark:text-purple-100">
-							Team Name:
-						</span>
-						<span className="text-purple-700 dark:text-purple-200">
-							{teamState.teamName}
-						</span>
-					</div>
-					<div className="flex items-center gap-2">
-						<span className="font-semibold text-purple-900 dark:text-purple-100">
-							Team ID:
-						</span>
-						<span className="text-purple-700 dark:text-purple-200">
-							{teamState.createdTeamId}
-						</span>
+					<div className="flex flex-col md:flex-row items-start md:items-center gap-4 w-full">
+						<div className="flex flex-col gap-3 flex-1">
+							<div className="flex items-center gap-2">
+								<span className="font-semibold text-purple-900 dark:text-purple-100 text-lg md:text-xl">
+									Team Name:
+								</span>
+								<span className="px-2 py-1 rounded-lg bg-purple-100 dark:bg-indigo-900 text-purple-700 dark:text-purple-200 text-lg md:text-xl break-all font-mono shadow">
+									{teamState.teamName}
+								</span>
+							</div>
+							<div className="flex items-center gap-2">
+								<span className="font-semibold text-purple-900 dark:text-purple-100 text-lg md:text-xl">
+									Team ID:
+								</span>
+								<span className="px-2 py-1 rounded-lg bg-purple-100 dark:bg-indigo-900 text-purple-700 dark:text-purple-200 text-lg md:text-xl break-all font-mono shadow">
+									{teamState.createdTeamId}
+								</span>
+								<button
+									type="button"
+									onClick={() => {
+										navigator.clipboard.writeText(teamState.createdTeamId);
+										toast.success("Copied Team ID");
+									}}
+									className={`${BUTTON_CLASSES.secondary} px-2 py-1 text-xs rounded-lg border border-purple-300 dark:border-indigo-700 hover:bg-purple-200 dark:hover:bg-indigo-800 transition`}
+									title="Copy Team ID"
+								>
+									Copy
+								</button>
+							</div>
+						</div>
 						<button
 							type="button"
-							onClick={() => {
-								navigator.clipboard.writeText(teamState.createdTeamId);
-								toast.success("Copied Team ID");
+							className="flex-shrink-0 flex items-center justify-center w-24 h-24 md:w-32 md:h-32 bg-purple-100 dark:bg-indigo-900 rounded-xl border border-purple-300 dark:border-indigo-700 cursor-pointer"
+							onClick={() => setShowQrModal(true)}
+							onKeyDown={(e) => {
+								if (e.key === "Enter" || e.key === " ") {
+									setShowQrModal(true);
+								}
 							}}
-							className={`${BUTTON_CLASSES.secondary} px-2 py-1 text-xs`}
+							aria-label="Show QR Code"
+							tabIndex={0}
 						>
-							Copy
+							<QRCodeSVG
+								value={teamState.createdTeamId}
+								size={112}
+								bgColor="#F3E8FF"
+								fgColor="#7C3AED"
+								className="w-20 h-20 md:w-28 md:h-28 object-contain rounded-xl"
+							/>
 						</button>
+						{showQrModal && (
+							<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+								<div className="relative bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-xl flex flex-col items-center">
+									<button
+										type="button"
+										onClick={() => setShowQrModal(false)}
+										className="absolute top-2 right-2 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+										aria-label="Close"
+									>
+										<X className="h-6 w-6" />
+									</button>
+									<QRCodeSVG
+										value={teamState.createdTeamId}
+										size={256}
+										bgColor="#F3E8FF"
+										fgColor="#7C3AED"
+										className="w-64 h-64 object-contain p-3"
+									/>
+									<div className="mt-2 text-center text-purple-900 dark:text-purple-100 break-all font-mono">
+										{teamState.createdTeamId}
+									</div>
+								</div>
+							</div>
+						)}
 					</div>
 					{teamState.isConfirmed ? (
 						<div className="w-full rounded-xl border border-green-500 bg-green-100 dark:bg-green-950 dark:border-green-400 p-4 text-center">
-							<span className="text-green-800 dark:text-green-300 font-semibold text-sm md:text-base">
+							<span className="text-green-800 dark:text-green-300 font-semibold text-lg md:text-xl">
 								Team has been confirmed!
 							</span>
 						</div>
@@ -575,14 +632,6 @@ const EventsPage = () => {
 							{selectedEvent &&
 							(selectedEvent?.flcAmount > 0 ||
 								selectedEvent?.nonFlcAmount > 0) ? (
-								// <button
-								// 	type="button"
-								// 	onClick={confirmTeam}
-								// 	className={`${BUTTON_CLASSES.primary} flex-1`}
-								// 	disabled={loading.confirmTeam || !userId}
-								// >
-								// 	{loading.confirmTeam ? "Confirming..." : "Confirm Team"}
-								// </button>
 								<PaymentButton
 									paymentType="EVENT"
 									title="Pay to Confirm Team"
@@ -625,12 +674,16 @@ const EventsPage = () => {
 							</button>
 						</div>
 					) : (
-						<div className="text-sm text-gray-500">
+						<div className="text-base md:text-lg text-purple-800 dark:text-purple-200">
 							Only the team leader can confirm the team.
 						</div>
 					)}
-					<div className="text-xs text-gray-400 mt-2">Members:</div>
-					<ul className="text-sm list-disc pl-4">
+					<div className="flex items-center gap-4 mt-2">
+						<div className="text-base md:text-lg text-purple-800 dark:text-purple-200 font-semibold">
+							Members:
+						</div>
+					</div>
+					<ul className="text-lg md:text-xl list-disc pl-4 text-purple-900 dark:text-purple-100">
 						{teamState.members.length === 0 ? (
 							<li>You</li>
 						) : (
@@ -815,10 +868,10 @@ const EventsPage = () => {
 							fixed
 							${
 								drawerDirection === "right"
-									? "top-0 right-0 h-full w-full sm:w-[420px] md:w-[500px] max-w-full rounded-l-3xl border-l border-purple-200 dark:border-indigo-800"
-									: "bottom-0 left-0 w-full h-[90vh] rounded-t-3xl border-t border-purple-200 dark:border-indigo-800"
+									? "top-0 right-0 h-full w-full sm:w-[420px] md:w-[550px] max-w-full rounded-l-3xl border-l border-purple-200 dark:border-indigo-800"
+									: "bottom-0 left-0 w-full h-[80vh] rounded-t-3xl border-t border-purple-200 dark:border-indigo-800"
 							}
-							bg-gradient-to-l from-white via-purple-50 to-purple-100 dark:from-gray-900 dark:via-indigo-950 dark:to-indigo-900
+							bg-[radial-gradient(at_top_right,_#FBCFF4,_#E4CCF8,_#C4E2F7,_#FEF9FF)] dark:bg-[radial-gradient(at_top_right,_#7F439D,_#33107C,_#060329)]
 							shadow-2xl z-50 flex flex-col transition-transform overflow-hidden
 						`}
 						style={{ maxHeight: "100vh" }}
@@ -827,59 +880,75 @@ const EventsPage = () => {
 							<VisuallyHidden>{selectedEvent?.name}</VisuallyHidden>
 						</Drawer.Title>
 						<div
-							className={`flex flex-col gap-4 px-4 pb-6 overflow-y-auto flex-1 ${drawerDirection === "bottom" ? "pt-2" : "pt-8"}`}
+							className={`flex flex-col gap-6 px-4 pb-8 overflow-y-auto flex-1 ${drawerDirection === "bottom" ? "pt-2" : "pt-8"}`}
 						>
-							<h2 className="text-2xl font-bold text-purple-900 dark:text-purple-100 break-words">
+							<h2 className="lilita-font text-3xl md:text-4xl font-bold text-purple-900 dark:text-purple-100 break-words text-center">
 								{selectedEvent?.name}
 							</h2>
 							{selectedEvent?.imgSrc && (
 								<div className="flex justify-center">
-									{/* biome-ignore lint/performance/noImgElement: <testong> */}
+									{/** biome-ignore lint/performance/noImgElement: <testing> */}
 									<img
 										ref={imageRef}
 										src={selectedEvent.imgSrc}
 										alt={selectedEvent.name}
-										className="rounded-xl h-36 md:h-44 object-cover w-3/4 md:w-2/3 border border-purple-100 dark:border-indigo-800 shadow"
+										className="rounded-xl h-40 md:h-52 object-cover w-3/4 md:w-2/3 border border-purple-100 dark:border-indigo-800 shadow"
 									/>
 								</div>
 							)}
-							<p className="text-gray-700 dark:text-gray-300 text-sm md:text-base whitespace-pre-line break-words">
+							<p className="comic-font text-purple-900 dark:text-purple-100 text-md md:text-lg whitespace-pre-line break-words leading-relaxed">
 								{selectedEvent?.description}
 							</p>
-							<div className="grid grid-cols-2 gap-2 text-xs md:text-sm mt-2">
-								<div>
-									<span className="font-semibold text-purple-800 dark:text-purple-200">
-										Venue:
-									</span>{" "}
-									{selectedEvent?.venue}
-								</div>
-								<div>
-									<span className="font-semibold text-purple-800 dark:text-purple-200">
-										Format:
-									</span>{" "}
-									{selectedEvent?.eventType}
-								</div>
-								<div>
-									<span className="font-semibold text-purple-800 dark:text-purple-200">
-										Team Size:
-									</span>{" "}
-									{selectedEvent?.maxTeamSize}
-								</div>
-								<div>
-									<span className="font-semibold text-purple-800 dark:text-purple-200">
-										Entry Fee:
-									</span>{" "}
-									{selectedEvent?.flcAmount === 0 ? (
-										"Free"
-									) : (
-										<>
-											{selectedEvent?.flcAmount}rs (Member) /{" "}
-											{selectedEvent?.nonFlcAmount}rs
-										</>
-									)}
+							<div className="w-full mt-2">
+								<div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-4 text-base md:text-lg justify-center items-center">
+									{[
+										{
+											label: "Venue",
+											value: selectedEvent?.venue || "TBA",
+										},
+										{
+											label: "Format",
+											value: selectedEvent?.eventType,
+										},
+										{
+											label: "Team Size",
+											value: teamSize,
+										},
+										{
+											label: "Entry Fee",
+											value: selectedEvent?.isMembersOnly ? (
+												selectedEvent?.flcAmount === 0 ? (
+													"Free"
+												) : (
+													`Member: ${selectedEvent?.flcAmount}`
+												)
+											) : selectedEvent?.flcAmount === 0 &&
+												selectedEvent?.nonFlcAmount === 0 ? (
+												"Free"
+											) : (
+												<div className="flex flex-col text-center">
+													Member: {selectedEvent?.flcAmount}
+													<br />
+													Non Member: {selectedEvent?.nonFlcAmount}
+												</div>
+											),
+										},
+									].map((item) => (
+										<div
+											key={item.label}
+											className="rounded-xl p-2 flex flex-col items-center justify-center w-full h-full bg-white dark:bg-gradient-to-r dark:from-purple-600 dark:to-indigo-600"
+										>
+											<span className="font-bold text-purple-900 dark:text-purple-100 truncate">
+												{item.label}
+											</span>
+											<span className="font-normal text-purple-900 dark:text-purple-100 truncate flex">
+												{item.value}
+											</span>
+										</div>
+									))}
 								</div>
 							</div>
-							<div className="flex flex-col gap-3 mt-6">
+							<div className="flex flex-col gap-4 mt-6">
 								{loading.events ? (
 									<button
 										type="button"
