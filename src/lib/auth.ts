@@ -7,6 +7,11 @@ export interface AppUser {
 	email: string;
 	role: string;
 	phone: string;
+	usn: string;
+	branch: string;
+	year: string;
+	bio: string;
+	image?: string;
 	accessToken?: string;
 	refreshToken?: string;
 	accessTokenExpiry?: number;
@@ -144,6 +149,11 @@ export const authOptions: NextAuthOptions = {
 				email: token.email ?? "",
 				role: token.role ?? "",
 				phone: token.phone ?? "",
+				usn: token.usn ?? "",
+				branch: token.branch ?? "",
+				year: token.year ?? "",
+				bio: token.bio ?? "",
+				image: token.image ?? "",
 				accessToken: token.accessToken,
 				refreshToken: token.refreshToken,
 				accessTokenExpiry: token.accessTokenExpiry,

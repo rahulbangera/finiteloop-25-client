@@ -76,6 +76,8 @@ const EventsPage = () => {
 	}>({ year: "2025-26", index: 2 });
 	const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 	const [payableAmount, setPayableAmount] = useState<number>(0);
+	const [showSoloConfirm, setSoloConfirm] = useState(false);
+	const [showTeamDialog, setShowTeamDialog] = useState(false);
 	const [drawerOpen, setDrawerOpen] = useState(false);
 	const [initialSlug, setInitialSlug] = useState<string | null>(null);
 	const [eventsByYear, setEventsByYear] = useState<EventsByYear>({
@@ -701,71 +703,17 @@ const EventsPage = () => {
 
 		return (
 			<div className="flex flex-col gap-3 mt-4">
-				<Dialog.Root>
-					<Dialog.Trigger asChild>
-						<button
-							type="button"
-							className={BUTTON_CLASSES.primary}
-							disabled={loading.createTeam}
-						>
-							{loading.createTeam ? "Creating Team..." : "Create Team"}
-						</button>
-					</Dialog.Trigger>
-					<Dialog.Portal>
-						<Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" />
-						<Dialog.Content
-							className="
-						fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-						bg-white dark:bg-gray-900 border border-purple-200 dark:border-indigo-700
-						rounded-xl p-6 w-[90vw] max-w-md shadow-2xl z-50
-					"
-						>
-							<div className="flex justify-between items-center mb-4">
-								<Dialog.Title className="text-xl font-bold text-purple-900 dark:text-purple-100">
-									Create a Team
-								</Dialog.Title>
-								<Dialog.Close asChild>
-									<button
-										type="button"
-										className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
-									>
-										<X className="h-5 w-5" />
-									</button>
-								</Dialog.Close>
-							</div>
-							<div className="flex flex-col gap-4">
-								<label className="text-sm text-gray-700 dark:text-gray-300">
-									Team Name
-									<input
-										type="text"
-										value={teamState.teamName}
-										onChange={(e) => {
-											setTeamState((prev) => ({
-												...prev,
-												teamName: e.target.value,
-											}));
-										}}
-										className="mt-1 w-full p-2 rounded-md bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-black dark:text-white"
-										placeholder="Enter your team name"
-									/>
-								</label>
-								<button
-									type="button"
-									className="mt-4 bg-purple-700 dark:bg-purple-400 text-white dark:text-black font-semibold py-2 px-4 rounded-lg hover:scale-105 transition"
-									onClick={() => {
-										if (!userId) {
-											toast.error("Login to register");
-											return;
-										}
-										setTeamState((prev) => ({ ...prev, action: "CREATE" }));
-									}}
-								>
-									Create
-								</button>
-							</div>
-						</Dialog.Content>
-					</Dialog.Portal>
-				</Dialog.Root>
+				<button
+					type="button"
+					className={BUTTON_CLASSES.primary}
+					onClick={() => {
+						setShowTeamDialog(true);
+					}}
+					disabled={loading.createTeam}
+				>
+					{loading.createTeam ? "Creating Team..." : "Create Team"}
+				</button>
+
 				<button
 					type="button"
 					onClick={() => {
@@ -932,7 +880,7 @@ const EventsPage = () => {
 										{selectedEvent?.eventType === "SOLO" && teamInitialized && (
 											<button
 												type="button"
-												onClick={handleRegister}
+												onClick={() => setSoloConfirm(true)}
 												disabled={
 													teamState.registering ||
 													loading.checkingRegistration ||
@@ -964,6 +912,91 @@ const EventsPage = () => {
 											Copy Link
 										</button>
 									</>
+								)}
+								{showTeamDialog && (
+									<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs">
+										<div className="bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-xl max-w-md w-[90%]">
+											<div className="flex justify-between items-center mb-4">
+												<h2 className="text-lg font-bold text-zinc-800 dark:text-zinc-100">
+													Create a Team
+												</h2>
+												<button
+													type="button"
+													onClick={() => setShowTeamDialog(false)}
+													className="text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+												>
+													<X className="h-5 w-5" />
+												</button>
+											</div>
+
+											<div className="flex flex-col gap-4">
+												<label className="text-sm text-zinc-700 dark:text-zinc-300">
+													Team Name
+													<input
+														type="text"
+														value={teamState.teamName}
+														onChange={(e) =>
+															setTeamState((prev) => ({
+																...prev,
+																teamName: e.target.value,
+															}))
+														}
+														className="mt-1 w-full p-2 rounded-md bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 text-black dark:text-white"
+														placeholder="Enter your team name"
+													/>
+												</label>
+
+												<button
+													type="button"
+													onClick={() => {
+														if (!userId) {
+															toast.error("Login to register");
+															return;
+														}
+														setTeamState((prev) => ({
+															...prev,
+															action: "CREATE",
+														}));
+														setShowTeamDialog(false);
+													}}
+													className="mt-2 px-4 py-2 rounded-lg bg-purple-700 dark:bg-purple-400 text-white dark:text-black font-medium hover:scale-105 transition"
+												>
+													Create
+												</button>
+											</div>
+										</div>
+									</div>
+								)}
+								{showSoloConfirm && (
+									<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs">
+										<div className="bg-white dark:bg-zinc-900 p-6 md:p-7 rounded-xl shadow-xl max-w-sm w-full">
+											<h3 className="text-lg font-semibold mb-4 text-center text-zinc-800 dark:text-zinc-100">
+												Confirm Registration
+											</h3>
+											<p className="text-sm text-center mb-6 text-zinc-600 dark:text-zinc-300">
+												Are you sure you want to register for this event?
+											</p>
+											<div className="flex justify-center gap-3">
+												<button
+													type="button"
+													onClick={() => {
+														handleRegister();
+														setSoloConfirm(false);
+													}}
+													className={BUTTON_CLASSES.primary}
+												>
+													Yes, Register
+												</button>
+												<button
+													type="button"
+													onClick={() => setSoloConfirm(false)}
+													className={BUTTON_CLASSES.secondary}
+												>
+													Cancel
+												</button>
+											</div>
+										</div>
+									</div>
 								)}
 							</div>
 						</div>
