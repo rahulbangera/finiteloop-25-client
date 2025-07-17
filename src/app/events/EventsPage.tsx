@@ -1,6 +1,8 @@
 "use client";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import gsap from "gsap";
+import * as Dialog from "@radix-ui/react-dialog";
+import { X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Drawer } from "vaul";
@@ -9,6 +11,7 @@ import { useSession } from "next-auth/react";
 import Radio from "@/components/elements/Radio";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import PaymentButton from "@/components/razorpay/paymentButton";
 
 type EventYear = "2023-24" | "2024-25" | "2025-26";
 type Event = {
@@ -37,7 +40,10 @@ type Event = {
 type EventsByYear = Record<EventYear, Event[]>;
 type TeamState = {
 	registering: boolean;
+	isConfirmed: boolean;
+	isLeader: boolean;
 	action: "NONE" | "CREATE" | "JOIN";
+	teamName: string;
 	teamId: string;
 	createdTeamId: string;
 	members: { id: string; name: string }[];
@@ -69,6 +75,7 @@ const EventsPage = () => {
 		index: number;
 	}>({ year: "2025-26", index: 2 });
 	const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+	const [payableAmount, setPayableAmount] = useState<number>(0);
 	const [drawerOpen, setDrawerOpen] = useState(false);
 	const [initialSlug, setInitialSlug] = useState<string | null>(null);
 	const [eventsByYear, setEventsByYear] = useState<EventsByYear>({
@@ -86,9 +93,12 @@ const EventsPage = () => {
 		joinTeam: false,
 	});
 	const [teamState, setTeamState] = useState<TeamState>({
+		teamName: "",
 		registering: false,
 		action: "NONE",
+		isLeader: false,
 		teamId: "",
+		isConfirmed: false,
 		createdTeamId: "",
 		members: [],
 	});
@@ -103,7 +113,6 @@ const EventsPage = () => {
 	const [drawerDirection, setDrawerDirection] = useState<"right" | "bottom">(
 		"right",
 	);
-
 	// Fetch events
 	useEffect(() => {
 		const fetchEvents = async () => {
@@ -183,8 +192,11 @@ const EventsPage = () => {
 			setSelectedEvent(null);
 			setRegistered(false);
 			setTeamState({
+				teamName: "",
+				isConfirmed: false,
 				registering: false,
 				action: "NONE",
+				isLeader: false,
 				teamId: "",
 				createdTeamId: "",
 				members: [],
@@ -257,6 +269,9 @@ const EventsPage = () => {
 
 						setTeamState((prev) => ({
 							...prev,
+							isConfirmed: json.data.isConfirmed || false,
+							teamName: json.data.teamName || "",
+							isLeader: json.data.isLeader || false,
 							registering: true,
 							createdTeamId: json.data.teamId,
 							members,
@@ -265,6 +280,9 @@ const EventsPage = () => {
 					} else {
 						setTeamState((prev) => ({
 							...prev,
+							teamName: "",
+							isConfirmed: false,
+							isLeader: false,
 							registering: true,
 							createdTeamId: "",
 							members: [],
@@ -354,7 +372,11 @@ const EventsPage = () => {
 				{
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ userId, eventId: selectedEvent.id }),
+					body: JSON.stringify({
+						userId,
+						eventId: selectedEvent.id,
+						teamName: teamState.teamName,
+					}),
 				},
 			);
 			const json = await res.json();
@@ -377,7 +399,7 @@ const EventsPage = () => {
 		} finally {
 			setLoading((prev) => ({ ...prev, createTeam: false }));
 		}
-	}, [selectedEvent, userId, session]);
+	}, [selectedEvent, userId, session, teamState.teamName]);
 
 	const joinTeam = useCallback(async () => {
 		if (!selectedEvent) return;
@@ -394,7 +416,11 @@ const EventsPage = () => {
 				{
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ userId, teamId: teamState.teamId }),
+					body: JSON.stringify({
+						userId,
+						teamId: teamState.teamId,
+						eventId: selectedEvent.id,
+					}),
 				},
 			);
 			const json = await res.json();
@@ -500,6 +526,14 @@ const EventsPage = () => {
 				<div className="flex flex-col gap-3 mt-4">
 					<div className="flex items-center gap-2">
 						<span className="font-semibold text-purple-900 dark:text-purple-100">
+							Team Name:
+						</span>
+						<span className="text-purple-700 dark:text-purple-200">
+							{teamState.teamName}
+						</span>
+					</div>
+					<div className="flex items-center gap-2">
+						<span className="font-semibold text-purple-900 dark:text-purple-100">
 							Team ID:
 						</span>
 						<span className="text-purple-700 dark:text-purple-200">
@@ -516,24 +550,70 @@ const EventsPage = () => {
 							Copy
 						</button>
 					</div>
-					<div className="flex gap-2">
-						<button
-							type="button"
-							onClick={confirmTeam}
-							className={`${BUTTON_CLASSES.primary} flex-1`}
-							disabled={loading.confirmTeam || !userId}
-						>
-							{loading.confirmTeam ? "Confirming..." : "Confirm Team"}
-						</button>
-						<button
-							type="button"
-							onClick={deleteTeam}
-							className={`${BUTTON_CLASSES.destructive} flex-1`}
-							disabled={loading.deleteTeam || !userId}
-						>
-							{loading.deleteTeam ? "Deleting..." : "Delete Team"}
-						</button>
-					</div>
+					{teamState.isConfirmed ? (
+						<div className="w-full rounded-xl border border-green-500 bg-green-100 dark:bg-green-950 dark:border-green-400 p-4 text-center">
+							<span className="text-green-800 dark:text-green-300 font-semibold text-sm md:text-base">
+								Team has been confirmed!
+							</span>
+						</div>
+					) : teamState.isLeader ? (
+						<div className="flex gap-2">
+							{selectedEvent &&
+							(selectedEvent?.flcAmount > 0 ||
+								selectedEvent?.nonFlcAmount > 0) ? (
+								// <button
+								// 	type="button"
+								// 	onClick={confirmTeam}
+								// 	className={`${BUTTON_CLASSES.primary} flex-1`}
+								// 	disabled={loading.confirmTeam || !userId}
+								// >
+								// 	{loading.confirmTeam ? "Confirming..." : "Confirm Team"}
+								// </button>
+								<PaymentButton
+									paymentType="EVENT"
+									title="Pay to Confirm Team"
+									amountInINR={400}
+									description={selectedEvent.name}
+									teamId={teamState.createdTeamId}
+									disabled={
+										loading.confirmTeam ||
+										!userId ||
+										teamState.isConfirmed ||
+										!selectedEvent ||
+										teamState.members.length + 1 < selectedEvent.minTeamSize ||
+										teamState.members.length + 1 > selectedEvent.maxTeamSize
+									}
+									onSuccess={async (paymentId) => {
+										toast.success("Payment successful");
+									}}
+									onFailure={() => {
+										toast.error("Payment failed");
+									}}
+								/>
+							) : (
+								<button
+									type="button"
+									onClick={confirmTeam}
+									className={`${BUTTON_CLASSES.primary} flex-1`}
+									disabled={loading.confirmTeam || !userId}
+								>
+									{loading.confirmTeam ? "Confirming..." : "Confirm Team"}
+								</button>
+							)}
+							<button
+								type="button"
+								onClick={deleteTeam}
+								className={`${BUTTON_CLASSES.destructive} flex-1`}
+								disabled={loading.deleteTeam || !userId}
+							>
+								{loading.deleteTeam ? "Deleting..." : "Delete Team"}
+							</button>
+						</div>
+					) : (
+						<div className="text-sm text-gray-500">
+							Only the team leader can confirm the team.
+						</div>
+					)}
 					<div className="text-xs text-gray-400 mt-2">Members:</div>
 					<ul className="text-sm list-disc pl-4">
 						{teamState.members.length === 0 ? (
@@ -621,20 +701,71 @@ const EventsPage = () => {
 
 		return (
 			<div className="flex flex-col gap-3 mt-4">
-				<button
-					type="button"
-					onClick={() => {
-						if (!userId) {
-							toast.error("Login to register");
-							return;
-						}
-						setTeamState((prev) => ({ ...prev, action: "CREATE" }));
-					}}
-					className={BUTTON_CLASSES.primary}
-					disabled={loading.createTeam}
-				>
-					{loading.createTeam ? "Creating Team..." : "Create Team"}
-				</button>
+				<Dialog.Root>
+					<Dialog.Trigger asChild>
+						<button
+							type="button"
+							className={BUTTON_CLASSES.primary}
+							disabled={loading.createTeam}
+						>
+							{loading.createTeam ? "Creating Team..." : "Create Team"}
+						</button>
+					</Dialog.Trigger>
+					<Dialog.Portal>
+						<Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" />
+						<Dialog.Content
+							className="
+						fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+						bg-white dark:bg-gray-900 border border-purple-200 dark:border-indigo-700
+						rounded-xl p-6 w-[90vw] max-w-md shadow-2xl z-50
+					"
+						>
+							<div className="flex justify-between items-center mb-4">
+								<Dialog.Title className="text-xl font-bold text-purple-900 dark:text-purple-100">
+									Create a Team
+								</Dialog.Title>
+								<Dialog.Close asChild>
+									<button
+										type="button"
+										className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+									>
+										<X className="h-5 w-5" />
+									</button>
+								</Dialog.Close>
+							</div>
+							<div className="flex flex-col gap-4">
+								<label className="text-sm text-gray-700 dark:text-gray-300">
+									Team Name
+									<input
+										type="text"
+										value={teamState.teamName}
+										onChange={(e) => {
+											setTeamState((prev) => ({
+												...prev,
+												teamName: e.target.value,
+											}));
+										}}
+										className="mt-1 w-full p-2 rounded-md bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-black dark:text-white"
+										placeholder="Enter your team name"
+									/>
+								</label>
+								<button
+									type="button"
+									className="mt-4 bg-purple-700 dark:bg-purple-400 text-white dark:text-black font-semibold py-2 px-4 rounded-lg hover:scale-105 transition"
+									onClick={() => {
+										if (!userId) {
+											toast.error("Login to register");
+											return;
+										}
+										setTeamState((prev) => ({ ...prev, action: "CREATE" }));
+									}}
+								>
+									Create
+								</button>
+							</div>
+						</Dialog.Content>
+					</Dialog.Portal>
+				</Dialog.Root>
 				<button
 					type="button"
 					onClick={() => {
@@ -777,7 +908,14 @@ const EventsPage = () => {
 									<span className="font-semibold text-purple-800 dark:text-purple-200">
 										Entry Fee:
 									</span>{" "}
-									{selectedEvent?.flcAmount}
+									{selectedEvent?.flcAmount === 0 ? (
+										"Free"
+									) : (
+										<>
+											{selectedEvent?.flcAmount}rs (Member) /{" "}
+											{selectedEvent?.nonFlcAmount}rs
+										</>
+									)}
 								</div>
 							</div>
 							<div className="flex flex-col gap-3 mt-6">
