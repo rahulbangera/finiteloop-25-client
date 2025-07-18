@@ -49,14 +49,28 @@ export default function NavBar() {
 	const handleSignOut = async () => {
 		if (!session?.user?.id) return;
 
-		await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/signout`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({ userId: session.user.id }),
-			credentials: "include",
-		});
+		try {
+			const res = await fetch(
+				`${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/revoke`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ userId: session?.user.id }),
+				},
+			);
+
+			if (!res.ok) {
+				throw new Error("Failed to revoke refresh tokens");
+			}
+
+			toast.success("Signed out successfully!");
+			await signOut({ callbackUrl: "/auth/login" });
+		} catch (err) {
+			console.error("Sign out failed:", err);
+			toast.error("Error signing out");
+		}
 
 		signOut();
 		toast.success("Logged out successfully!", { autoClose: 1500 });
