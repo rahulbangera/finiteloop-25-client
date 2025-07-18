@@ -12,6 +12,8 @@ export interface AppUser {
 	year: string;
 	bio: string;
 	image?: string;
+	activityPoints?: string;
+	attendance?: string;
 	accessToken?: string;
 	refreshToken?: string;
 	accessTokenExpiry?: number;
@@ -154,6 +156,8 @@ export const authOptions: NextAuthOptions = {
 				year: token.year ?? "",
 				bio: token.bio ?? "",
 				image: token.image ?? "",
+				activityPoints: token.activityPoints ?? "",
+				attendance: token.attendance ?? "",
 				accessToken: token.accessToken,
 				refreshToken: token.refreshToken,
 				accessTokenExpiry: token.accessTokenExpiry,
