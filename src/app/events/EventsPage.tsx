@@ -75,7 +75,6 @@ const EventsPage = () => {
 		index: number;
 	}>({ year: "2025-26", index: 2 });
 	const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-	// const [payableAmount, setPayableAmount] = useState<number>(0);
 	const [showSoloConfirm, setSoloConfirm] = useState(false);
 	const [showTeamDialog, setShowTeamDialog] = useState(false);
 	const [drawerOpen, setDrawerOpen] = useState(false);
@@ -93,6 +92,7 @@ const EventsPage = () => {
 		confirmTeam: false,
 		deleteTeam: false,
 		joinTeam: false,
+		checkAvailable: false,
 	});
 	const [teamState, setTeamState] = useState<TeamState>({
 		teamName: "",
@@ -117,6 +117,8 @@ const EventsPage = () => {
 	const [drawerDirection, setDrawerDirection] = useState<"right" | "bottom">(
 		"right",
 	);
+
+	const [available, setAvailable] = useState<null | boolean>(null);
 
 	useEffect(() => {
 		const fetchEvents = async () => {
@@ -203,6 +205,7 @@ const EventsPage = () => {
 				members: [],
 			});
 			setTeamInitialized(false);
+			setAvailable(null);
 		}
 	}, [drawerOpen]);
 
@@ -226,8 +229,41 @@ const EventsPage = () => {
 		}
 	}, [drawerOpen]);
 
+	// Check available before showing registration UI
 	useEffect(() => {
-		if (!selectedEvent || !userId) {
+		const checkAvailable = async () => {
+			if (!selectedEvent) return;
+			setLoading((prev) => ({ ...prev, checkAvailable: true }));
+			try {
+				const res = await fetch(
+					`${process.env.NEXT_PUBLIC_SERVER_URL}/api/events/check-available`,
+					{
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({ eventId: selectedEvent.id }),
+					},
+				);
+				const json = await res.json();
+				if (res.ok && typeof json.available === "boolean") {
+					setAvailable(json.available);
+				} else {
+					setAvailable(null);
+				}
+			} catch (err) {
+				console.error("Error checking availability:", err);
+				setAvailable(null);
+			} finally {
+				setLoading((prev) => ({ ...prev, checkAvailable: false }));
+			}
+		};
+		if (selectedEvent) {
+			setAvailable(null);
+			checkAvailable();
+		}
+	}, [selectedEvent]);
+
+	useEffect(() => {
+		if (!selectedEvent || !userId || available !== true) {
 			setTeamInitialized(true);
 			return;
 		}
@@ -298,7 +334,7 @@ const EventsPage = () => {
 		};
 
 		checkRegistration();
-	}, [selectedEvent, userId]);
+	}, [selectedEvent, userId, available]);
 
 	useEffect(() => {
 		if (selectedEvent) {
@@ -963,15 +999,21 @@ const EventsPage = () => {
 											Registrations are Closed
 										</span>
 									</div>
-								) : loading.events ? (
+								) : loading.checkAvailable ? (
 									<button
 										type="button"
 										disabled
 										className={BUTTON_CLASSES.primary}
 									>
-										Loading...
+										Checking availability...
 									</button>
-								) : (
+								) : available === false && !registered ? (
+									<div className="w-full rounded-xl border border-yellow-400 bg-yellow-100 dark:bg-yellow-950 dark:border-yellow-500 p-4 text-center">
+										<span className="text-yellow-900 dark:text-yellow-200 font-semibold text-lg md:text-xl">
+											Registrations are Full
+										</span>
+									</div>
+								) : available === true ? (
 									<>
 										{selectedEvent?.eventType === "SOLO" && teamInitialized && (
 											<button
@@ -1008,7 +1050,7 @@ const EventsPage = () => {
 											Copy Link
 										</button>
 									</>
-								)}
+								) : null}
 								{showTeamDialog && (
 									<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs">
 										<div className="bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-xl max-w-md w-[90%]">
