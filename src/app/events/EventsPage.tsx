@@ -402,6 +402,10 @@ const EventsPage = () => {
 				if (json.success) {
 					toast.success("Registered successfully!");
 					setRegistered(true);
+					setTeamState((prev) => ({
+						...prev,
+						createdTeamId: json.data.teamId,
+					}));
 				} else toast.error(json.error || "Failed to register");
 			} catch (err) {
 				console.error("Error registering for event", err);
@@ -1030,29 +1034,79 @@ const EventsPage = () => {
 										<>
 											{selectedEvent?.eventType === "SOLO" &&
 												teamInitialized && (
-													<button
-														type="button"
-														onClick={() => setSoloConfirm(true)}
-														disabled={
-															teamState.registering ||
-															loading.checkingRegistration ||
-															registered ||
-															loading.register
-														}
-														className={
-															registered
-																? BUTTON_CLASSES.disabled
-																: BUTTON_CLASSES.primary
-														}
-													>
-														{loading.checkingRegistration
-															? "Checking..."
-															: teamState.registering || loading.register
-																? "Processing..."
-																: registered
-																	? "Registered"
-																	: "Register"}
-													</button>
+													<>
+														{registered && teamState.createdTeamId && (
+															<>
+																<button
+																	type="button"
+																	className="flex-shrink-0 flex items-center justify-center w-24 h-24 md:w-32 md:h-32 bg-purple-100 dark:bg-indigo-900 rounded-xl border border-purple-300 dark:border-indigo-700 cursor-pointer"
+																	onClick={() => setShowQrModal(true)}
+																	onKeyDown={(e) => {
+																		if (e.key === "Enter" || e.key === " ") {
+																			setShowQrModal(true);
+																		}
+																	}}
+																	aria-label="Show QR Code"
+																	tabIndex={0}
+																>
+																	<QRCodeSVG
+																		value={teamState.createdTeamId}
+																		size={112}
+																		bgColor="#F3E8FF"
+																		fgColor="#6e11b0"
+																		className="w-20 h-20 md:w-28 md:h-28 object-contain rounded-xl"
+																	/>
+																</button>
+																{showQrModal && (
+																	<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+																		<div className="relative bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-xl flex flex-col items-center">
+																			<button
+																				type="button"
+																				onClick={() => setShowQrModal(false)}
+																				className="absolute top-2 right-2 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+																				aria-label="Close"
+																			>
+																				<X className="h-6 w-6" />
+																			</button>
+																			<QRCodeSVG
+																				value={teamState.createdTeamId}
+																				size={256}
+																				bgColor="#F3E8FF"
+																				fgColor="#7C3AED"
+																				className="w-64 h-64 object-contain p-3"
+																			/>
+																			<div className="mt-2 text-center text-purple-900 dark:text-purple-100 break-all font-mono">
+																				{teamState.createdTeamId}
+																			</div>
+																		</div>
+																	</div>
+																)}
+															</>
+														)}
+														<button
+															type="button"
+															onClick={() => setSoloConfirm(true)}
+															disabled={
+																teamState.registering ||
+																loading.checkingRegistration ||
+																registered ||
+																loading.register
+															}
+															className={
+																registered
+																	? BUTTON_CLASSES.disabled
+																	: BUTTON_CLASSES.primary
+															}
+														>
+															{loading.checkingRegistration
+																? "Checking..."
+																: teamState.registering || loading.register
+																	? "Processing..."
+																	: registered
+																		? "Registered"
+																		: "Register"}
+														</button>
+													</>
 												)}
 											{selectedEvent?.eventType === "TEAM" &&
 												renderTeamRegistration()}
@@ -1074,29 +1128,102 @@ const EventsPage = () => {
 								) : available === true ? (
 									<>
 										{selectedEvent?.eventType === "SOLO" && teamInitialized && (
-											<button
-												type="button"
-												onClick={() => setSoloConfirm(true)}
-												disabled={
-													teamState.registering ||
-													loading.checkingRegistration ||
-													registered ||
-													loading.register
-												}
-												className={
-													registered
-														? BUTTON_CLASSES.disabled
-														: BUTTON_CLASSES.primary
-												}
-											>
-												{loading.checkingRegistration
-													? "Checking..."
-													: teamState.registering || loading.register
-														? "Processing..."
-														: registered
-															? "Registered"
-															: "Register"}
-											</button>
+											<>
+												{registered && teamState.createdTeamId && (
+													<>
+														<div className="flex flex-row items-left">
+															<button
+																type="button"
+																className="flex-shrink-0 flex items-center justify-center w-24 h-24 md:w-32 md:h-32 bg-purple-100 dark:bg-indigo-900 rounded-xl border border-purple-300 dark:border-indigo-700 cursor-pointer"
+																onClick={() => setShowQrModal(true)}
+																onKeyDown={(e) => {
+																	if (e.key === "Enter" || e.key === " ") {
+																		setShowQrModal(true);
+																	}
+																}}
+																aria-label="Show QR Code"
+																tabIndex={0}
+															>
+																<QRCodeSVG
+																	value={teamState.createdTeamId}
+																	size={112}
+																	bgColor="#F3E8FF"
+																	fgColor="#6e11b0"
+																	className="w-20 h-20 md:w-28 md:h-28 object-contain rounded-xl"
+																/>
+															</button>
+															<div className="flex flex-col ml-4">
+																<div className="text-lg md:text-xl font-semibold text-purple-800 dark:text-purple-200">
+																	Team ID:
+																</div>
+																<div className="px-2 py-1 rounded-lg text-purple-900 dark:text-purple-100 text-lg md:text-xl break-all font-mono shadow">
+																	{teamState.createdTeamId}
+																</div>
+																<button
+																	type="button"
+																	onClick={() => {
+																		navigator.clipboard.writeText(
+																			teamState.createdTeamId,
+																		);
+																		toast.success("Copied Team ID");
+																	}}
+																	className={`${BUTTON_CLASSES.secondary} px-2 py-1 w-20 text-xs rounded-lg border border-purple-300 dark:border-indigo-700 hover:bg-purple-200 dark:hover:bg-indigo-800 transition`}
+																	title="Copy Team ID"
+																>
+																	Copy
+																</button>
+															</div>
+														</div>
+														{showQrModal && (
+															<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+																<div className="relative bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-xl flex flex-col items-center">
+																	<button
+																		type="button"
+																		onClick={() => setShowQrModal(false)}
+																		className="absolute top-2 right-2 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+																		aria-label="Close"
+																	>
+																		<X className="h-6 w-6" />
+																	</button>
+																	<QRCodeSVG
+																		value={teamState.createdTeamId}
+																		size={256}
+																		bgColor="#F3E8FF"
+																		fgColor="#7C3AED"
+																		className="w-64 h-64 object-contain p-3"
+																	/>
+																	<div className="mt-2 text-center text-purple-900 dark:text-purple-100 break-all font-mono">
+																		{teamState.createdTeamId}
+																	</div>
+																</div>
+															</div>
+														)}
+													</>
+												)}
+												<button
+													type="button"
+													onClick={() => setSoloConfirm(true)}
+													disabled={
+														teamState.registering ||
+														loading.checkingRegistration ||
+														registered ||
+														loading.register
+													}
+													className={
+														registered
+															? BUTTON_CLASSES.disabled
+															: BUTTON_CLASSES.primary
+													}
+												>
+													{loading.checkingRegistration
+														? "Checking..."
+														: teamState.registering || loading.register
+															? "Processing..."
+															: registered
+																? "Registered"
+																: "Register"}
+												</button>
+											</>
 										)}
 										{selectedEvent?.eventType === "TEAM" &&
 											renderTeamRegistration()}
