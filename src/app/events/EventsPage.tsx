@@ -229,13 +229,87 @@ const EventsPage = () => {
 		}
 	}, [drawerOpen]);
 
-	// Check available before showing registration UI
 	useEffect(() => {
-		const checkAvailable = async () => {
-			if (!selectedEvent) return;
-			setLoading((prev) => ({ ...prev, checkAvailable: true }));
+		const checkRegistrationAndAvailable = async () => {
+			if (!selectedEvent) {
+				setTeamInitialized(true);
+				return;
+			}
+
+			setLoading((prev) => ({
+				...prev,
+				checkingRegistration: true,
+				checkAvailable: true,
+			}));
+
 			try {
-				const res = await fetch(
+				let isRegistered = false;
+
+				// First, check registration
+				if (userId) {
+					if (selectedEvent.eventType === "SOLO") {
+						const resSolo = await fetch(
+							`${process.env.NEXT_PUBLIC_SERVER_URL}/api/events/checkSolo`,
+							{
+								method: "POST",
+								headers: { "Content-Type": "application/json" },
+								body: JSON.stringify({ userId, eventId: selectedEvent.id }),
+							},
+						);
+						const jsonSolo = await resSolo.json();
+						if (resSolo.ok && jsonSolo.success) {
+							setRegistered(true);
+							isRegistered = true;
+						} else {
+							setRegistered(false);
+						}
+					} else if (selectedEvent.eventType === "TEAM") {
+						const resTeam = await fetch(
+							`${process.env.NEXT_PUBLIC_SERVER_URL}/api/events/getTeam`,
+							{
+								method: "POST",
+								headers: { "Content-Type": "application/json" },
+								body: JSON.stringify({ userId, eventId: selectedEvent.id }),
+							},
+						);
+						const jsonTeam = await resTeam.json();
+						if (resTeam.ok && jsonTeam.success && jsonTeam.data) {
+							const members = Array.isArray(jsonTeam.data.members)
+								? jsonTeam.data.members.map(
+										(m: { id: string; name: string }) => ({
+											id: m.id,
+											name: m.name,
+										}),
+									)
+								: [];
+							setTeamState((prev) => ({
+								...prev,
+								isConfirmed: jsonTeam.data.isConfirmed || false,
+								teamName: jsonTeam.data.teamName || "",
+								isLeader: jsonTeam.data.isLeader || false,
+								registering: true,
+								createdTeamId: jsonTeam.data.teamId,
+								members,
+								action: "NONE",
+							}));
+							isRegistered = true;
+						} else {
+							setTeamState((prev) => ({
+								...prev,
+								teamName: "",
+								isConfirmed: false,
+								isLeader: false,
+								registering: true,
+								createdTeamId: "",
+								members: [],
+								action: "NONE",
+							}));
+						}
+					}
+				}
+
+				// Then, check availability
+				const resAvailable = await fetch(
 					`${process.env.NEXT_PUBLIC_SERVER_URL}/api/events/check-available`,
 					{
 						method: "POST",
@@ -243,100 +317,34 @@ const EventsPage = () => {
 						body: JSON.stringify({ eventId: selectedEvent.id }),
 					},
 				);
-				const json = await res.json();
-				if (res.ok && typeof json.available === "boolean") {
-					setAvailable(json.available);
+				const jsonAvailable = await resAvailable.json();
+				if (resAvailable.ok && typeof jsonAvailable.available === "boolean") {
+					setAvailable(jsonAvailable.available);
 				} else {
 					setAvailable(null);
 				}
+
+				if (!isRegistered) setTeamInitialized(true);
 			} catch (err) {
-				console.error("Error checking availability:", err);
+				console.error("Error checking registration/availability:", err);
 				setAvailable(null);
 			} finally {
-				setLoading((prev) => ({ ...prev, checkAvailable: false }));
-			}
-		};
-		if (selectedEvent) {
-			setAvailable(null);
-			checkAvailable();
-		}
-	}, [selectedEvent]);
-
-	useEffect(() => {
-		if (!selectedEvent || !userId || available !== true) {
-			setTeamInitialized(true);
-			return;
-		}
-
-		const checkRegistration = async () => {
-			setLoading((prev) => ({ ...prev, checkingRegistration: true }));
-			try {
-				if (selectedEvent.eventType === "SOLO") {
-					const res = await fetch(
-						`${process.env.NEXT_PUBLIC_SERVER_URL}/api/events/checkSolo`,
-						{
-							method: "POST",
-							headers: { "Content-Type": "application/json" },
-							body: JSON.stringify({ userId, eventId: selectedEvent.id }),
-						},
-					);
-					const json = await res.json();
-					if (res.ok && json.success) {
-						setRegistered(true);
-					}
-				} else if (selectedEvent.eventType === "TEAM") {
-					const res = await fetch(
-						`${process.env.NEXT_PUBLIC_SERVER_URL}/api/events/getTeam`,
-						{
-							method: "POST",
-							headers: { "Content-Type": "application/json" },
-							body: JSON.stringify({ userId, eventId: selectedEvent.id }),
-						},
-					);
-					const json = await res.json();
-					if (res.ok && json.success && json.data) {
-						const members = Array.isArray(json.data.members)
-							? json.data.members.map((m: { id: string; name: string }) => ({
-									id: m.id,
-									name: m.name,
-								}))
-							: [];
-
-						setTeamState((prev) => ({
-							...prev,
-							isConfirmed: json.data.isConfirmed || false,
-							teamName: json.data.teamName || "",
-							isLeader: json.data.isLeader || false,
-							registering: true,
-							createdTeamId: json.data.teamId,
-							members,
-							action: "NONE",
-						}));
-					} else {
-						setTeamState((prev) => ({
-							...prev,
-							teamName: "",
-							isConfirmed: false,
-							isLeader: false,
-							registering: true,
-							createdTeamId: "",
-							members: [],
-							action: "NONE",
-						}));
-					}
-				}
-			} catch (err) {
-				console.error("Error checking registration/team:", err);
-			} finally {
 				setTeamInitialized(true);
-				setLoading((prev) => ({ ...prev, checkingRegistration: false }));
+				setLoading((prev) => ({
+					...prev,
+					checkAvailable: false,
+					checkingRegistration: false,
+				}));
 			}
 		};
 
-		checkRegistration();
-	}, [selectedEvent, userId, available]);
+		setAvailable(null);
+		setRegistered(false);
+		setTeamInitialized(false);
 
-	useEffect(() => {
+		if (selectedEvent) {
+			checkRegistrationAndAvailable();
+		}
 		if (selectedEvent) {
 			const size =
 				selectedEvent.eventType === "SOLO"
@@ -344,7 +352,7 @@ const EventsPage = () => {
 					: `${selectedEvent.minTeamSize} - ${selectedEvent.maxTeamSize}  `;
 			setTeamSize(size);
 		}
-	}, [selectedEvent]);
+	}, [selectedEvent, userId]);
 
 	const handleToggleChange = (e: React.ChangeEvent<HTMLDivElement>) => {
 		const id = (e.target as HTMLElement).id;
@@ -999,6 +1007,14 @@ const EventsPage = () => {
 											Registrations are Closed
 										</span>
 									</div>
+								) : loading.checkingRegistration ? (
+									<button
+										type="button"
+										disabled
+										className={BUTTON_CLASSES.primary}
+									>
+										Checking registration...
+									</button>
 								) : loading.checkAvailable ? (
 									<button
 										type="button"
@@ -1007,12 +1023,52 @@ const EventsPage = () => {
 									>
 										Checking availability...
 									</button>
-								) : available === false && !registered ? (
-									<div className="w-full rounded-xl border border-yellow-400 bg-yellow-100 dark:bg-yellow-950 dark:border-yellow-500 p-4 text-center">
-										<span className="text-yellow-900 dark:text-yellow-200 font-semibold text-lg md:text-xl">
-											Registrations are Full
-										</span>
-									</div>
+								) : available === false ? (
+									registered ? (
+										<>
+											{selectedEvent?.eventType === "SOLO" &&
+												teamInitialized && (
+													<button
+														type="button"
+														onClick={() => setSoloConfirm(true)}
+														disabled={
+															teamState.registering ||
+															loading.checkingRegistration ||
+															registered ||
+															loading.register
+														}
+														className={
+															registered
+																? BUTTON_CLASSES.disabled
+																: BUTTON_CLASSES.primary
+														}
+													>
+														{loading.checkingRegistration
+															? "Checking..."
+															: teamState.registering || loading.register
+																? "Processing..."
+																: registered
+																	? "Registered"
+																	: "Register"}
+													</button>
+												)}
+											{selectedEvent?.eventType === "TEAM" &&
+												renderTeamRegistration()}
+											<button
+												type="button"
+												onClick={handleCopyLink}
+												className={BUTTON_CLASSES.secondary}
+											>
+												Copy Link
+											</button>
+										</>
+									) : (
+										<div className="w-full rounded-xl border border-yellow-400 bg-yellow-100 dark:bg-yellow-950 dark:border-yellow-500 p-4 text-center">
+											<span className="text-yellow-900 dark:text-yellow-200 font-semibold text-lg md:text-xl">
+												Registrations are Full
+											</span>
+										</div>
+									)
 								) : available === true ? (
 									<>
 										{selectedEvent?.eventType === "SOLO" && teamInitialized && (
