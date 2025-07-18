@@ -244,8 +244,6 @@ const EventsPage = () => {
 
 			try {
 				let isRegistered = false;
-
-				// First, check registration
 				if (userId) {
 					if (selectedEvent.eventType === "SOLO") {
 						const resSolo = await fetch(
@@ -257,8 +255,12 @@ const EventsPage = () => {
 							},
 						);
 						const jsonSolo = await resSolo.json();
-						if (resSolo.ok && jsonSolo.success) {
+						if (resSolo.ok && jsonSolo.result.success) {
 							setRegistered(true);
+							setTeamState((prev) => ({
+								...prev,
+								createdTeamId: jsonSolo.result.teamId,
+							}));
 							isRegistered = true;
 						} else {
 							setRegistered(false);
