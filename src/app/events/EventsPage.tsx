@@ -873,8 +873,11 @@ const EventsPage = () => {
 			</div>
 			<div className="min-h-screen w-[90%] grid justify-center items-start grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mt-2 md:mt-5 md:px-0">
 				{loading.events ? (
-					<div className="lilita-font w-full text-4xl md:text-6xl font-bold text-flc-yellow text-center col-span-full mt-20 md:mt-40">
-						Loading...
+					<div className="lilita-font w-full text-4xl md:text-6xl font-bold text-flc-yellow text-center col-span-full md:mt-40">
+						<div className="animate-spin rounded-full h-32 w-32 border-t-4 border-[#FCA410] border-b-4 mx-auto mb-4"></div>
+						<p className="text-3xl lilita-font font-bold text-[#FCA410]">
+							Loading Events...
+						</p>
 					</div>
 				) : eventsByYear[selectedYearData.year].length === 0 ? (
 					<div className="w-full text-2xl md:text-5xl text-black dark:text-white text-center col-span-full mt-20 md:mt-40">
