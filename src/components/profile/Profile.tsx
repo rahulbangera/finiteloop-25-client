@@ -17,14 +17,34 @@ import { SiLeetcode } from "react-icons/si";
 import { MdDelete } from "react-icons/md";
 import type { AppUser } from "@/lib/auth";
 
-function ProfileDetail({ label, value }: { label: string; value: string }) {
+function ProfileDetail({
+	label,
+	value,
+	isViewingOther = false,
+	userName = "This user",
+}: {
+	label: string;
+	value: string;
+	isViewingOther?: boolean;
+	userName?: string;
+}) {
+	const hasValue = value && value.trim() !== "";
+
 	return (
 		<div className="interactive bg-gradient-to-tr from-neutral-800 to-neutral-900 border border-neutral-700 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 shadow-sm hover:border-orange-400 hover:shadow-md transition-all duration-200">
 			<div className="text-xs text-gray-400 uppercase font-semibold mb-1 tracking-wide">
 				{label}
 			</div>
-			<div className="text-sm sm:text-base font-medium text-white break-words">
-				{value}
+			<div className="text-sm sm:text-base font-medium break-words">
+				{hasValue ? (
+					<span className="text-white">{value}</span>
+				) : (
+					<span className="text-gray-500 italic">
+						{isViewingOther
+							? `${userName} hasn't shared this information`
+							: "Not shared"}
+					</span>
+				)}
 			</div>
 		</div>
 	);
@@ -812,27 +832,42 @@ export default function Profile({ userId }: { userId?: number }) {
 
 					<div className="space-y-3 sm:space-y-4">
 						<div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-							<ProfileDetail label="USN" value={`${currentUser?.usn || ""}`} />
+							<ProfileDetail
+								label="USN"
+								value={`${currentUser?.usn || ""}`}
+								isViewingOther={!!isViewingOtherProfile}
+								userName={currentUser?.name || "This user"}
+							/>
 							<ProfileDetail
 								label="Year of Graduation"
 								value={`${currentUser?.year || ""}`}
+								isViewingOther={!!isViewingOtherProfile}
+								userName={currentUser?.name || "This user"}
 							/>
 						</div>
 
 						<ProfileDetail
 							label="Branch"
 							value={`${(currentUser as unknown as { Branch: { name: string } })?.Branch?.name || currentUser?.branch || ""}`}
+							isViewingOther={!!isViewingOtherProfile}
+							userName={currentUser?.name || "This user"}
 						/>
 
 						<div className="interactive bg-gradient-to-tr from-neutral-800 to-neutral-900 border border-neutral-700 rounded-lg sm:rounded-xl px-3 sm:px-4 py-4 sm:py-6 shadow-sm hover:border-orange-400 hover:shadow-md transition-all duration-200">
 							<div className="text-xs text-gray-400 uppercase font-semibold mb-2 sm:mb-3 tracking-wide">
 								Bio
 							</div>
-							<div className="text-sm sm:text-base font-medium text-white break-words leading-relaxed min-h-[60px] sm:min-h-[80px]">
-								{currentUser?.bio ? (
-									<p className="whitespace-pre-wrap">{currentUser.bio}</p>
+							<div className="text-sm sm:text-base font-medium break-words leading-relaxed min-h-[60px] sm:min-h-[80px]">
+								{currentUser?.bio?.trim() ? (
+									<p className="whitespace-pre-wrap text-white">
+										{currentUser.bio}
+									</p>
 								) : (
-									<p className="text-gray-500 italic">No bio available</p>
+									<p className="text-gray-500 italic">
+										{isViewingOtherProfile
+											? `${currentUser?.name || "This user"} hasn't shared their bio`
+											: "No bio shared"}
+									</p>
 								)}
 							</div>
 						</div>
