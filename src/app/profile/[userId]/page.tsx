@@ -8,7 +8,7 @@ interface ProfilePageProps {
 }
 
 export default async function UserProfilePage({ params }: ProfilePageProps) {
-	const { userId } = params;
+	const { userId } = await params;
 
 	const userIdNumber = parseInt(userId, 10);
 	if (Number.isNaN(userIdNumber)) {
