@@ -1,21 +1,29 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import PaymentButton from "../razorpay/paymentButton";
 import { toast } from "react-toastify";
 import { useSession } from "next-auth/react";
 import { z } from "zod";
-import { FaInstagram, FaLinkedin, FaGithub, FaGlobe } from "react-icons/fa";
+import {
+	FaInstagram,
+	FaLinkedin,
+	FaGithub,
+	FaGlobe,
+	FaShare,
+} from "react-icons/fa";
 import { SiLeetcode } from "react-icons/si";
 import { MdDelete } from "react-icons/md";
+import type { AppUser } from "@/lib/auth";
 
 function ProfileDetail({ label, value }: { label: string; value: string }) {
 	return (
-		<div className="interactive bg-gradient-to-tr from-neutral-800 to-neutral-900 border border-neutral-700 rounded-xl px-4 py-3 shadow-sm hover:border-orange-400 transition">
+		<div className="interactive bg-gradient-to-tr from-neutral-800 to-neutral-900 border border-neutral-700 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 shadow-sm hover:border-orange-400 hover:shadow-md transition-all duration-200">
 			<div className="text-xs text-gray-400 uppercase font-semibold mb-1 tracking-wide">
 				{label}
 			</div>
-			<div className="text-base font-medium text-white break-words">
+			<div className="text-sm sm:text-base font-medium text-white break-words">
 				{value}
 			</div>
 		</div>
@@ -24,11 +32,11 @@ function ProfileDetail({ label, value }: { label: string; value: string }) {
 
 function StatItem({ label, value }: { label: string; value: string | number }) {
 	return (
-		<div className="interactive text-center bg-gradient-to-tr from-neutral-800 to-neutral-900 border border-neutral-700 rounded-2xl p-5 shadow transition hover:scale-105 hover:border-orange-500">
+		<div className="interactive text-center bg-gradient-to-tr from-neutral-800 to-neutral-900 border border-neutral-700 rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-5 shadow transition-all duration-300 hover:scale-105 hover:border-orange-500 hover:shadow-lg">
 			<div className="text-xs text-gray-400 uppercase font-semibold mb-1 tracking-wide">
 				{label}
 			</div>
-			<div className="text-2xl font-extrabold bg-gradient-to-tr from-orange-500 to-yellow-400 bg-clip-text text-transparent drop-shadow">
+			<div className="text-lg sm:text-xl md:text-2xl font-extrabold bg-gradient-to-tr from-orange-500 to-yellow-400 bg-clip-text text-transparent drop-shadow">
 				{value}
 			</div>
 		</div>
@@ -69,106 +77,269 @@ function EditProfileDialog({
 }) {
 	if (!open) return null;
 	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-			<div className="bg-gradient-to-tr from-neutral-900 to-neutral-800 border border-neutral-700 rounded-2xl shadow-2xl p-8 w-full max-w-md relative">
+		<div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-lg p-2 sm:p-4 pt-16 sm:pt-20">
+			<div className="bg-gradient-to-br from-neutral-900/95 via-neutral-800/95 to-neutral-900/95 backdrop-blur-xl border border-neutral-600/50 rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 md:p-8 w-full max-w-xs sm:max-w-md lg:max-w-lg relative animate-fade-in max-h-[90vh] overflow-y-auto">
 				<button
 					type="button"
-					className="absolute top-3 right-3 text-gray-400 hover:text-orange-400 text-2xl transition"
+					className="absolute top-2 right-2 sm:top-4 sm:right-4 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-neutral-700/50 hover:bg-red-500/20 text-gray-300 hover:text-red-400 transition-all duration-200 z-10"
 					onClick={onClose}
 					aria-label="Close"
 				>
-					×
+					<svg
+						width="16"
+						height="16"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						strokeWidth="2"
+						className="w-4 h-4 sm:w-5 sm:h-5"
+					>
+						<title>Close</title>
+						<line x1="18" y1="6" x2="6" y2="18"></line>
+						<line x1="6" y1="6" x2="18" y2="18"></line>
+					</svg>
 				</button>
-				<h2 className="text-2xl font-extrabold mb-6 text-white text-center bg-gradient-to-tr from-orange-400 to-yellow-400 bg-clip-text">
-					Edit Profile
-				</h2>
-				<div className="space-y-5">
-					<div>
-						<label className="text-xs text-gray-400 uppercase font-semibold mb-2 tracking-wide block">
-							Name
+
+				<div className="text-center mb-4 sm:mb-6 md:mb-8 pr-8 sm:pr-0">
+					<h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
+						Edit Profile
+					</h2>
+					<p className="text-sm sm:text-base text-gray-400">
+						Update your personal information
+					</p>
+				</div>
+
+				<div className="space-y-4 sm:space-y-6">
+					<div className="grid grid-cols-1 gap-4">
+						<div>
+							<label
+								htmlFor="name"
+								className="block text-xs sm:text-sm font-medium text-gray-300 mb-1 sm:mb-2"
+							>
+								<span className="flex items-center gap-2">
+									<svg
+										width="14"
+										height="14"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										strokeWidth="2"
+										className="sm:w-4 sm:h-4"
+									>
+										<title>Name</title>
+										<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+										<circle cx="12" cy="7" r="4"></circle>
+									</svg>
+									Full Name
+								</span>
+							</label>
 							<input
+								id="name"
 								type="text"
 								name="name"
 								value={form.name}
 								onChange={onChange}
-								className="w-full px-4 py-2 rounded-xl bg-gradient-to-tr from-neutral-800 to-neutral-900 text-white border-2 border-orange-400 focus:border-yellow-400 focus:outline-none shadow-inner transition"
-								placeholder="Name"
+								className="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl bg-neutral-800/50 backdrop-blur-sm text-white border border-neutral-600 focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 focus:outline-none transition-all duration-200 placeholder-gray-400 text-sm sm:text-base"
+								placeholder="Enter your full name"
 								autoComplete="off"
 							/>
-						</label>
-					</div>
-					<div>
-						<label className="text-xs text-gray-400 uppercase font-semibold mb-2 tracking-wide block">
-							USN
+						</div>
+						<div>
+							<label
+								htmlFor="usn"
+								className="block text-xs sm:text-sm font-medium text-gray-300 mb-1 sm:mb-2"
+							>
+								<span className="flex items-center gap-2">
+									<svg
+										width="14"
+										height="14"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										strokeWidth="2"
+										className="sm:w-4 sm:h-4"
+									>
+										<title>USN</title>
+										<rect
+											x="2"
+											y="3"
+											width="20"
+											height="14"
+											rx="2"
+											ry="2"
+										></rect>
+										<line x1="8" y1="21" x2="16" y2="21"></line>
+										<line x1="12" y1="17" x2="12" y2="21"></line>
+									</svg>
+									USN
+								</span>
+							</label>
 							<input
+								id="usn"
 								type="text"
 								name="usn"
 								value={form.usn}
 								onChange={onChange}
-								className="w-full px-4 py-2 rounded-xl bg-gradient-to-tr from-neutral-800 to-neutral-900 text-white border-2 border-orange-400 focus:border-yellow-400 focus:outline-none shadow-inner transition"
-								placeholder="USN"
+								className="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl bg-neutral-800/50 backdrop-blur-sm text-white border border-neutral-600 focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 focus:outline-none transition-all duration-200 placeholder-gray-400 text-sm sm:text-base"
+								placeholder="Your USN"
 								autoComplete="off"
 							/>
-						</label>
+						</div>
 					</div>
-					<div>
-						<label className="text-xs text-gray-400 uppercase font-semibold mb-2 tracking-wide block">
-							Branch
+
+					<div className="grid grid-cols-1 gap-4">
+						<div>
+							<label
+								htmlFor="branch"
+								className="block text-xs sm:text-sm font-medium text-gray-300 mb-1 sm:mb-2"
+							>
+								<span className="flex items-center gap-2">
+									<svg
+										width="14"
+										height="14"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										strokeWidth="2"
+										className="sm:w-4 sm:h-4"
+									>
+										<title>Branch</title>
+										<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2v11z"></path>
+									</svg>
+									Branch
+								</span>
+							</label>
 							<select
+								id="branch"
 								name="branch"
 								value={form.branch}
 								onChange={onChange}
-								className="w-full px-4 py-2 rounded-xl bg-gradient-to-tr from-neutral-800 to-neutral-900 text-white border-2 border-orange-400 focus:border-yellow-400 focus:outline-none shadow-inner transition"
+								className="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl bg-neutral-800/50 backdrop-blur-sm text-white border border-neutral-600 focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 focus:outline-none transition-all duration-200 text-sm sm:text-base"
 							>
 								<option value="">Select Branch</option>
 								{branches.map((b) => (
-									<option key={b.id} value={b.id}>
+									<option key={b.id} value={b.id} className="bg-neutral-800">
 										{b.name}
 									</option>
 								))}
 							</select>
-						</label>
-					</div>
-					<div>
-						<label className="text-xs text-gray-400 uppercase font-semibold mb-2 tracking-wide block">
-							Year of Graduation
+						</div>
+						<div>
+							<label
+								htmlFor="year"
+								className="block text-xs sm:text-sm font-medium text-gray-300 mb-1 sm:mb-2"
+							>
+								<span className="flex items-center gap-2">
+									<svg
+										width="14"
+										height="14"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										strokeWidth="2"
+										className="sm:w-4 sm:h-4"
+									>
+										<title>Year</title>
+										<rect
+											x="3"
+											y="4"
+											width="18"
+											height="18"
+											rx="2"
+											ry="2"
+										></rect>
+										<line x1="16" y1="2" x2="16" y2="6"></line>
+										<line x1="8" y1="2" x2="8" y2="6"></line>
+										<line x1="3" y1="10" x2="21" y2="10"></line>
+									</svg>
+									Graduation Year
+								</span>
+							</label>
 							<input
+								id="year"
 								type="text"
 								name="year"
 								value={form.year}
 								onChange={onChange}
-								className="w-full px-4 py-2 rounded-xl bg-gradient-to-tr from-neutral-800 to-neutral-900 text-white border-2 border-orange-400 focus:border-yellow-400 focus:outline-none shadow-inner transition"
-								placeholder="Year"
+								className="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl bg-neutral-800/50 backdrop-blur-sm text-white border border-neutral-600 focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 focus:outline-none transition-all duration-200 placeholder-gray-400 text-sm sm:text-base"
+								placeholder="2025"
 								autoComplete="off"
 							/>
-						</label>
+						</div>
 					</div>
+
 					<div>
-						<label className="text-xs text-gray-400 uppercase font-semibold mb-2 tracking-wide block">
-							Bio
-							<textarea
-								name="bio"
-								value={form.bio}
-								onChange={onChange}
-								className="w-full px-4 py-2 rounded-xl bg-gradient-to-tr from-neutral-800 to-neutral-900 text-white border-2 border-orange-400 focus:border-yellow-400 focus:outline-none shadow-inner transition resize-none"
-								placeholder="Bio"
-								rows={3}
-							/>
+						<label
+							htmlFor="bio"
+							className="block text-xs sm:text-sm font-medium text-gray-300 mb-1 sm:mb-2"
+						>
+							<span className="flex items-center gap-2">
+								<svg
+									width="14"
+									height="14"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="2"
+									className="sm:w-4 sm:h-4"
+								>
+									<title>Bio</title>
+									<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+									<polyline points="14,2 14,8 20,8"></polyline>
+									<line x1="16" y1="13" x2="8" y2="13"></line>
+									<line x1="16" y1="17" x2="8" y2="17"></line>
+									<polyline points="10,9 9,9 8,9"></polyline>
+								</svg>
+								Bio
+							</span>
 						</label>
+						<textarea
+							id="bio"
+							name="bio"
+							value={form.bio}
+							onChange={onChange}
+							className="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl bg-neutral-800/50 backdrop-blur-sm text-white border border-neutral-600 focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 focus:outline-none transition-all duration-200 resize-none placeholder-gray-400 text-sm sm:text-base"
+							placeholder="Tell us about yourself..."
+							rows={3}
+						/>
 					</div>
 				</div>
-				<div className="flex gap-3 mt-8 justify-center">
+
+				<div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-4 sm:mt-6 md:mt-8 justify-center">
 					<button
 						type="button"
-						className="interactive px-6 py-2 rounded-full bg-gradient-to-tr from-green-500 to-lime-400 text-white font-bold shadow-lg hover:scale-105 hover:shadow-xl transition disabled:opacity-60"
+						className="interactive flex items-center justify-center gap-2 px-4 sm:px-6 md:px-8 py-2 sm:py-3 rounded-lg sm:rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed min-w-[100px] sm:min-w-[120px] text-sm sm:text-base order-2 sm:order-1"
 						onClick={onSave}
 						disabled={loading}
 					>
-						{loading ? "Saving..." : "Save"}
+						{loading ? (
+							<>
+								<div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-2 border-white border-t-transparent"></div>
+								<span className="hidden sm:inline">Saving...</span>
+								<span className="sm:hidden">Save...</span>
+							</>
+						) : (
+							<>
+								<svg
+									width="14"
+									height="14"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="2"
+									className="sm:w-4 sm:h-4"
+								>
+									<title>Save</title>
+									<polyline points="20,6 9,17 4,12"></polyline>
+								</svg>
+								<span className="hidden sm:inline">Save Changes</span>
+								<span className="sm:hidden">Save</span>
+							</>
+						)}
 					</button>
 					<button
 						type="button"
-						className="interactive px-6 py-2 rounded-full bg-gradient-to-tr from-gray-500 to-gray-700 text-white font-bold shadow-lg hover:scale-105 hover:shadow-xl transition disabled:opacity-60"
+						className="interactive px-4 sm:px-6 md:px-8 py-2 sm:py-3 rounded-lg sm:rounded-xl bg-neutral-700 hover:bg-neutral-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 text-sm sm:text-base order-1 sm:order-2"
 						onClick={onClose}
 						disabled={loading}
 					>
@@ -180,7 +351,7 @@ function EditProfileDialog({
 	);
 }
 
-export default function Profile() {
+export default function Profile({ userId }: { userId?: number }) {
 	const { data: session, update } = useSession();
 	const [editMode, setEditMode] = useState(false);
 	const [form, setForm] = useState({
@@ -192,9 +363,57 @@ export default function Profile() {
 	});
 	const [branches, setBranches] = useState<Branch[]>([]);
 	const [loading, setLoading] = useState(false);
+	const [viewedUser, setViewedUser] = useState<AppUser | null>(null);
 
 	const [socialName, setSocialName] = useState<string>("");
 	const [socialUrl, setSocialUrl] = useState<string>("");
+	const [addingSocialLink, setAddingSocialLink] = useState(false);
+	const [removingLinkIndex, setRemovingLinkIndex] = useState<number | null>(
+		null,
+	);
+	const [shareLoading, setShareLoading] = useState(false);
+
+	// Determine if we're viewing someone else's profile
+	const isViewingOtherProfile =
+		userId && userId !== parseInt(session?.user?.id || "0", 10);
+	const [fetchingUser, setFetchingUser] = useState(isViewingOtherProfile);
+	const currentUser = isViewingOtherProfile ? viewedUser : session?.user;
+
+	// Share function
+	const handleShareProfile = async () => {
+		setShareLoading(true);
+		try {
+			const currentUrl = window.location.origin + window.location.pathname;
+			const shareUrl = isViewingOtherProfile
+				? currentUrl
+				: `${currentUrl}/${session?.user?.id}`;
+
+			await navigator.clipboard.writeText(shareUrl);
+			toast.success("Profile link copied to clipboard!");
+		} catch (err) {
+			console.error("Failed to copy link:", err);
+			toast.error("Failed to copy link");
+		} finally {
+			setShareLoading(false);
+		}
+	};
+
+	const getRoleName = (user: AppUser | null | undefined) => {
+		if (!user) return "";
+		return typeof user.role === "string"
+			? user.role
+			: (user as unknown as { role: { name: string } }).role?.name;
+	};
+
+	const getUserLinks = (user: AppUser | null | undefined) => {
+		if (!user) return [];
+		return (
+			user.userLinks ||
+			(user as unknown as { UserLink: { linkName: string; url: string }[] })
+				.UserLink ||
+			[]
+		);
+	};
 
 	useEffect(() => {
 		const rippleHandler = (e: Event) => {
@@ -265,6 +484,53 @@ export default function Profile() {
 		}
 	}, [session]);
 
+	// Fetch user data when viewing another user's profile
+	useEffect(() => {
+		const fetchUserData = async () => {
+			if (!isViewingOtherProfile || !userId) return;
+
+			setFetchingUser(true);
+			try {
+				const res = await fetch(
+					`${process.env.NEXT_PUBLIC_SERVER_URL}/api/user/searchbyId`,
+					{
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({
+							userId: userId.toString(),
+						}),
+					},
+				);
+
+				if (!res.ok) throw new Error("User not found");
+
+				const data = await res.json();
+				if (data.success && data.id) {
+					// Transform the server response to match expected user structure
+					setViewedUser({
+						...data,
+						role: data.role?.name || data.role,
+						userLinks: data.UserLink || [],
+						branch: data.Branch?.name || "",
+						totalActivityPoints: data.totalActivityPoints || 0,
+						activityPoints: data.totalActivityPoints || 0,
+						attendance: data.attendance || 0,
+						image: data.image || null,
+					});
+				} else {
+					toast.error("User not found");
+				}
+			} catch (error) {
+				console.error("Error fetching user:", error);
+				toast.error("Failed to load user profile");
+			} finally {
+				setFetchingUser(false);
+			}
+		};
+
+		fetchUserData();
+	}, [userId, isViewingOtherProfile]);
+
 	const handleChange = (
 		e: React.ChangeEvent<
 			HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -290,6 +556,15 @@ export default function Profile() {
 	};
 
 	const handleSave = async () => {
+		if (!form.name.trim()) {
+			toast.error("Name is required");
+			return;
+		}
+		if (!form.usn.trim()) {
+			toast.error("USN is required");
+			return;
+		}
+
 		setLoading(true);
 		try {
 			const res = await fetch(
@@ -299,23 +574,29 @@ export default function Profile() {
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({
 						userId: session?.user.id,
-						name: form.name,
-						usn: form.usn,
-						year: form.year,
-						bio: form.bio,
+						name: form.name.trim(),
+						usn: form.usn.trim(),
+						year: form.year.trim(),
+						bio: form.bio.trim(),
 						branch: form.branch,
 					}),
 				},
 			);
-			if (!res.ok) throw new Error("Failed to update");
+			if (!res.ok) {
+				const errorData = await res.json();
+				throw new Error(errorData.message || "Failed to update profile");
+			}
 			await update();
-			toast.success("Profile updated");
+			toast.success("Profile updated successfully!");
 			setEditMode(false);
 		} catch (err) {
 			console.error(err);
-			toast.error("Update failed");
+			toast.error(
+				err instanceof Error ? err.message : "Update failed. Please try again.",
+			);
+		} finally {
+			setLoading(false);
 		}
-		setLoading(false);
 	};
 
 	const handleRemoveSocial = async (idx: number) => {
@@ -338,6 +619,7 @@ export default function Profile() {
 			return;
 		}
 
+		setRemovingLinkIndex(idx);
 		try {
 			const res = await fetch(
 				`${process.env.NEXT_PUBLIC_SERVER_URL}/api/user/removeUserLink`,
@@ -347,140 +629,295 @@ export default function Profile() {
 					body: JSON.stringify(payload),
 				},
 			);
-			if (!res.ok) throw new Error("Failed to remove link");
+			if (!res.ok) {
+				const errorData = await res.json();
+				throw new Error(errorData.message || "Failed to remove link");
+			}
 			await update();
-			toast.success("Social link removed");
+			toast.success("Social link removed successfully!");
 		} catch (err) {
 			console.error(err);
-			toast.error("Failed to remove social link");
+			toast.error(
+				err instanceof Error
+					? err.message
+					: "Failed to remove social link. Please try again.",
+			);
+		} finally {
+			setRemovingLinkIndex(null);
 		}
 	};
 
-	return (
-		<section className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-6 px-2 sm:px-4 py-6 sm:py-10 max-w-full sm:max-w-4xl lg:max-w-6xl mx-auto mt-20">
-			{/* Profile Card */}
-			<div className="card profile-card bg-gradient-to-tr from-white/20 via-white/10 to-white/5 dark:from-neutral-900/40 dark:to-neutral-800/20 border border-black dark:border-white rounded-2xl overflow-hidden shadow transition backdrop-blur-sm">
-				<div className="p-5 sm:p-8 space-y-6 text-black dark:text-white">
-					<div className="flex flex-col sm:flex-row sm:items-start gap-6">
-						<div className="relative flex-shrink-0 mx-auto sm:mx-0">
-							{/* biome-ignore lint/performance/noImgElement: <testing> */}
-							<img
-								src={session?.user.image || "https://placehold.co/160x160"}
-								alt="Profile"
-								className="w-28 h-28 sm:w-32 sm:h-32 rounded-full border-4 border-orange-400 object-cover shadow transition-transform hover:scale-105"
-							/>
-						</div>
+	if (isViewingOtherProfile && fetchingUser) {
+		return (
+			<section className="relative z-10 flex items-center justify-center min-h-[300px] sm:min-h-[400px] px-3 sm:px-4 py-4 sm:py-6 md:py-10 max-w-full sm:max-w-4xl lg:max-w-6xl mx-auto mt-16 sm:mt-20">
+				<div className="text-white text-center bg-gradient-to-tr from-neutral-900/60 via-neutral-800/40 to-neutral-700/20 border border-neutral-700 rounded-xl sm:rounded-2xl p-6 sm:p-8 backdrop-blur-sm shadow-2xl animate-fade-in max-w-md">
+					<div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-4 border-orange-400 border-t-transparent mx-auto mb-4"></div>
+					<h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-orange-400">
+						Loading Profile
+					</h2>
+					<p className="text-sm sm:text-base text-gray-400 px-2">
+						Please wait while we fetch the profile information...
+					</p>
+				</div>
+			</section>
+		);
+	}
 
-						<div className="flex flex-col sm:flex-row w-full justify-between items-start sm:items-center">
-							<div className="flex flex-col text-center sm:text-left">
-								<h1 className="text-2xl sm:text-3xl font-extrabold mb-1 break-words">
-									{session?.user.name}
+	if (isViewingOtherProfile && !fetchingUser && !viewedUser) {
+		return (
+			<section className="relative z-10 flex items-center justify-center min-h-[300px] sm:min-h-[400px] px-3 sm:px-4 py-4 sm:py-6 md:py-10 max-w-full sm:max-w-4xl lg:max-w-6xl mx-auto mt-16 sm:mt-20">
+				<div className="text-white text-center bg-gradient-to-tr from-neutral-900/60 via-neutral-800/40 to-neutral-700/20 border border-neutral-700 rounded-xl sm:rounded-2xl p-6 sm:p-8 backdrop-blur-sm shadow-2xl animate-fade-in max-w-md">
+					<div className="text-4xl sm:text-6xl mb-3 sm:mb-4">🔍</div>
+					<h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-orange-400">
+						User Not Found
+					</h2>
+					<p className="text-sm sm:text-base text-gray-400 mb-3 sm:mb-4 px-2">
+						The profile you're looking for doesn't exist or may have been
+						removed.
+					</p>
+					<button
+						type="button"
+						onClick={() => window.history.back()}
+						className="interactive px-5 sm:px-6 py-2 bg-gradient-to-tr from-orange-500 to-yellow-400 text-white rounded-full font-semibold hover:scale-105 transition shadow-lg text-sm sm:text-base"
+					>
+						Go Back
+					</button>
+				</div>
+			</section>
+		);
+	}
+
+	return (
+		<section className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 px-3 sm:px-4 py-4 sm:py-6 md:py-10 max-w-full sm:max-w-4xl lg:max-w-6xl mx-auto mt-16 sm:mt-20 animate-fade-in">
+			{/* Profile Viewing Indicator */}
+			{isViewingOtherProfile && (
+				<div className="col-span-full mb-4">
+					<div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-xl p-3 sm:p-4 backdrop-blur-sm">
+						<div className="flex items-center gap-2 sm:gap-3 text-sm sm:text-base text-white">
+							<div className="w-8 h-8 rounded-full bg-blue-500/30 flex items-center justify-center flex-shrink-0">
+								<svg
+									width="16"
+									height="16"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="2"
+									className="text-blue-400"
+								>
+									<title>User Profile</title>
+									<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+									<circle cx="12" cy="7" r="4"></circle>
+								</svg>
+							</div>
+							<span className="font-medium">
+								You are viewing{" "}
+								<span className="text-blue-400 font-semibold">
+									{currentUser?.name || "someone's"}
+								</span>{" "}
+								profile
+							</span>
+						</div>
+					</div>
+				</div>
+			)}
+
+			<div className="card profile-card bg-gradient-to-tr from-white/20 via-white/10 to-white/5 dark:from-neutral-900/40 dark:to-neutral-800/20 border border-black dark:border-white rounded-xl sm:rounded-2xl overflow-hidden shadow transition backdrop-blur-sm relative">
+				<div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 flex gap-2">
+					{!isViewingOtherProfile && (
+						<button
+							type="button"
+							className="interactive px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 text-xs sm:text-sm"
+							onClick={handleEdit}
+						>
+							<span className="hidden sm:inline">Edit Profile</span>
+							<span className="sm:hidden">Edit</span>
+						</button>
+					)}
+					<button
+						type="button"
+						className="interactive flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl bg-green-500 hover:bg-green-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 text-xs sm:text-sm disabled:opacity-50"
+						onClick={handleShareProfile}
+						disabled={shareLoading}
+						title="Share Profile"
+					>
+						{shareLoading ? (
+							<div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-white border-t-transparent"></div>
+						) : (
+							<>
+								<FaShare className="text-xs sm:text-sm" />
+								<span className="hidden sm:inline">Share</span>
+							</>
+						)}
+					</button>
+				</div>
+
+				<div className="p-4 sm:p-5 md:p-8 space-y-4 sm:space-y-6 text-black dark:text-white">
+					<div className="flex flex-col gap-4 sm:gap-6">
+						<div className="flex flex-col items-center text-center sm:flex-row sm:items-start sm:text-left sm:gap-6 pt-8 sm:pt-0">
+							<div className="relative flex-shrink-0">
+								<div className="relative group">
+									<Image
+										src={currentUser?.image || "/testing/160x160.svg"}
+										alt="Profile"
+										width={96}
+										height={96}
+										className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 rounded-full border-3 sm:border-4 border-orange-400 object-cover shadow-lg transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl"
+										priority
+									/>
+								</div>
+							</div>
+
+							<div className="flex flex-col items-center sm:items-start flex-1 min-w-0">
+								<h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold mb-2 break-words text-center sm:text-left">
+									{currentUser?.name}
 								</h1>
 								<span
-									className={`interactive inline-block w-fit mt-2 px-4 py-1 rounded-full text-sm font-semibold transition
+									className={`interactive inline-block w-fit px-3 sm:px-4 py-1 rounded-full text-xs sm:text-sm font-semibold transition mb-3 sm:mb-0
 										${
-											session?.user.role === "ADMIN"
+											getRoleName(currentUser) === "ADMIN"
 												? "bg-gradient-to-tr from-red-500 to-pink-400 border border-red-500 text-white hover:bg-red-600 dark:bg-gradient-to-tr dark:from-red-700 dark:to-pink-600"
-												: session?.user.role === "MEMBER"
+												: getRoleName(currentUser) === "MEMBER"
 													? "bg-gradient-to-tr from-green-400 to-lime-400 border border-green-400 text-white hover:bg-green-500 dark:bg-gradient-to-tr dark:from-green-700 dark:to-lime-600"
 													: "bg-gradient-to-tr from-blue-400 to-cyan-400 border border-blue-400 text-white hover:bg-blue-500 dark:bg-gradient-to-tr dark:from-blue-700 dark:to-cyan-600"
 										}`}
-									title={`Role: ${session?.user.role}`}
+									title={`Role: ${getRoleName(currentUser)}`}
 								>
-									{session?.user.role === "ADMIN"
+									{getRoleName(currentUser) === "ADMIN"
 										? "🛡️ ADMIN"
-										: session?.user.role === "MEMBER"
+										: getRoleName(currentUser) === "MEMBER"
 											? "❤️ MEMBER"
-											: `• ${session?.user.role}`}
+											: `• ${getRoleName(currentUser)}`}
 								</span>
 							</div>
-
-							<div className="mt-4 sm:mt-0 flex gap-2">
-								{session?.user.role === "USER" && (
-									<PaymentButton
-										title="Pay Membership"
-										paymentType="MEMBERSHIP"
-										description="Club Membership"
-										onSuccess={async (paymentId) => {
-											await update();
-											toast.success("Payment successful");
-											console.log("Payment ID:", paymentId);
-										}}
-										onFailure={() => {
-											toast.error("Payment failed");
-										}}
-										type="submit"
-									/>
-								)}
-								<button
-									type="button"
-									className="interactive px-4 py-2 rounded bg-orange-500 text-white font-semibold shadow hover:bg-orange-600 transition"
-									onClick={handleEdit}
-								>
-									Edit
-								</button>
-							</div>
 						</div>
+
+						{!isViewingOtherProfile && getRoleName(currentUser) === "USER" && (
+							<div className="flex justify-center">
+								<PaymentButton
+									title="Pay Membership"
+									paymentType="MEMBERSHIP"
+									description="Club Membership"
+									onSuccess={async (_paymentId) => {
+										await update();
+										toast.success("Payment successful");
+									}}
+									onFailure={() => {
+										toast.error("Payment failed");
+									}}
+									type="submit"
+								/>
+							</div>
+						)}
 					</div>
 
-					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-						<ProfileDetail label="USN" value={`${session?.user.usn}`} />
-						<ProfileDetail label="Branch" value={`${session?.user.branch}`} />
+					<div className="space-y-3 sm:space-y-4">
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+							<ProfileDetail label="USN" value={`${currentUser?.usn || ""}`} />
+							<ProfileDetail
+								label="Year of Graduation"
+								value={`${currentUser?.year || ""}`}
+							/>
+						</div>
+
 						<ProfileDetail
-							label="Year of Graduation"
-							value={`${session?.user.year}`}
+							label="Branch"
+							value={`${(currentUser as unknown as { Branch: { name: string } })?.Branch?.name || currentUser?.branch || ""}`}
 						/>
-						<ProfileDetail label="Bio" value={`${session?.user.bio}`} />
+
+						<div className="interactive bg-gradient-to-tr from-neutral-800 to-neutral-900 border border-neutral-700 rounded-lg sm:rounded-xl px-3 sm:px-4 py-4 sm:py-6 shadow-sm hover:border-orange-400 hover:shadow-md transition-all duration-200">
+							<div className="text-xs text-gray-400 uppercase font-semibold mb-2 sm:mb-3 tracking-wide">
+								Bio
+							</div>
+							<div className="text-sm sm:text-base font-medium text-white break-words leading-relaxed min-h-[60px] sm:min-h-[80px]">
+								{currentUser?.bio ? (
+									<p className="whitespace-pre-wrap">{currentUser.bio}</p>
+								) : (
+									<p className="text-gray-500 italic">No bio available</p>
+								)}
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
 
 			{/* Stats Card */}
-			<div className="bg-gradient-to-tr from-white/20 via-white/10 to-white/5 dark:from-neutral-900/40 dark:to-neutral-800/20 border border-black dark:border-white rounded-2xl overflow-hidden shadow transition backdrop-blur-sm">
-				<div className="p-5 sm:p-8 space-y-6 text-black dark:text-white">
-					<div className="grid grid-cols-2 gap-4">
+			<div className="bg-gradient-to-tr from-white/20 via-white/10 to-white/5 dark:from-neutral-900/40 dark:to-neutral-800/20 border border-black dark:border-white rounded-xl sm:rounded-2xl overflow-hidden shadow transition backdrop-blur-sm">
+				<div className="p-4 sm:p-5 md:p-8 space-y-4 sm:space-y-6 text-black dark:text-white">
+					{/* Activity Stats */}
+					<div className="grid grid-cols-2 gap-3 sm:gap-4">
 						<StatItem
 							label="Activity Points"
-							value={`${session?.user.activityPoints}`}
+							value={`${(currentUser as unknown as { totalActivityPoints: number })?.totalActivityPoints || currentUser?.activityPoints || "0"}`}
 						/>
 						<StatItem
 							label="Attendance"
-							value={`${session?.user.attendance}%`}
+							value={`${currentUser?.attendance || "0"}%`}
 						/>
 					</div>
+
 					<div>
-						<div className="interactive bg-gradient-to-tr from-neutral-800 to-neutral-900 border text-center border-neutral-700 rounded-3xl p-6 shadow mb-2">
-							<h4 className="text-lg font-bold mb-4 text-gray-300">
-								Add Social Link
-							</h4>
-							<div className="flex flex-col sm:flex-row gap-3 items-center">
-								<div className="w-full flex flex-col sm:flex-row gap-3 items-center justify-center">
-									<div className="flex flex-col sm:flex-row gap-3 w-full">
-										<select
-											className="px-4 py-2 rounded-full bg-neutral-900 text-white border border-orange-400 focus:border-yellow-400 focus:outline-none transition w-full sm:w-40"
-											value={socialName}
-											onChange={(e) => setSocialName(e.target.value)}
-										>
-											<option value="">Select Platform</option>
-											<option value="instagram">Instagram</option>
-											<option value="linkedin">LinkedIn</option>
-											<option value="github">GitHub</option>
-											<option value="portfolio">Portfolio</option>
-											<option value="leetcode">LeetCode</option>
-										</select>
+						{!isViewingOtherProfile && (
+							<div className="interactive bg-gradient-to-tr from-neutral-800 to-neutral-900 border border-neutral-700 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-md hover:shadow-lg hover:border-orange-400/50 transition-all duration-200">
+								<h4 className="text-base sm:text-lg font-bold mb-3 sm:mb-4 text-gray-300 text-center">
+									🔗 Add Social Link
+								</h4>
+								<div className="space-y-3">
+									<div className="flex flex-col gap-3">
+										<div className="relative w-full">
+											<select
+												className="appearance-none px-3 sm:px-4 py-2 pr-8 rounded-lg sm:rounded-full bg-neutral-900 text-white border border-orange-400 focus:border-yellow-400 focus:outline-none transition-colors w-full focus:ring-2 focus:ring-orange-400/50 cursor-pointer text-sm sm:text-base"
+												value={socialName}
+												onChange={(e) => setSocialName(e.target.value)}
+												disabled={addingSocialLink}
+											>
+												<option value="">Select Platform</option>
+												<option value="instagram">Instagram</option>
+												<option value="linkedin">LinkedIn</option>
+												<option value="github">GitHub</option>
+												<option value="portfolio">Portfolio</option>
+												<option value="leetcode">LeetCode</option>
+											</select>
+											<div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+												<svg
+													width="14"
+													height="14"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													strokeWidth="2"
+													className="text-orange-400 sm:w-4 sm:h-4"
+												>
+													<title>Dropdown Arrow</title>
+													<polyline points="6,9 12,15 18,9"></polyline>
+												</svg>
+											</div>
+										</div>
 										<input
 											type="url"
-											className="px-4 py-2 rounded-full bg-neutral-900 text-white border border-orange-400 focus:border-yellow-400 focus:outline-none flex-1 transition w-full"
-											placeholder="Enter URL"
+											className="px-3 sm:px-4 py-2 rounded-lg sm:rounded-full bg-neutral-900 text-white border border-orange-400 focus:border-yellow-400 focus:outline-none flex-1 transition-colors focus:ring-2 focus:ring-orange-400/50 text-sm sm:text-base"
+											placeholder="https://example.com/yourprofile"
 											value={socialUrl}
 											onChange={(e) => setSocialUrl(e.target.value)}
+											disabled={addingSocialLink}
 										/>
+									</div>
+									<div className="flex justify-center">
 										<button
 											type="button"
-											className="interactive px-4 py-2 rounded-full bg-green-500 text-white font-bold shadow hover:bg-green-600 transition flex items-center justify-center"
+											className="interactive px-4 sm:px-6 py-2 rounded-lg sm:rounded-full bg-gradient-to-tr from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:shadow-lg min-w-[100px] sm:min-w-[120px] text-sm sm:text-base"
 											onClick={async () => {
 												if (!socialName || !socialUrl || !session?.user?.id)
 													return;
+
+												if (
+													!socialUrl.startsWith("http://") &&
+													!socialUrl.startsWith("https://")
+												) {
+													toast.error(
+														"Please enter a valid URL starting with http:// or https://",
+													);
+													return;
+												}
 
 												const schema = z.object({
 													linkName: z.string().min(1),
@@ -496,10 +933,13 @@ export default function Profile() {
 
 												const result = schema.safeParse(payload);
 												if (!result.success) {
-													toast.error("Invalid link data");
+													toast.error(
+														"Invalid link data. Please check your inputs.",
+													);
 													return;
 												}
 
+												setAddingSocialLink(true);
 												try {
 													const res = await fetch(
 														`${process.env.NEXT_PUBLIC_SERVER_URL}/api/user/addUserLink`,
@@ -509,112 +949,210 @@ export default function Profile() {
 															body: JSON.stringify(payload),
 														},
 													);
-													if (!res.ok) throw new Error("Failed to add link");
+													if (!res.ok) {
+														const errorData = await res.json();
+														throw new Error(
+															errorData.message || "Failed to add link",
+														);
+													}
 													await update();
 													setSocialName("");
 													setSocialUrl("");
-													toast.success("Social link added");
+													toast.success("Social link added successfully!");
 												} catch (err) {
-													console.error(err);
-													toast.error("Failed to add social link");
+													toast.error(
+														err instanceof Error
+															? err.message
+															: "Failed to add social link. Please try again.",
+													);
+												} finally {
+													setAddingSocialLink(false);
 												}
 											}}
-											disabled={!socialName || !socialUrl}
+											disabled={!socialName || !socialUrl || addingSocialLink}
 											title="Add Social Link"
 										>
-											<span className="text-xl">+</span>
+											{addingSocialLink ? (
+												<>
+													<div className="animate-spin rounded-full h-5 w-5 border-t-2 border-white"></div>
+													<span>Adding...</span>
+												</>
+											) : (
+												<>
+													<span className="text-lg">+</span>
+													<span>Add Link</span>
+												</>
+											)}
 										</button>
 									</div>
 								</div>
 							</div>
+						)}
 
-							{Array.isArray(session?.user.userLinks) &&
-								session.user.userLinks.length > 0 && (
-									<div className="mt-6">
-										<h5 className="text-base font-semibold mb-3 text-gray-300">
-											Your Social Links:
-										</h5>
-										<ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-											{session.user.userLinks.map((link, idx) => {
-												const icons: Record<string, React.JSX.Element> = {
-													instagram: (
-														<span className="flex w-7 h-7 rounded-full bg-gradient-to-tr from-pink-500 to-yellow-400 items-center justify-center mr-2">
-															<FaInstagram className="text-white text-xl" />
-														</span>
-													),
-													linkedin: (
-														<span className="w-7 h-7 rounded-full bg-blue-700 flex items-center justify-center mr-2">
-															<FaLinkedin className="text-white text-xl" />
-														</span>
-													),
-													github: (
-														<span className=" w-7 h-7 rounded-full bg-neutral-900 flex items-center justify-center mr-2">
-															<FaGithub className="text-white text-xl" />
-														</span>
-													),
-													portfolio: (
-														<span className="w-7 h-7 rounded-full bg-gradient-to-tr from-orange-400 to-yellow-400 flex items-center justify-center mr-2">
-															<FaGlobe className="text-white text-xl" />
-														</span>
-													),
-													leetcode: (
-														<span className="w-7 h-7 rounded-full bg-gradient-to-tr from-yellow-400 to-orange-500 flex items-center justify-center mr-2">
-															<SiLeetcode className="text-white text-xl" />
-														</span>
-													),
-												};
-												return (
-													<li
-														key={`${link.linkName}-${link.url}`}
-														className="flex items-center justify-center border-2 border-flc-yellow rounded-lg p-2"
+						<div className="mt-4 sm:mt-6">
+							<h5 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-black dark:text-gray-100 flex items-center gap-2">
+								<svg
+									width="16"
+									height="16"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="2"
+									className="sm:w-5 sm:h-5"
+								>
+									<title>Social Links</title>
+									<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+									<path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+								</svg>
+								<span className="hidden sm:inline">
+									{isViewingOtherProfile ? "Social Links" : "Your Social Links"}
+								</span>
+								<span className="sm:hidden">Links</span>
+							</h5>
+
+							{getUserLinks(currentUser).length > 0 ? (
+								<div className="grid grid-cols-1 gap-2 sm:gap-3">
+									{getUserLinks(currentUser).map(
+										(link: { linkName: string; url: string }, idx: number) => {
+											const icons: Record<string, React.JSX.Element> = {
+												instagram: (
+													<div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-tr from-pink-500 via-red-500 to-yellow-500 flex items-center justify-center shadow-lg">
+														<FaInstagram className="text-white text-sm sm:text-lg" />
+													</div>
+												),
+												linkedin: (
+													<div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-tr from-blue-600 to-blue-700 flex items-center justify-center shadow-lg">
+														<FaLinkedin className="text-white text-sm sm:text-lg" />
+													</div>
+												),
+												github: (
+													<div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-tr from-gray-800 to-gray-900 flex items-center justify-center shadow-lg">
+														<FaGithub className="text-white text-sm sm:text-lg" />
+													</div>
+												),
+												portfolio: (
+													<div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-tr from-orange-500 to-yellow-500 flex items-center justify-center shadow-lg">
+														<FaGlobe className="text-white text-sm sm:text-lg" />
+													</div>
+												),
+												leetcode: (
+													<div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-tr from-yellow-500 to-orange-500 flex items-center justify-center shadow-lg">
+														<SiLeetcode className="text-white text-sm sm:text-lg" />
+													</div>
+												),
+											};
+
+											const platformNames: Record<string, string> = {
+												instagram: "Instagram",
+												linkedin: "LinkedIn",
+												github: "GitHub",
+												portfolio: "Portfolio",
+												leetcode: "LeetCode",
+											};
+
+											return (
+												<div
+													key={`${link.linkName}-${link.url}`}
+													className="flex items-center bg-gradient-to-r from-neutral-800/80 to-neutral-900/80 backdrop-blur-sm border border-neutral-700/50 hover:border-orange-400/50 rounded-xl sm:rounded-2xl p-3 sm:p-4 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] group"
+												>
+													<a
+														href={link.url}
+														target="_blank"
+														rel="noopener noreferrer"
+														className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0 transition-all duration-200"
+														title={`Visit ${platformNames[link.linkName] || link.linkName} profile`}
 													>
-														<a
-															href={link.url}
-															target="_blank"
-															rel="noopener noreferrer"
-															className="block"
-															title={link.linkName}
-														>
-															{icons[link.linkName] || (
-																<span className="w-7 h-7 rounded-full bg-gray-600 flex items-center justify-center mr-2">
-																	<FaGlobe className="text-white text-xl" />
-																</span>
-															)}
-														</a>
-														<button
-															type="button"
-															onClick={() => handleRemoveSocial(idx)}
-															className="ml-2 text-xl px-2 py-1 transition"
-															title="Remove"
-														>
-															<MdDelete className="text-red-400 hover:text-red-600" />
-														</button>
-													</li>
-												);
-											})}
-										</ul>
-									</div>
-								)}
+														{icons[link.linkName] || (
+															<div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-tr from-gray-600 to-gray-700 flex items-center justify-center shadow-lg flex-shrink-0">
+																<FaGlobe className="text-white text-sm sm:text-lg" />
+															</div>
+														)}
+														<div className="flex flex-col min-w-0 flex-1">
+															<span className="text-xs sm:text-sm font-semibold text-white capitalize group-hover:text-orange-400 transition-colors truncate">
+																{platformNames[link.linkName] || link.linkName}
+															</span>
+															<span className="text-xs text-gray-400 truncate max-w-[100px] sm:max-w-[120px]">
+																{
+																	link.url
+																		.replace(/^https?:\/\//, "")
+																		.split("/")[0]
+																}
+															</span>
+														</div>
+														<div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex-shrink-0 hidden sm:block">
+															<svg
+																width="14"
+																height="14"
+																viewBox="0 0 24 24"
+																fill="none"
+																stroke="currentColor"
+																strokeWidth="2"
+																className="text-orange-400 sm:w-4 sm:h-4"
+															>
+																<title>External Link</title>
+																<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+																<polyline points="15,3 21,3 21,9"></polyline>
+																<line x1="10" y1="14" x2="21" y2="3"></line>
+															</svg>
+														</div>
+													</a>
+													{!isViewingOtherProfile && (
+														<div className="flex items-center ml-1 sm:ml-2">
+															<button
+																type="button"
+																onClick={() => handleRemoveSocial(idx)}
+																className="w-7 h-7 sm:w-9 sm:h-9 flex items-center justify-center rounded-lg sm:rounded-xl transition-all duration-200 hover:bg-red-500/20 disabled:opacity-50 group-hover:scale-110 border border-transparent hover:border-red-500/30"
+																title="Remove link"
+																disabled={removingLinkIndex === idx}
+															>
+																{removingLinkIndex === idx ? (
+																	<div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-red-400 border-t-transparent"></div>
+																) : (
+																	<MdDelete className="text-red-400 hover:text-red-300 text-base sm:text-lg transition-colors" />
+																)}
+															</button>
+														</div>
+													)}
+												</div>
+											);
+										},
+									)}
+								</div>
+							) : (
+								<div className="bg-gradient-to-tr from-neutral-800/50 to-neutral-900/50 border border-neutral-700/30 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center">
+									<div className="text-3xl sm:text-4xl mb-3 opacity-50">🔗</div>
+									<p className="text-sm sm:text-base text-gray-400 mb-1">
+										{isViewingOtherProfile
+											? `${currentUser?.name || "This user"} hasn't shared their social handles yet`
+											: "You haven't added any social links yet"}
+									</p>
+									<p className="text-xs text-gray-500">
+										{isViewingOtherProfile
+											? "Check back later to see their social profiles"
+											: "Add your social media profiles above to connect with others"}
+									</p>
+								</div>
+							)}
 						</div>
 					</div>
 				</div>
 			</div>
 
-			<div className="col-span-full text-black dark:text-white bg-gradient-to-tr from-white/20 via-white/10 to-white/5 dark:from-neutral-900/40 dark:to-neutral-800/20 border border-black dark:border-white rounded-2xl p-5 sm:p-8 text-center shadow backdrop-blur-sm">
-				<h2 className="text-2xl sm:text-4xl font-extrabold bg-gradient-to-tr from-orange-400 to-yellow-400 bg-clip-text text-transparent mb-2 sm:mb-3">
+			<div className="col-span-full text-black dark:text-white bg-gradient-to-tr from-white/20 via-white/10 to-white/5 dark:from-neutral-900/40 dark:to-neutral-800/20 border border-black dark:border-white rounded-xl sm:rounded-2xl p-4 sm:p-5 md:p-8 text-center shadow backdrop-blur-sm">
+				<h2 className="text-xl sm:text-2xl md:text-4xl font-extrabold bg-gradient-to-tr from-orange-400 to-yellow-400 bg-clip-text text-transparent mb-2 sm:mb-3">
 					My Events
 				</h2>
-				<p className="text-base sm:text-lg font-medium mb-1 sm:mb-2">
+				<p className="text-sm sm:text-base md:text-lg font-medium mb-1 sm:mb-2">
 					You're missing out!
 				</p>
-				<p className="text-gray-500 dark:text-gray-300 mb-2 sm:mb-4">
+				<p className="text-xs sm:text-sm text-gray-500 dark:text-gray-300 mb-3 sm:mb-4 px-2">
 					Register for events to get started and make the most of your
 					experience!
 				</p>
-				<Link href="/events" className="inline-block mt-2 sm:mt-4">
+				<Link href="/events" className="inline-block">
 					<button
 						type="button"
-						className="interactive mt-2 sm:mt-4 px-6 sm:px-8 py-2 sm:py-3 font-semibold bg-gradient-to-tr from-orange-500 to-yellow-400 rounded-full shadow transition hover:scale-105 hover:shadow-lg text-white text-base sm:text-lg"
+						className="interactive px-5 sm:px-6 md:px-8 py-2 sm:py-3 font-semibold bg-gradient-to-tr from-orange-500 to-yellow-400 rounded-full shadow transition hover:scale-105 hover:shadow-lg text-white text-sm sm:text-base md:text-lg"
 					>
 						Browse Events
 					</button>
