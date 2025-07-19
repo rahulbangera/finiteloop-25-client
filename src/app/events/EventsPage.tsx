@@ -84,6 +84,7 @@ const EventsPage = () => {
 		"2024-25": [],
 		"2025-26": [],
 	});
+
 	const [loading, setLoading] = useState({
 		events: true,
 		checkingRegistration: false,
@@ -230,6 +231,8 @@ const EventsPage = () => {
 	}, [drawerOpen]);
 
 	useEffect(() => {
+		setShowTeamDialog(false);
+		setSoloConfirm(false);
 		const checkRegistrationAndAvailable = async () => {
 			if (!selectedEvent) {
 				setTeamInitialized(true);
@@ -259,6 +262,7 @@ const EventsPage = () => {
 							setRegistered(true);
 							setTeamState((prev) => ({
 								...prev,
+								isConfirmed: jsonSolo.result.isConfirmed || false,
 								createdTeamId: jsonSolo.result.teamId,
 							}));
 							isRegistered = true;
@@ -416,7 +420,9 @@ const EventsPage = () => {
 			}
 		}
 	};
-
+	useEffect(() => {
+		console.log(teamState.isConfirmed);
+	}, [teamState.isConfirmed]);
 	const createTeam = useCallback(async () => {
 		if (!selectedEvent) return;
 		if (!userId) {
@@ -443,6 +449,7 @@ const EventsPage = () => {
 				setTeamState((prev) => ({
 					...prev,
 					createdTeamId: json.data.teamId,
+					isLeader: true,
 					members: Array.isArray(json.data?.members)
 						? json.data.members.map((m: { id: string; name: string }) => ({
 								id: m.id,
@@ -683,9 +690,15 @@ const EventsPage = () => {
 							(selectedEvent?.flcAmount > 0 ||
 								selectedEvent?.nonFlcAmount > 0) ? (
 								<PaymentButton
+									id="confirm-team-payment"
 									paymentType="EVENT"
-									title="Pay to Confirm Team"
 									amountInINR={400}
+									onStart={() => {
+										setLoading((prev) => ({ ...prev, confirmTeam: true }));
+									}}
+									onEnd={() => {
+										setLoading((prev) => ({ ...prev, confirmTeam: false }));
+									}}
 									description={selectedEvent.name}
 									teamId={teamState.createdTeamId}
 									disabled={
@@ -703,7 +716,11 @@ const EventsPage = () => {
 									onFailure={() => {
 										toast.error("Payment failed");
 									}}
-								/>
+								>
+									{loading.confirmTeam
+										? "Confirming..."
+										: "Pay to confirm Team"}
+								</PaymentButton>
 							) : (
 								<button
 									type="button"
@@ -1130,7 +1147,10 @@ const EventsPage = () => {
 																	? "Processing..."
 																	: registered
 																		? "Registered"
-																		: "Register"}
+																		: selectedEvent.flcAmount > 0 ||
+																				selectedEvent.nonFlcAmount > 0
+																			? "Pay to Register"
+																			: "Register"}
 														</button>
 													</>
 												)}
@@ -1155,88 +1175,90 @@ const EventsPage = () => {
 									<>
 										{selectedEvent?.eventType === "SOLO" && teamInitialized && (
 											<>
-												{registered && teamState.createdTeamId && (
-													<>
-														<div className="flex flex-row items-left">
-															<button
-																type="button"
-																className="flex-shrink-0 flex items-center justify-center w-24 h-24 md:w-32 md:h-32 bg-purple-100 dark:bg-indigo-900 rounded-xl border border-purple-300 dark:border-indigo-700 cursor-pointer"
-																onClick={() => setShowQrModal(true)}
-																onKeyDown={(e) => {
-																	if (e.key === "Enter" || e.key === " ") {
-																		setShowQrModal(true);
-																	}
-																}}
-																aria-label="Show QR Code"
-																tabIndex={0}
-															>
-																<QRCodeSVG
-																	value={teamState.createdTeamId}
-																	size={112}
-																	bgColor="#F3E8FF"
-																	fgColor="#6e11b0"
-																	className="w-20 h-20 md:w-28 md:h-28 object-contain rounded-xl"
-																/>
-															</button>
-															<div className="flex flex-col ml-4">
-																<div className="text-lg md:text-xl font-semibold text-purple-800 dark:text-purple-200">
-																	Team ID:
-																</div>
-																<div className="px-2 py-1 rounded-lg text-purple-900 dark:text-purple-100 text-lg md:text-xl break-all font-mono">
-																	{teamState.createdTeamId}
-																</div>
+												{registered &&
+													teamState.createdTeamId &&
+													teamState.isConfirmed && (
+														<>
+															<div className="flex flex-row items-left">
 																<button
 																	type="button"
-																	onClick={() => {
-																		navigator.clipboard.writeText(
-																			teamState.createdTeamId,
-																		);
-																		toast.success("Copied Team ID");
+																	className="flex-shrink-0 flex items-center justify-center w-24 h-24 md:w-32 md:h-32 bg-purple-100 dark:bg-indigo-900 rounded-xl border border-purple-300 dark:border-indigo-700 cursor-pointer"
+																	onClick={() => setShowQrModal(true)}
+																	onKeyDown={(e) => {
+																		if (e.key === "Enter" || e.key === " ") {
+																			setShowQrModal(true);
+																		}
 																	}}
-																	className={`${BUTTON_CLASSES.secondary} px-2 py-1 w-20 text-xs rounded-lg border border-purple-300 dark:border-indigo-700 hover:bg-purple-200 dark:hover:bg-indigo-800 transition`}
-																	title="Copy Team ID"
+																	aria-label="Show QR Code"
+																	tabIndex={0}
 																>
-																	Copy
-																</button>
-															</div>
-														</div>
-														{showQrModal && (
-															<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-																<div className="relative bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-xl flex flex-col items-center">
-																	<button
-																		type="button"
-																		onClick={() => setShowQrModal(false)}
-																		className="absolute top-2 right-2 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
-																		aria-label="Close"
-																	>
-																		<X className="h-6 w-6" />
-																	</button>
 																	<QRCodeSVG
 																		value={teamState.createdTeamId}
-																		size={256}
+																		size={112}
 																		bgColor="#F3E8FF"
-																		fgColor="#7C3AED"
-																		className="w-64 h-64 object-contain p-3"
+																		fgColor="#6e11b0"
+																		className="w-20 h-20 md:w-28 md:h-28 object-contain rounded-xl"
 																	/>
-																	<div className="mt-2 text-center text-purple-900 dark:text-purple-100 break-all font-mono">
+																</button>
+																<div className="flex flex-col ml-4">
+																	<div className="text-lg md:text-xl font-semibold text-purple-800 dark:text-purple-200">
+																		Team ID:
+																	</div>
+																	<div className="px-2 py-1 rounded-lg text-purple-900 dark:text-purple-100 text-lg md:text-xl break-all font-mono">
 																		{teamState.createdTeamId}
 																	</div>
+																	<button
+																		type="button"
+																		onClick={() => {
+																			navigator.clipboard.writeText(
+																				teamState.createdTeamId,
+																			);
+																			toast.success("Copied Team ID");
+																		}}
+																		className={`${BUTTON_CLASSES.secondary} px-2 py-1 w-20 text-xs rounded-lg border border-purple-300 dark:border-indigo-700 hover:bg-purple-200 dark:hover:bg-indigo-800 transition`}
+																		title="Copy Team ID"
+																	>
+																		Copy
+																	</button>
 																</div>
 															</div>
-														)}
-													</>
-												)}
+															{showQrModal && (
+																<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+																	<div className="relative bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-xl flex flex-col items-center">
+																		<button
+																			type="button"
+																			onClick={() => setShowQrModal(false)}
+																			className="absolute top-2 right-2 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+																			aria-label="Close"
+																		>
+																			<X className="h-6 w-6" />
+																		</button>
+																		<QRCodeSVG
+																			value={teamState.createdTeamId}
+																			size={256}
+																			bgColor="#F3E8FF"
+																			fgColor="#7C3AED"
+																			className="w-64 h-64 object-contain p-3"
+																		/>
+																		<div className="mt-2 text-center text-purple-900 dark:text-purple-100 break-all font-mono">
+																			{teamState.createdTeamId}
+																		</div>
+																	</div>
+																</div>
+															)}
+														</>
+													)}
 												<button
 													type="button"
 													onClick={() => setSoloConfirm(true)}
 													disabled={
 														teamState.registering ||
 														loading.checkingRegistration ||
-														registered ||
+														(registered && teamState.isConfirmed) ||
 														loading.register
 													}
 													className={
-														registered
+														registered && teamState.isConfirmed
 															? BUTTON_CLASSES.disabled
 															: BUTTON_CLASSES.primary
 													}
@@ -1245,9 +1267,14 @@ const EventsPage = () => {
 														? "Checking..."
 														: teamState.registering || loading.register
 															? "Processing..."
-															: registered
+															: registered && teamState.isConfirmed
 																? "Registered"
-																: "Register"}
+																: registered &&
+																		!teamState.isConfirmed &&
+																		(selectedEvent?.flcAmount > 0 ||
+																			selectedEvent?.nonFlcAmount > 0)
+																	? "Pay to Confirm"
+																	: "Register"}
 												</button>
 											</>
 										)}
@@ -1323,19 +1350,78 @@ const EventsPage = () => {
 												Confirm Registration
 											</h3>
 											<p className="text-sm text-center mb-6 text-zinc-600 dark:text-zinc-300">
-												Are you sure you want to register for this event?
+												Are you sure you want to{" "}
+												{selectedEvent &&
+												(selectedEvent?.flcAmount > 0 ||
+													selectedEvent?.nonFlcAmount)
+													? "pay and "
+													: ""}{" "}
+												register for this event?
 											</p>
 											<div className="flex justify-center gap-3">
-												<button
-													type="button"
-													onClick={() => {
-														handleRegister();
-														setSoloConfirm(false);
-													}}
-													className={BUTTON_CLASSES.primary}
-												>
-													Yes, Register
-												</button>
+												{selectedEvent && !registered ? (
+													<button
+														type="button"
+														onClick={async () => {
+															await handleRegister();
+															if (
+																!(
+																	selectedEvent.flcAmount > 0 ||
+																	selectedEvent.nonFlcAmount
+																)
+															) {
+																setSoloConfirm(false);
+															}
+														}}
+														className={BUTTON_CLASSES.primary}
+													>
+														Yes, Register
+													</button>
+												) : selectedEvent &&
+													registered &&
+													!teamState.isConfirmed &&
+													(selectedEvent.flcAmount > 0 ||
+														selectedEvent?.nonFlcAmount) ? (
+													<PaymentButton
+														paymentType="EVENT"
+														className="bg-purple-600  hover:bg-purple-700 text-white dark:text-black font-medium hover:scale-105 transition"
+														amountInINR={400}
+														description={selectedEvent.name}
+														onStart={() => {
+															setLoading((prev) => ({
+																...prev,
+																confirmTeam: true,
+															}));
+														}}
+														onEnd={() => {
+															setLoading((prev) => ({
+																...prev,
+																confirmTeam: false,
+															}));
+															setSoloConfirm(false);
+														}}
+														disabled={
+															loading.confirmTeam ||
+															!userId ||
+															!selectedEvent ||
+															teamState.isConfirmed
+														}
+														teamId={teamState.createdTeamId}
+														onSuccess={async (paymentId) => {
+															console.log("Payment successful:", paymentId);
+															toast.success("Payment successful");
+															setSoloConfirm(false);
+														}}
+														onFailure={() => {
+															toast.error("Payment failed");
+															setSoloConfirm(false);
+														}}
+													>
+														{loading.confirmTeam
+															? "Confirming..."
+															: "Pay to Confirm"}
+													</PaymentButton>
+												) : null}
 												<button
 													type="button"
 													onClick={() => setSoloConfirm(false)}

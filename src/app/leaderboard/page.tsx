@@ -50,8 +50,8 @@ export default function Leaderboard() {
 					return;
 				}
 
-				const rankedData = data.map((user, index: number) => ({
-					rank: index + 1,
+				const rankedData = data.map((user) => ({
+					rank: user.rank,
 					name: user.name,
 					userId: user.id,
 					totalActivityPoints: user.totalActivityPoints,

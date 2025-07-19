@@ -9,10 +9,11 @@ type PaymentType = "EVENT" | "MEMBERSHIP";
 const PaymentButton = forwardRef<
 	HTMLButtonElement,
 	ButtonProps & {
-		title: string;
+		onStart?: () => void;
 		description: string;
 		onSuccess: (paymentId: string) => void;
 		onFailure: () => void;
+		onEnd?: () => void;
 	} & (
 			| {
 					paymentType: "EVENT";
@@ -28,13 +29,14 @@ const PaymentButton = forwardRef<
 >(
 	(
 		{
-			title,
+			onStart,
 			description,
 			paymentType,
 			amountInINR,
 			teamId,
 			onFailure,
 			onSuccess,
+			onEnd,
 			...props
 		},
 		ref,
@@ -64,6 +66,9 @@ const PaymentButton = forwardRef<
 					className="z-20"
 					onClick={async () => {
 						console.log("Payment button clicked");
+						if (onStart) {
+							onStart();
+						}
 						const order = await fetch(`${API_URL}/api/razorpay/create-order`, {
 							method: "POST",
 							headers: {
@@ -167,11 +172,12 @@ const PaymentButton = forwardRef<
 							},
 						});
 						paymentObj.open();
+						if (onEnd) {
+							onEnd();
+						}
 					}}
 					{...props}
-				>
-					{title || "Pay Now"}
-				</Button>
+				/>
 			</>
 		);
 	},
