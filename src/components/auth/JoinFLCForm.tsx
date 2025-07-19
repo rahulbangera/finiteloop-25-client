@@ -50,8 +50,9 @@ export default function JoinFLCForm() {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
+						Authorization: `Bearer ${session?.user?.accessToken}`,
 					},
-					body: JSON.stringify({ userId: session?.user.id, ...data }),
+					body: JSON.stringify({ ...data }),
 				},
 			);
 

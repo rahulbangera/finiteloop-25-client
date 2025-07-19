@@ -4,8 +4,6 @@ import Script from "next/script";
 import { Button, type ButtonProps } from "../ui/button";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
-type PaymentType = "EVENT" | "MEMBERSHIP";
-
 const PaymentButton = forwardRef<
 	HTMLButtonElement,
 	ButtonProps & {
@@ -73,6 +71,7 @@ const PaymentButton = forwardRef<
 							method: "POST",
 							headers: {
 								"Content-Type": "application/json",
+								Authorization: `Bearer ${session?.data?.accessToken}`,
 							},
 							body: JSON.stringify(
 								paymentType === "MEMBERSHIP"
@@ -128,6 +127,7 @@ const PaymentButton = forwardRef<
 											method: "POST",
 											headers: {
 												"Content-Type": "application/json",
+												Authorization: `Bearer ${session?.data?.accessToken}`,
 											},
 											body: JSON.stringify(
 												paymentType === "MEMBERSHIP"

@@ -56,8 +56,9 @@ export default function NavBar() {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
+						Authorization: `Bearer ${session?.user?.accessToken}`,
 					},
-					body: JSON.stringify({ userId: session?.user.id }),
+					body: JSON.stringify({}),
 				},
 			);
 
