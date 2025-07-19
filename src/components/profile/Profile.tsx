@@ -4,6 +4,10 @@ import { useEffect, useState } from "react";
 import PaymentButton from "../razorpay/paymentButton";
 import { toast } from "react-toastify";
 import { useSession } from "next-auth/react";
+import { z } from "zod";
+import { FaInstagram, FaLinkedin, FaGithub, FaGlobe } from "react-icons/fa";
+import { SiLeetcode } from "react-icons/si";
+import { MdDelete } from "react-icons/md";
 
 function ProfileDetail({ label, value }: { label: string; value: string }) {
 	return (
@@ -189,6 +193,9 @@ export default function Profile() {
 	const [branches, setBranches] = useState<Branch[]>([]);
 	const [loading, setLoading] = useState(false);
 
+	const [socialName, setSocialName] = useState<string>("");
+	const [socialUrl, setSocialUrl] = useState<string>("");
+
 	useEffect(() => {
 		const rippleHandler = (e: Event) => {
 			const button = e.currentTarget as HTMLElement;
@@ -307,8 +314,45 @@ export default function Profile() {
 		} catch (err) {
 			console.error(err);
 			toast.error("Update failed");
-		} finally {
-			setLoading(false);
+		}
+		setLoading(false);
+	};
+
+	const handleRemoveSocial = async (idx: number) => {
+		if (!session?.user?.id || !Array.isArray(session.user.userLinks)) return;
+		const link = session.user.userLinks[idx];
+
+		const schema = z.object({
+			userId: z.number().min(1),
+			linkName: z.string().min(1),
+		});
+
+		const payload = {
+			userId: session.user.id,
+			linkName: link.linkName,
+		};
+
+		const result = schema.safeParse(payload);
+		if (!result.success) {
+			toast.error("Invalid data for removing social link");
+			return;
+		}
+
+		try {
+			const res = await fetch(
+				`${process.env.NEXT_PUBLIC_SERVER_URL}/api/user/removeUserLink`,
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(payload),
+				},
+			);
+			if (!res.ok) throw new Error("Failed to remove link");
+			await update();
+			toast.success("Social link removed");
+		} catch (err) {
+			console.error(err);
+			toast.error("Failed to remove social link");
 		}
 	};
 
@@ -321,7 +365,7 @@ export default function Profile() {
 						<div className="relative flex-shrink-0 mx-auto sm:mx-0">
 							{/* biome-ignore lint/performance/noImgElement: <testing> */}
 							<img
-								src="https://placehold.co/160x160"
+								src={session?.user.image || "https://placehold.co/160x160"}
 								alt="Profile"
 								className="w-28 h-28 sm:w-32 sm:h-32 rounded-full border-4 border-orange-400 object-cover shadow transition-transform hover:scale-105"
 							/>
@@ -337,13 +381,17 @@ export default function Profile() {
 										${
 											session?.user.role === "ADMIN"
 												? "bg-gradient-to-tr from-red-500 to-pink-400 border border-red-500 text-white hover:bg-red-600 dark:bg-gradient-to-tr dark:from-red-700 dark:to-pink-600"
-												: "bg-gradient-to-tr from-blue-400 to-cyan-400 border border-blue-400 text-white hover:bg-blue-500 dark:bg-gradient-to-tr dark:from-blue-700 dark:to-cyan-600"
+												: session?.user.role === "MEMBER"
+													? "bg-gradient-to-tr from-green-400 to-lime-400 border border-green-400 text-white hover:bg-green-500 dark:bg-gradient-to-tr dark:from-green-700 dark:to-lime-600"
+													: "bg-gradient-to-tr from-blue-400 to-cyan-400 border border-blue-400 text-white hover:bg-blue-500 dark:bg-gradient-to-tr dark:from-blue-700 dark:to-cyan-600"
 										}`}
 									title={`Role: ${session?.user.role}`}
 								>
 									{session?.user.role === "ADMIN"
-										? "🛡️ Admin"
-										: `• ${session?.user.role}`}
+										? "🛡️ ADMIN"
+										: session?.user.role === "MEMBER"
+											? "❤️ MEMBER"
+											: `• ${session?.user.role}`}
 								</span>
 							</div>
 
@@ -401,23 +449,157 @@ export default function Profile() {
 						/>
 					</div>
 					<div>
-						<h3 className="text-lg sm:text-xl font-semibold text-center text-flc-yellow bg-clip-text mb-3">
-							Certificates
-						</h3>
-						<div className="interactive text-center p-6 bg-gradient-to-tr from-neutral-800 to-neutral-900 border-2 border-dashed border-neutral-700 rounded-2xl shadow transition hover:scale-[1.03]">
-							<div className="text-4xl mb-2">🚀</div>
-							<p className="text-gray-300 font-medium">
-								Jump into upcoming events
-							</p>
-							<p className="text-sm text-gray-400">
-								Your path to earning certificates starts there!
-							</p>
+						<div className="interactive bg-gradient-to-tr from-neutral-800 to-neutral-900 border text-center border-neutral-700 rounded-3xl p-6 shadow mb-2">
+							<h4 className="text-lg font-bold mb-4 text-gray-300">
+								Add Social Link
+							</h4>
+							<div className="flex flex-col sm:flex-row gap-3 items-center">
+								<div className="w-full flex flex-col sm:flex-row gap-3 items-center justify-center">
+									<div className="flex flex-col sm:flex-row gap-3 w-full">
+										<select
+											className="px-4 py-2 rounded-full bg-neutral-900 text-white border border-orange-400 focus:border-yellow-400 focus:outline-none transition w-full sm:w-40"
+											value={socialName}
+											onChange={(e) => setSocialName(e.target.value)}
+										>
+											<option value="">Select Platform</option>
+											<option value="instagram">Instagram</option>
+											<option value="linkedin">LinkedIn</option>
+											<option value="github">GitHub</option>
+											<option value="portfolio">Portfolio</option>
+											<option value="leetcode">LeetCode</option>
+										</select>
+										<input
+											type="url"
+											className="px-4 py-2 rounded-full bg-neutral-900 text-white border border-orange-400 focus:border-yellow-400 focus:outline-none flex-1 transition w-full"
+											placeholder="Enter URL"
+											value={socialUrl}
+											onChange={(e) => setSocialUrl(e.target.value)}
+										/>
+										<button
+											type="button"
+											className="interactive px-4 py-2 rounded-full bg-green-500 text-white font-bold shadow hover:bg-green-600 transition flex items-center justify-center"
+											onClick={async () => {
+												if (!socialName || !socialUrl || !session?.user?.id)
+													return;
+
+												const schema = z.object({
+													linkName: z.string().min(1),
+													url: z.string().url(),
+													userId: z.number().min(1),
+												});
+
+												const payload = {
+													linkName: socialName,
+													url: socialUrl,
+													userId: session.user.id,
+												};
+
+												const result = schema.safeParse(payload);
+												if (!result.success) {
+													toast.error("Invalid link data");
+													return;
+												}
+
+												try {
+													const res = await fetch(
+														`${process.env.NEXT_PUBLIC_SERVER_URL}/api/user/addUserLink`,
+														{
+															method: "POST",
+															headers: { "Content-Type": "application/json" },
+															body: JSON.stringify(payload),
+														},
+													);
+													if (!res.ok) throw new Error("Failed to add link");
+													await update();
+													setSocialName("");
+													setSocialUrl("");
+													toast.success("Social link added");
+												} catch (err) {
+													console.error(err);
+													toast.error("Failed to add social link");
+												}
+											}}
+											disabled={!socialName || !socialUrl}
+											title="Add Social Link"
+										>
+											<span className="text-xl">+</span>
+										</button>
+									</div>
+								</div>
+							</div>
+
+							{Array.isArray(session?.user.userLinks) &&
+								session.user.userLinks.length > 0 && (
+									<div className="mt-6">
+										<h5 className="text-base font-semibold mb-3 text-gray-300">
+											Your Social Links:
+										</h5>
+										<ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+											{session.user.userLinks.map((link, idx) => {
+												const icons: Record<string, React.JSX.Element> = {
+													instagram: (
+														<span className="flex w-7 h-7 rounded-full bg-gradient-to-tr from-pink-500 to-yellow-400 items-center justify-center mr-2">
+															<FaInstagram className="text-white text-xl" />
+														</span>
+													),
+													linkedin: (
+														<span className="w-7 h-7 rounded-full bg-blue-700 flex items-center justify-center mr-2">
+															<FaLinkedin className="text-white text-xl" />
+														</span>
+													),
+													github: (
+														<span className=" w-7 h-7 rounded-full bg-neutral-900 flex items-center justify-center mr-2">
+															<FaGithub className="text-white text-xl" />
+														</span>
+													),
+													portfolio: (
+														<span className="w-7 h-7 rounded-full bg-gradient-to-tr from-orange-400 to-yellow-400 flex items-center justify-center mr-2">
+															<FaGlobe className="text-white text-xl" />
+														</span>
+													),
+													leetcode: (
+														<span className="w-7 h-7 rounded-full bg-gradient-to-tr from-yellow-400 to-orange-500 flex items-center justify-center mr-2">
+															<SiLeetcode className="text-white text-xl" />
+														</span>
+													),
+												};
+												return (
+													<li
+														key={`${link.linkName}-${link.url}`}
+														className="flex items-center justify-center border-2 border-flc-yellow rounded-lg p-2"
+													>
+														<a
+															href={link.url}
+															target="_blank"
+															rel="noopener noreferrer"
+															className="block"
+															title={link.linkName}
+														>
+															{icons[link.linkName] || (
+																<span className="w-7 h-7 rounded-full bg-gray-600 flex items-center justify-center mr-2">
+																	<FaGlobe className="text-white text-xl" />
+																</span>
+															)}
+														</a>
+														<button
+															type="button"
+															onClick={() => handleRemoveSocial(idx)}
+															className="ml-2 text-xl px-2 py-1 transition"
+															title="Remove"
+														>
+															<MdDelete className="text-red-400 hover:text-red-600" />
+														</button>
+													</li>
+												);
+											})}
+										</ul>
+									</div>
+								)}
 						</div>
 					</div>
 				</div>
 			</div>
 
-			{/* Events Section */}
 			<div className="col-span-full text-black dark:text-white bg-gradient-to-tr from-white/20 via-white/10 to-white/5 dark:from-neutral-900/40 dark:to-neutral-800/20 border border-black dark:border-white rounded-2xl p-5 sm:p-8 text-center shadow backdrop-blur-sm">
 				<h2 className="text-2xl sm:text-4xl font-extrabold bg-gradient-to-tr from-orange-400 to-yellow-400 bg-clip-text text-transparent mb-2 sm:mb-3">
 					My Events
