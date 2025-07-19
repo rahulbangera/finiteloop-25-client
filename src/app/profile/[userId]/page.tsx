@@ -2,9 +2,9 @@ import Profile from "@/components/profile/Profile";
 import { notFound } from "next/navigation";
 
 interface ProfilePageProps {
-	params: {
+	params: Promise<{
 		userId: string;
-	};
+	}>;
 }
 
 export default async function UserProfilePage({ params }: ProfilePageProps) {
