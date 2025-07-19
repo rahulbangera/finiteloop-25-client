@@ -1,5 +1,7 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { signOut } from "next-auth/react";
+import { toast } from "react-toastify";
 
 export interface AppUser {
 	id: string;
@@ -14,6 +16,7 @@ export interface AppUser {
 	image?: string;
 	activityPoints?: string;
 	attendance?: string;
+	userLinks?: { linkName: string; url: string }[];
 	accessToken?: string;
 	refreshToken?: string;
 	accessTokenExpiry?: number;
@@ -116,12 +119,14 @@ export const authOptions: NextAuthOptions = {
 				};
 			}
 
+			// Refresh the token if it's about to expire (within 2 minutes)
 			if (
 				trigger === "update" ||
-				(token.accessTokenExpiry && token.accessTokenExpiry < now)
+				(token.accessTokenExpiry && token.accessTokenExpiry - now < 120)
 			) {
 				try {
 					const refreshed = await refreshToken(token.id, token.refreshToken);
+					console.log("Refreshed token:", refreshed);
 					if (refreshed) {
 						const {
 							user,
@@ -133,11 +138,20 @@ export const authOptions: NextAuthOptions = {
 							...user,
 							accessToken,
 							refreshToken: newRefreshToken,
-							accessTokenExpiry: now + 60 * 15,
+							accessTokenExpiry: now + 60 * 60 * 24 * 30,
 						};
+					} else {
+						if (typeof window !== "undefined") {
+							await signOut({ callbackUrl: "/auth/login" });
+							toast.error("Session expired. Please sign in again.");
+						}
 					}
 				} catch (err) {
 					console.error("Token refresh error:", err);
+					if (typeof window !== "undefined") {
+						await signOut({ callbackUrl: "/auth/login" });
+						toast.error("Session expired. Please sign in again.");
+					}
 				}
 			}
 
@@ -158,6 +172,9 @@ export const authOptions: NextAuthOptions = {
 				image: token.image ?? "",
 				activityPoints: token.activityPoints ?? "",
 				attendance: token.attendance ?? "",
+				userLinks: token.userLinks as
+					| { linkName: string; url: string }[]
+					| undefined,
 				accessToken: token.accessToken,
 				refreshToken: token.refreshToken,
 				accessTokenExpiry: token.accessTokenExpiry,
