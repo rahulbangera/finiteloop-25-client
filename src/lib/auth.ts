@@ -126,7 +126,6 @@ export const authOptions: NextAuthOptions = {
 			) {
 				try {
 					const refreshed = await refreshToken(token.id, token.refreshToken);
-					console.log("Refreshed token:", refreshed);
 					if (refreshed) {
 						const {
 							user,
@@ -138,7 +137,7 @@ export const authOptions: NextAuthOptions = {
 							...user,
 							accessToken,
 							refreshToken: newRefreshToken,
-							accessTokenExpiry: now + 60 * 60 * 24 * 30,
+							accessTokenExpiry: now + 60 * 60 * 24 * 31, // add one day
 						};
 					} else {
 						if (typeof window !== "undefined") {

@@ -64,8 +64,6 @@ export default function NavBar() {
 			if (!res.ok) {
 				throw new Error("Failed to revoke refresh tokens");
 			}
-
-			toast.success("Signed out successfully!");
 			await signOut({ callbackUrl: "/auth/login" });
 		} catch (err) {
 			console.error("Sign out failed:", err);
