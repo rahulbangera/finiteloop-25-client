@@ -38,6 +38,37 @@ export default function NavBar() {
 		};
 	}, []);
 
+	const getRoleColor = (role: string) => {
+		switch (role?.toLowerCase()) {
+			case "admin":
+				return "text-red-600 dark:text-red-400";
+			case "moderator":
+				return "text-orange-600 dark:text-orange-400";
+			case "member":
+				return "text-green-600 dark:text-green-400";
+			case "user":
+				return "text-blue-600 dark:text-blue-400";
+			default:
+				return "text-gray-800 dark:text-white";
+		}
+	};
+
+	const getRoleIcon = (role: string) => {
+		const baseClasses = "relative mr-3 drop-shadow-sm";
+		switch (role?.toLowerCase()) {
+			case "admin":
+				return `${baseClasses} text-red-600 dark:text-red-400`;
+			case "moderator":
+				return `${baseClasses} text-orange-600 dark:text-orange-400`;
+			case "member":
+				return `${baseClasses} text-green-600 dark:text-green-400`;
+			case "user":
+				return `${baseClasses} text-blue-600 dark:text-blue-400`;
+			default:
+				return `${baseClasses} text-gray-800 dark:text-white`;
+		}
+	};
+
 	const toggleMenu = () => {
 		setIsMenuOpen(!isMenuOpen);
 	};
@@ -170,21 +201,22 @@ export default function NavBar() {
 								<button
 									type="button"
 									onClick={toggleProfileDropdown}
-									className="relative bg-white/35 dark:bg-white/25 hover:bg-white/45 dark:hover:bg-white/35 backdrop-blur-2xl rounded-2xl px-4 py-3 flex justify-center items-center shadow-lg cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-xl group overflow-hidden"
+									className="relative bg-white/35 dark:bg-white/25 hover:bg-white/45 dark:hover:bg-white/35 backdrop-blur-2xl rounded-2xl px-6 py-3 flex justify-center items-center shadow-lg cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-xl group overflow-hidden"
 								>
 									<div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-									<User
-										size={20}
-										className="relative text-gray-800 dark:text-white mr-2 drop-shadow-sm"
-									/>
-									<span className="relative font-semibold text-gray-800 dark:text-white tracking-wide">
-										{session.user?.name || "Profile"}
+									<User size={20} className={getRoleIcon(session.user?.role)} />
+									<span
+										className={`relative font-bold text-base tracking-wider uppercase ${getRoleColor(session.user?.role)} drop-shadow-sm`}
+									>
+										{session.user?.role ||
+											session.user?.name?.split(" ")[0] ||
+											"User"}
 									</span>
 									<div
-										className={`ml-2 transition-transform duration-200 ${isProfileDropdownOpen ? "rotate-180" : ""}`}
+										className={`ml-3 transition-transform duration-200 ${isProfileDropdownOpen ? "rotate-180" : ""}`}
 									>
 										<svg
-											className="w-4 h-4 text-gray-800 dark:text-white"
+											className={`w-4 h-4 drop-shadow-sm ${getRoleColor(session.user?.role)}`}
 											fill="none"
 											stroke="currentColor"
 											viewBox="0 0 24 24"
@@ -202,30 +234,40 @@ export default function NavBar() {
 
 								{/* Dropdown Menu */}
 								{isProfileDropdownOpen && (
-									<div className="absolute right-0 top-full mt-2 w-48 bg-white/90 dark:bg-black/90 backdrop-blur-2xl rounded-2xl shadow-2xl border border-white/20 dark:border-white/10 overflow-hidden z-50">
+									<div className="absolute right-0 top-full mt-2 w-52 bg-white/40 dark:bg-white/25 backdrop-blur-3xl rounded-2xl shadow-2xl border border-white/30 dark:border-white/20 overflow-hidden z-50 p-2">
 										<Link href="/profile">
 											<button
 												type="button"
 												onClick={() => setIsProfileDropdownOpen(false)}
-												className="w-full px-4 py-3 text-left hover:bg-white/50 dark:hover:bg-white/10 transition-colors duration-200 flex items-center text-gray-800 dark:text-white"
+												className="relative w-full bg-white/35 dark:bg-white/25 hover:bg-white/45 dark:hover:bg-white/35 backdrop-blur-2xl rounded-xl px-4 py-3 mb-2 flex items-center transition-all duration-300 hover:scale-[1.02] hover:shadow-lg group overflow-hidden"
 											>
-												<User size={18} className="mr-3" />
-												<span className="font-medium">Profile</span>
+												<div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+												<User
+													size={18}
+													className="relative mr-3 text-gray-800 dark:text-white drop-shadow-sm"
+												/>
+												<span className="relative font-semibold text-gray-800 dark:text-white tracking-wide">
+													Profile
+												</span>
 											</button>
 										</Link>
-										<div className="border-t border-white/20 dark:border-white/10">
-											<button
-												type="button"
-												onClick={() => {
-													handleSignOut();
-													setIsProfileDropdownOpen(false);
-												}}
-												className="w-full px-4 py-3 text-left hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors duration-200 flex items-center text-red-600 dark:text-red-400"
-											>
-												<LogOut size={18} className="mr-3" />
-												<span className="font-medium">Logout</span>
-											</button>
-										</div>
+										<button
+											type="button"
+											onClick={() => {
+												handleSignOut();
+												setIsProfileDropdownOpen(false);
+											}}
+											className="relative w-full bg-red-500/80 dark:bg-red-600/80 hover:bg-red-600/90 dark:hover:bg-red-700/90 backdrop-blur-2xl rounded-xl px-4 py-3 flex items-center transition-all duration-300 hover:scale-[1.02] hover:shadow-lg group overflow-hidden"
+										>
+											<div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+											<LogOut
+												size={18}
+												className="relative mr-3 text-white drop-shadow-sm"
+											/>
+											<span className="relative font-semibold text-white tracking-wide">
+												Logout
+											</span>
+										</button>
 									</div>
 								)}
 							</div>
