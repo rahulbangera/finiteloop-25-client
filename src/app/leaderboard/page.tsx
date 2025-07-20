@@ -6,15 +6,21 @@ import { useEffect, useState } from "react";
 import { Scrollbar } from "react-scrollbars-custom";
 
 const podiumStyle = {
-	1: "order-2 mb-10 z-10",
-	2: "order-1 mb-5",
-	3: "order-3 mb-0",
+	1: "order-2 z-10", // First place - center
+	2: "order-1 z-5 mt-8", // Second place - left, lower than 1st
+	3: "order-3 z-5 mt-12", // Third place - right, lowest
 };
 
 const podiumBorder = {
-	1: "border-[#FFD700]", // goldy
-	2: "border-[#C0C0C0]", // silver
-	3: "border-[#CD7F32]", // bronze
+	1: "border-[#FFD700] shadow-[0_0_20px_rgba(255,215,0,0.5)]", // Gold with glow
+	2: "border-[#C0C0C0] shadow-[0_0_15px_rgba(192,192,192,0.4)]", // Silver with glow
+	3: "border-[#CD7F32] shadow-[0_0_15px_rgba(205,127,50,0.4)]", // Bronze with glow
+};
+
+const podiumRankBg = {
+	1: "bg-gradient-to-r from-[#FFD700] to-[#FFA500] border-yellow-300", // Gold gradient
+	2: "bg-gradient-to-r from-[#C0C0C0] to-[#A8A8A8] border-gray-300", // Silver gradient
+	3: "bg-gradient-to-r from-[#CD7F32] to-[#B8860B] border-orange-400", // Bronze gradient
 };
 
 export default function Leaderboard() {
@@ -114,48 +120,76 @@ export default function Leaderboard() {
 
 	return (
 		<main>
-			{/* Mobile View */}
 			<div className="flex md:hidden mt-20 p-2 flex-col items-center justify-center overflow-x-hidden overflow-y-hidden">
-				<p className="text-center lilita-font text-4xl p-2 font-mono font-bold text-flc-yellow tracking-wide drop-shadow mb-8">
-					LeaderBoard
-				</p>
+				<div className="text-center mb-16">
+					<h1 className="lilita-font text-6xl md:text-7xl lg:text-8xl font-bold text-flc-yellow relative mt-8 select-none">
+						LeaderBoard
+					</h1>
+				</div>
 
-				{/* Podium */}
-				<div className="flex flex-row justify-center items-end gap-2 mb-6">
+				<div className="flex flex-row justify-center items-end gap-3 mb-8 px-2 h-48">
 					{sortedTopThree.map((user) => (
-						<div
+						<button
 							key={user.userId}
-							className={`flex flex-col items-center ${podiumStyle[user.rank as 1 | 2 | 3]}`}
+							type="button"
+							className={`flex flex-col items-center justify-end transition-all duration-300 cursor-pointer hover:scale-105 bg-transparent border-none p-0 ${podiumStyle[user.rank as 1 | 2 | 3]} w-[90px]`}
+							onClick={() => {
+								window.location.assign(`/profile/${user.userId}`);
+							}}
+							onKeyDown={(e) => {
+								if (e.key === "Enter" || e.key === " ") {
+									e.preventDefault();
+									window.location.assign(`/profile/${user.userId}`);
+								}
+							}}
 						>
-							<div className="relative">
+							<div className="relative mb-3">
 								<Image
 									src={user.avatar}
 									alt={user.name}
-									className={`rounded-full border-4 shadow-lg ${podiumBorder[user.rank as 1 | 2 | 3]}`}
-									width={80}
-									height={80}
+									className={`rounded-full border-4 shadow-xl transition-all duration-300 ${podiumBorder[user.rank as 1 | 2 | 3]}`}
+									width={user.rank === 1 ? 85 : 70}
+									height={user.rank === 1 ? 85 : 70}
 								/>
-								<span className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 bg-gradient-to-r from-[#FCA410] to-yellow-400 text-white text-sm font-bold rounded-full w-7 h-7 flex items-center justify-center shadow">
+								<span
+									className={`absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 ${podiumRankBg[user.rank as 1 | 2 | 3]} text-white text-sm font-bold rounded-full w-7 h-7 flex items-center justify-center shadow-lg border-2`}
+								>
 									{user.rank}
 								</span>
 							</div>
-							<p
-								className={`mt-5 font-semibold text-center text-2xl ${
-									user.userId === currentUser?.userId
-										? "text-[#FCA410]"
-										: "text-black dark:text-white"
+							<div className="text-center w-full">
+								<p
+									className={`font-sans font-bold text-center leading-tight mb-1 ${
+										user.rank === 1 ? "text-lg" : "text-base"
+									} ${
+										user.userId === currentUser?.userId
+											? "text-[#FCA410]"
+											: "text-black dark:text-white"
+									}`}
+								>
+									{user.name.length > 8
+										? `${user.name.substring(0, 8)}...`
+										: user.name}
+								</p>
+								<p
+									className={`text-gray-600 dark:text-gray-300 font-sans font-medium ${user.rank === 1 ? "text-sm" : "text-xs"}`}
+								>
+									{user.totalActivityPoints} pts
+								</p>
+							</div>
+							<div
+								className={`w-full mt-2 rounded-t-lg ${
+									user.rank === 1
+										? "bg-gradient-to-b from-[#FFD700]/30 to-[#FFA500]/20 h-12"
+										: user.rank === 2
+											? "bg-gradient-to-b from-[#C0C0C0]/30 to-[#A8A8A8]/20 h-8"
+											: "bg-gradient-to-b from-[#CD7F32]/30 to-[#B8860B]/20 h-6"
 								}`}
-							>
-								{user.name}
-							</p>
-							<p className="text-black dark:text-white text-xs font-mono">
-								{user.totalActivityPoints} pts
-							</p>
-						</div>
+							/>
+						</button>
 					))}
 				</div>
 
-				{/* Table */}
 				<div className="flex flex-col backdrop-blur-sm bg-gradient-to-tr from-white/20 via-white/10 to-white/5 dark:from-neutral-900/40 dark:to-neutral-800/20 h-96 max-h-[400px] w-[90%] mt-2 rounded-2xl shadow-lg mb-8">
 					<div className="flex flex-row gap-4 h-14 p-5 rounded-2xl justify-between font-mono items-center text-lg bg-gradient-to-r to-white/25 from-[#FCA410]/30 dark:to-white/10 dark:text-white font-bold">
 						<span>Rank</span>
@@ -192,10 +226,9 @@ export default function Leaderboard() {
 					)}
 				</div>
 
-				{/* Stats Section for Mobile */}
-				<div className="flex flex-col gap-4 w-[90%] mb-8 relative border-2 border-[#FCA410] rounded-3xl p-5 shadow-xl bg-gradient-to-tr from-white/20 via-white/10 to-white/5 dark:from-neutral-900/40 dark:to-neutral-800/20 backdrop-blur-sm dark:text-white">
+				<div className="flex flex-col gap-4 w-[92%] mb-8 relative border-2 border-[#FCA410] rounded-3xl p-5 shadow-xl bg-gradient-to-tr from-white/20 via-white/10 to-white/5 dark:from-neutral-900/40 dark:to-neutral-800/20 backdrop-blur-sm dark:text-white">
 					<div className="flex flex-row gap-4 items-center">
-						<div className="rounded-lg overflow-hidden shadow-xl border-2 border-[#FCA410] w-20 h-20 flex-shrink-0">
+						<div className="rounded-xl overflow-hidden shadow-xl border-2 border-[#FCA410] w-20 h-20 flex-shrink-0">
 							<Image
 								src={currentUser?.avatar ?? "/testing/avatar_1.jpg"}
 								alt={currentUser?.name ?? "User"}
@@ -204,11 +237,11 @@ export default function Leaderboard() {
 								className="object-cover w-full h-full"
 							/>
 						</div>
-						<div className="flex flex-col flex-1">
+						<div className="flex flex-col flex-1 min-w-0">
 							<p className="text-xs dark:text-gray-300 font-bold tracking-wide">
 								NAME
 							</p>
-							<p className="text-2xl font-extrabold text-[#FCA410] drop-shadow text-ellipsis overflow-hidden whitespace-nowrap">
+							<p className="text-xl font-extrabold text-[#FCA410] drop-shadow truncate">
 								{currentUser?.name ?? "N/A"}
 							</p>
 						</div>
@@ -236,7 +269,7 @@ export default function Leaderboard() {
 						</div>
 					</div>
 					{!session && (
-						<div className="absolute inset-0 flex items-center justify-center z-10">
+						<div className="absolute inset-0 flex flex-col items-center justify-center z-10 gap-2">
 							<svg width="32" height="32" viewBox="0 0 24 24" fill="none">
 								<title>Lock Icon</title>
 								<path
@@ -248,13 +281,13 @@ export default function Leaderboard() {
 									fill="#FCA410"
 								/>
 							</svg>
-							<p className="text-xl font-bold text-[#FCA410] rounded-xl px-4 py-2">
+							<p className="text-lg font-bold text-[#FCA410] rounded-xl px-4 py-2">
 								Login to view stats
 							</p>
 						</div>
 					)}
 					<div
-						className="absolute inset-0 pointer-events-none"
+						className="absolute inset-0 pointer-events-none rounded-3xl"
 						style={{
 							filter: !session ? "blur(8px)" : "none",
 							WebkitBackdropFilter: !session ? "blur(8px)" : "none",
@@ -265,51 +298,83 @@ export default function Leaderboard() {
 				</div>
 			</div>
 
-			{/* Desktop View */}
 			<div className="hidden md:flex pt-20 m-8 mb-15 flex-col items-center justify-center overflow-x-hidden">
-				<p className="lilita-font text-center text-5xl font-extrabold p-2 font-mono text-flc-yellow tracking-wide drop-shadow mb-8">
-					LeaderBoard
-				</p>
+				<div className="text-center mb-16">
+					<h1 className="lilita-font text-6xl md:text-7xl lg:text-8xl font-bold text-flc-yellow relative mt-8 select-none">
+						LeaderBoard
+					</h1>
+				</div>
 
-				{/* Podium */}
-				<div className="flex flex-row justify-center items-end gap-6 mb-10">
+				<div className="flex flex-row justify-center items-end gap-8 mb-12 px-4 h-96">
 					{sortedTopThree.map((user) => (
-						<div
+						<button
 							key={user.userId}
-							className={`flex flex-col items-center ${podiumStyle[user.rank as 1 | 2 | 3]}`}
+							type="button"
+							className={`flex flex-col items-center justify-end transition-all duration-500 cursor-pointer hover:scale-105 bg-transparent border-none p-0 ${podiumStyle[user.rank as 1 | 2 | 3]} relative`}
+							onClick={() => {
+								window.location.assign(`/profile/${user.userId}`);
+							}}
+							onKeyDown={(e) => {
+								if (e.key === "Enter" || e.key === " ") {
+									e.preventDefault();
+									window.location.assign(`/profile/${user.userId}`);
+								}
+							}}
 						>
-							<div className="relative">
-								<Image
-									src={user.avatar}
-									alt={user.name}
-									className={`rounded-full border-8 shadow-2xl ${podiumBorder[user.rank as 1 | 2 | 3]}`}
-									width={175}
-									height={175}
-								/>
-								<span className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 bg-gradient-to-r from-[#FCA410] to-yellow-400 text-white text-lg font-bold rounded-full w-12 h-12 flex items-center justify-center shadow-lg border-2 border-white">
-									{user.rank}
-								</span>
+							{/* Content positioned above the podium base */}
+							<div className="flex flex-col items-center mb-3">
+								<div className="relative mb-6">
+									<Image
+										src={user.avatar}
+										alt={user.name}
+										className={`rounded-full border-8 shadow-2xl transition-all duration-500 ${podiumBorder[user.rank as 1 | 2 | 3]}`}
+										width={user.rank === 1 ? 200 : 160}
+										height={user.rank === 1 ? 200 : 160}
+									/>
+									<span
+										className={`absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 ${podiumRankBg[user.rank as 1 | 2 | 3]} text-white font-bold rounded-full flex items-center justify-center shadow-xl border-4 border-white ${user.rank === 1 ? "text-xl w-14 h-14" : "text-lg w-12 h-12"}`}
+									>
+										{user.rank}
+									</span>
+								</div>
+								<div className="text-center">
+									<p
+										className={`font-sans font-bold text-center transition-all duration-300 ${
+											user.rank === 1 ? "text-3xl" : "text-2xl"
+										} ${
+											user.userId === currentUser?.userId
+												? "text-[#FCA410]"
+												: "text-black dark:text-white"
+										}`}
+									>
+										{user.name.length > 15
+											? `${user.name.substring(0, 15)}...`
+											: user.name}
+									</p>
+									<p
+										className={`text-gray-600 dark:text-gray-300 font-sans font-semibold mt-2 ${user.rank === 1 ? "text-xl" : "text-lg"}`}
+									>
+										{user.totalActivityPoints} pts
+									</p>
+								</div>
 							</div>
-							<p
-								className={`mt-8 font-semibold text-center text-2xl ${
-									user.userId === currentUser?.userId
-										? "text-[#FCA410]"
-										: "text-black dark:text-white"
-								}`}
-							>
-								{user.name}
-							</p>
-							<p className="dark:text-gray-300 text-lg font-mono">
-								{user.totalActivityPoints} pts
-							</p>
-						</div>
+							{/* Podium Base */}
+							<div
+								className={`w-full rounded-t-xl ${
+									user.rank === 1
+										? "bg-gradient-to-b from-[#FFD700]/30 to-[#FFA500]/20 h-20"
+										: user.rank === 2
+											? "bg-gradient-to-b from-[#C0C0C0]/30 to-[#A8A8A8]/20 h-16"
+											: "bg-gradient-to-b from-[#CD7F32]/30 to-[#B8860B]/20 h-12"
+								} min-w-[180px]`}
+							/>
+						</button>
 					))}
 				</div>
 
-				<div className="flex flex-row gap-10 justify-end w-full md:w-[80%]">
-					{/* Table */}
+				<div className="flex flex-row gap-8 justify-center w-full max-w-7xl mx-auto px-4">
 					<div className="flex flex-col backdrop-blur-sm bg-gradient-to-tr from-white/20 via-white/10 to-white/5 dark:from-neutral-900/40 dark:to-neutral-800/20 h-125 w-1/2 mt-2 rounded-2xl shadow-lg">
-						<div className="flex flex-row gap-4 h-14 p-5 rounded-2xl justify-between font-mono items-center text-2xl bg-gradient-to-r to-white/25 from-[#FCA410]/30 dark:to-white/10 dark:text-white font-bold">
+						<div className="flex flex-row gap-4 h-16 p-6 rounded-2xl justify-between font-mono items-center text-2xl bg-gradient-to-r to-white/25 from-[#FCA410]/30 dark:to-white/10 dark:text-white font-bold">
 							<span>Rank</span>
 							<span>Name</span>
 							<span>Points</span>
@@ -324,7 +389,7 @@ export default function Leaderboard() {
 										userId={user.userId}
 										points={user.totalActivityPoints ?? 0}
 										highlightUserId={currentUser?.userId}
-										className="h-14 p-5 pl-8 pr-8 rounded-2xl justify-between font-mono items-center text-xl dark:text-white hover:bg-[#FCA410]/10 transition"
+										className="h-16 p-6 pl-8 pr-8 rounded-2xl justify-between font-mono items-center text-xl dark:text-white hover:bg-[#FCA410]/10 transition-all duration-200"
 									/>
 								))}
 							</div>
@@ -338,60 +403,61 @@ export default function Leaderboard() {
 									userId={currentUser.userId}
 									points={currentUser.totalActivityPoints ?? 0}
 									highlightUserId={currentUser.userId}
-									className="h-14 p-5 pl-8 pr-8 rounded-2xl justify-between font-mono items-center text-xl dark:text-white hover:bg-[#FCA410]/10 transition"
+									className="h-16 p-6 pl-8 pr-8 rounded-2xl justify-between font-mono items-center text-xl dark:text-white hover:bg-[#FCA410]/10 transition-all duration-200"
 								/>
 							</>
 						)}
 					</div>
 
-					{/* Stats Section for Desktop */}
 					<div
-						className={`flex flex-col m-5 gap-5 w-1/2 relative border-2 border-[#FCA410] rounded-3xl p-5 shadow-xl bg-gradient-to-tr from-white/20 via-white/10 to-white/5 dark:from-neutral-900/40 dark:to-neutral-800/20 backdrop-blur-sm dark:text-white`}
+						className={`flex flex-col gap-6 w-1/2 relative border-2 border-[#FCA410] rounded-3xl p-6 shadow-xl bg-gradient-to-tr from-white/20 via-white/10 to-white/5 dark:from-neutral-900/40 dark:to-neutral-800/20 backdrop-blur-sm dark:text-white`}
 					>
-						<div className="flex flex-row gap-5">
-							<div className="rounded-lg overflow-hidden shadow-2xl border-4 border-[#FCA410]">
+						<div className="flex flex-row gap-6 h-48">
+							<div className="rounded-2xl overflow-hidden shadow-2xl border-4 border-[#FCA410] flex-shrink-0">
 								<Image
 									src={currentUser?.avatar ?? "/testing/avatar_1.jpg"}
 									alt={currentUser?.name ?? "User"}
-									className=""
-									width={200}
-									height={200}
+									className="object-cover"
+									width={192}
+									height={192}
 								/>
 							</div>
-							<div className="relative bg-gradient-to-tr from-white/20 via-white/10 to-white/5 dark:from-neutral-900/40 dark:to-neutral-800/20 backdrop-blur-sm shadow-xl rounded-3xl w-1/2 h-full dark:text-white flex flex-col justify-center items-center border-2 border-[#FCA410]">
-								<p className="absolute top-2 left-3 text-sm dark:text-gray-300 font-bold tracking-wide">
-									RANK
-								</p>
-								<div className="flex h-full justify-center items-center">
-									<p className="text-8xl font-extrabold text-[#FCA410] drop-shadow">
-										{currentUser?.rank ?? "-"}
+							<div className="flex flex-col gap-4 flex-1">
+								<div className="relative bg-gradient-to-tr from-white/20 via-white/10 to-white/5 dark:from-neutral-900/40 dark:to-neutral-800/20 backdrop-blur-sm shadow-xl rounded-2xl h-1/2 dark:text-white flex flex-col justify-center items-center border-2 border-[#FCA410]">
+									<p className="absolute top-2 left-4 text-sm dark:text-gray-300 font-bold tracking-wide">
+										RANK
 									</p>
+									<div className="flex h-full justify-center items-center">
+										<p className="text-6xl font-extrabold text-[#FCA410] drop-shadow">
+											{currentUser?.rank ?? "-"}
+										</p>
+									</div>
 								</div>
-							</div>
-							<div className="relative bg-gradient-to-tr from-white/20 via-white/10 to-white/5 dark:from-neutral-900/40 dark:to-neutral-800/20 backdrop-blur-sm shadow-xl rounded-3xl w-1/2 h-full dark:text-white flex flex-col justify-center items-center border-2 border-[#FCA410]">
-								<p className="absolute top-2 left-3 text-sm dark:text-gray-300 font-bold tracking-wide">
-									POINTS
-								</p>
-								<div className="flex h-full justify-center items-center">
-									<p className="text-8xl font-extrabold text-[#FCA410] drop-shadow">
-										{currentUser?.totalActivityPoints ?? "-"}
+								<div className="relative bg-gradient-to-tr from-white/20 via-white/10 to-white/5 dark:from-neutral-900/40 dark:to-neutral-800/20 backdrop-blur-sm shadow-xl rounded-2xl h-1/2 dark:text-white flex flex-col justify-center items-center border-2 border-[#FCA410]">
+									<p className="absolute top-2 left-4 text-sm dark:text-gray-300 font-bold tracking-wide">
+										POINTS
 									</p>
+									<div className="flex h-full justify-center items-center">
+										<p className="text-6xl font-extrabold text-[#FCA410] drop-shadow">
+											{currentUser?.totalActivityPoints ?? "-"}
+										</p>
+									</div>
 								</div>
 							</div>
 						</div>
-						<div className="relative bg-gradient-to-tr from-white/20 via-white/10 to-white/5 dark:from-neutral-900/40 dark:to-neutral-800/20 backdrop-blur-sm shadow-xl rounded-3xl w-full h-full dark:text-white border-2 border-[#FCA410]">
-							<p className="absolute top-2 left-3 text-sm dark:text-gray-300 font-bold tracking-wide">
+						<div className="relative bg-gradient-to-tr from-white/20 via-white/10 to-white/5 dark:from-neutral-900/40 dark:to-neutral-800/20 backdrop-blur-sm shadow-xl rounded-2xl h-20 dark:text-white border-2 border-[#FCA410]">
+							<p className="absolute top-2 left-4 text-sm dark:text-gray-300 font-bold tracking-wide">
 								NAME
 							</p>
-							<div className="flex h-full justify-center items-center wrap-break text-center">
-								<p className="text-5xl font-extrabold text-[#FCA410] drop-shadow">
+							<div className="flex h-full justify-center items-center px-4">
+								<p className="text-4xl font-extrabold text-[#FCA410] drop-shadow text-center truncate">
 									{currentUser?.name ?? "N/A"}
 								</p>
 							</div>
 						</div>
 						{!session && (
-							<div className="absolute inset-0 flex items-center justify-center z-10">
-								<svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+							<div className="absolute inset-0 flex flex-col items-center justify-center z-10 gap-4">
+								<svg width="48" height="48" viewBox="0 0 24 24" fill="none">
 									<title>Lock Icon</title>
 									<path
 										d="M6 9c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V11c0-1.1-.9-2-2-2H6zm6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"
@@ -408,7 +474,7 @@ export default function Leaderboard() {
 							</div>
 						)}
 						<div
-							className="absolute inset-0 pointer-events-none"
+							className="absolute inset-0 pointer-events-none rounded-3xl"
 							style={{
 								filter: !session ? "blur(8px)" : "none",
 								WebkitBackdropFilter: !session ? "blur(8px)" : "none",
