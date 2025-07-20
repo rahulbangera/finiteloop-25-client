@@ -16,6 +16,7 @@ import {
 import { SiLeetcode } from "react-icons/si";
 import { MdDelete } from "react-icons/md";
 import type { AppUser } from "@/lib/auth";
+import { useWhatsAppShare, WHATSAPP_SHARE_CONFIG } from "./WhatsAppShare";
 
 function ProfileDetail({
 	label,
@@ -392,15 +393,32 @@ export default function Profile({ userId }: { userId?: number }) {
 		null,
 	);
 	const [shareLoading, setShareLoading] = useState(false);
+	const [showShareOptions, setShowShareOptions] = useState(false);
 
 	// Determine if we're viewing someone else's profile
 	const isViewingOtherProfile =
 		userId && userId !== parseInt(session?.user?.id || "0", 10);
+
 	const [fetchingUser, setFetchingUser] = useState(isViewingOtherProfile);
+
+	// Get the current user data
 	const currentUser = isViewingOtherProfile ? viewedUser : session?.user;
 
+	// WhatsApp sharing functionality
+	const { handleWhatsAppShare } = useWhatsAppShare({
+		user: currentUser, // Type assertion handled in WhatsAppShare component
+		isViewingOtherProfile: !!isViewingOtherProfile,
+		userId: session?.user?.id,
+		onShareComplete: () => setShowShareOptions(false),
+		enabled: WHATSAPP_SHARE_CONFIG.enabled,
+	});
+
 	// Share function
-	const handleShareProfile = async () => {
+	const handleShareProfile = () => {
+		setShowShareOptions(!showShareOptions);
+	};
+
+	const handleCopyLink = async () => {
 		setShareLoading(true);
 		try {
 			const currentUrl = window.location.origin + window.location.pathname;
@@ -410,6 +428,7 @@ export default function Profile({ userId }: { userId?: number }) {
 
 			await navigator.clipboard.writeText(shareUrl);
 			toast.success("Profile link copied to clipboard!");
+			setShowShareOptions(false);
 		} catch (err) {
 			console.error("Failed to copy link:", err);
 			toast.error("Failed to copy link");
@@ -464,16 +483,26 @@ export default function Profile({ userId }: { userId?: number }) {
 			setTimeout(() => ripple.remove(), 600);
 		};
 
+		const handleClickOutside = (event: MouseEvent) => {
+			const target = event.target as HTMLElement;
+			if (!target.closest(".share-dropdown-container")) {
+				setShowShareOptions(false);
+			}
+		};
+
 		document.querySelectorAll(".interactive").forEach((el) => {
 			el.addEventListener("click", rippleHandler);
 			el.addEventListener("touchstart", rippleHandler);
 		});
+
+		document.addEventListener("mousedown", handleClickOutside);
 
 		return () => {
 			document.querySelectorAll(".interactive").forEach((el) => {
 				el.removeEventListener("click", rippleHandler);
 				el.removeEventListener("touchstart", rippleHandler);
 			});
+			document.removeEventListener("mousedown", handleClickOutside);
 		};
 	}, []);
 
@@ -701,7 +730,7 @@ export default function Profile({ userId }: { userId?: number }) {
 					<button
 						type="button"
 						onClick={() => window.history.back()}
-						className="interactive px-5 sm:px-6 py-2 bg-gradient-to-tr from-orange-500 to-yellow-400 text-white rounded-full font-semibold hover:scale-105 transition shadow-lg text-sm sm:text-base"
+						className="px-5 sm:px-6 py-2 bg-gradient-to-tr from-orange-500 to-yellow-400 text-white rounded-full font-semibold hover:scale-105 transition shadow-lg text-sm sm:text-base whitespace-nowrap"
 					>
 						Go Back
 					</button>
@@ -749,67 +778,175 @@ export default function Profile({ userId }: { userId?: number }) {
 					{!isViewingOtherProfile && (
 						<button
 							type="button"
-							className="interactive px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 text-xs sm:text-sm"
+							className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 text-xs sm:text-sm whitespace-nowrap"
 							onClick={handleEdit}
 						>
 							<span className="hidden sm:inline">Edit Profile</span>
 							<span className="sm:hidden">Edit</span>
 						</button>
 					)}
-					<button
-						type="button"
-						className="interactive flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl bg-green-500 hover:bg-green-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 text-xs sm:text-sm disabled:opacity-50"
-						onClick={handleShareProfile}
-						disabled={shareLoading}
-						title="Share Profile"
-					>
-						{shareLoading ? (
-							<div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-white border-t-transparent"></div>
-						) : (
+					<div className="relative share-dropdown-container">
+						{WHATSAPP_SHARE_CONFIG.enabled ? (
 							<>
-								<FaShare className="text-xs sm:text-sm" />
-								<span className="hidden sm:inline">Share</span>
+								<button
+									type="button"
+									className="flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl bg-green-500 hover:bg-green-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 text-xs sm:text-sm disabled:opacity-50 whitespace-nowrap"
+									onClick={handleShareProfile}
+									disabled={shareLoading}
+									title="Share Profile"
+								>
+									{shareLoading ? (
+										<div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-white border-t-transparent"></div>
+									) : (
+										<>
+											<FaShare className="text-xs sm:text-sm" />
+											<span className="hidden sm:inline">Share</span>
+											<svg
+												width="12"
+												height="12"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												strokeWidth="2"
+												className="ml-1"
+											>
+												<title>Dropdown Arrow</title>
+												<polyline points="6,9 12,15 18,9"></polyline>
+											</svg>
+										</>
+									)}
+								</button>
+								{showShareOptions && (
+									<div className="absolute top-full right-0 mt-2 bg-neutral-800 border border-neutral-600 rounded-lg shadow-lg z-50 min-w-[200px]">
+										<button
+											type="button"
+											className="w-full px-4 py-3 text-left text-white hover:bg-neutral-700 transition-colors flex items-center gap-3 text-sm border-b border-neutral-600"
+											onClick={async () => {
+												setShareLoading(true);
+												try {
+													await handleWhatsAppShare();
+												} catch (error) {
+													console.error("WhatsApp share error:", error);
+												} finally {
+													setShareLoading(false);
+												}
+											}}
+											disabled={shareLoading}
+										>
+											<div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+												<svg
+													width="14"
+													height="14"
+													viewBox="0 0 24 24"
+													fill="currentColor"
+													className="text-white"
+												>
+													<title>WhatsApp</title>
+													<path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.69" />
+												</svg>
+											</div>
+											<span>Share on WhatsApp</span>
+										</button>
+										<button
+											type="button"
+											className="w-full px-4 py-3 text-left text-white hover:bg-neutral-700 transition-colors flex items-center gap-3 text-sm"
+											onClick={handleCopyLink}
+											disabled={shareLoading}
+										>
+											<div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+												<svg
+													width="14"
+													height="14"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													strokeWidth="2"
+													className="text-white"
+												>
+													<title>Copy</title>
+													<rect
+														x="9"
+														y="9"
+														width="13"
+														height="13"
+														rx="2"
+														ry="2"
+													></rect>
+													<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+												</svg>
+											</div>
+											<span>Copy Link</span>
+										</button>
+									</div>
+								)}
 							</>
+						) : (
+							<button
+								type="button"
+								className="flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl bg-green-500 hover:bg-green-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 text-xs sm:text-sm disabled:opacity-50 whitespace-nowrap"
+								onClick={handleCopyLink}
+								disabled={shareLoading}
+								title="Share Profile Link"
+							>
+								{shareLoading ? (
+									<div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-white border-t-transparent"></div>
+								) : (
+									<>
+										<FaShare className="text-xs sm:text-sm" />
+										<span className="hidden sm:inline">Share</span>
+									</>
+								)}
+							</button>
 						)}
-					</button>
+					</div>
 				</div>
 
 				<div className="p-4 sm:p-5 md:p-8 space-y-4 sm:space-y-6 text-black dark:text-white">
 					<div className="flex flex-col gap-4 sm:gap-6">
-						<div className="flex flex-col items-center text-center sm:flex-row sm:items-start sm:text-left sm:gap-6 pt-8 sm:pt-0">
+						<div className="flex flex-col sm:flex-row items-center sm:items-center gap-6 pt-8 sm:pt-0">
 							<div className="relative flex-shrink-0">
 								<div className="relative group">
 									<Image
 										src={currentUser?.image || "/testing/160x160.svg"}
 										alt="Profile"
-										width={96}
-										height={96}
-										className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 rounded-full border-3 sm:border-4 border-orange-400 object-cover shadow-lg transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl"
+										width={120}
+										height={120}
+										className="w-24 h-24 sm:w-28 sm:h-28 md:w-30 md:h-30 rounded-full border-4 border-orange-400 object-cover shadow-lg transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl"
 										priority
 									/>
+									<div className="absolute inset-0 rounded-full bg-gradient-to-tr from-orange-400/10 to-yellow-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 								</div>
 							</div>
 
-							<div className="flex flex-col items-center sm:items-start flex-1 min-w-0">
-								<h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold mb-2 break-words text-center sm:text-left">
+							<div className="flex flex-col items-center sm:items-start flex-1 min-w-0 text-center sm:text-left">
+								<h1 className="text-2xl sm:text-3xl md:text-3xl font-bold mb-2 text-white">
 									{currentUser?.name}
 								</h1>
 								<span
-									className={`interactive inline-block w-fit px-3 sm:px-4 py-1 rounded-full text-xs sm:text-sm font-semibold transition mb-3 sm:mb-0
+									className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold transition-all duration-200
 										${
 											getRoleName(currentUser) === "ADMIN"
-												? "bg-gradient-to-tr from-red-500 to-pink-400 border border-red-500 text-white hover:bg-red-600 dark:bg-gradient-to-tr dark:from-red-700 dark:to-pink-600"
+												? "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg shadow-red-500/25"
 												: getRoleName(currentUser) === "MEMBER"
-													? "bg-gradient-to-tr from-green-400 to-lime-400 border border-green-400 text-white hover:bg-green-500 dark:bg-gradient-to-tr dark:from-green-700 dark:to-lime-600"
-													: "bg-gradient-to-tr from-blue-400 to-cyan-400 border border-blue-400 text-white hover:bg-blue-500 dark:bg-gradient-to-tr dark:from-blue-700 dark:to-cyan-600"
+													? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/25"
+													: "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25"
 										}`}
 									title={`Role: ${getRoleName(currentUser)}`}
 								>
-									{getRoleName(currentUser) === "ADMIN"
-										? "🛡️ ADMIN"
-										: getRoleName(currentUser) === "MEMBER"
-											? "❤️ MEMBER"
-											: `• ${getRoleName(currentUser)}`}
+									<span className="text-sm">
+										{getRoleName(currentUser) === "ADMIN"
+											? "🛡️"
+											: getRoleName(currentUser) === "MEMBER"
+												? "⭐"
+												: "👤"}
+									</span>
+									<span className="font-bold">
+										{getRoleName(currentUser) === "ADMIN"
+											? "ADMIN"
+											: getRoleName(currentUser) === "MEMBER"
+												? "MEMBER"
+												: getRoleName(currentUser)}
+									</span>
 								</span>
 							</div>
 						</div>
@@ -878,10 +1015,8 @@ export default function Profile({ userId }: { userId?: number }) {
 				</div>
 			</div>
 
-			{/* Stats Card */}
 			<div className="bg-gradient-to-tr from-white/20 via-white/10 to-white/5 dark:from-neutral-900/40 dark:to-neutral-800/20 border border-black dark:border-white rounded-xl sm:rounded-2xl overflow-hidden shadow transition backdrop-blur-sm">
 				<div className="p-4 sm:p-5 md:p-8 space-y-4 sm:space-y-6 text-black dark:text-white">
-					{/* Activity Stats */}
 					<div className="grid grid-cols-2 gap-3 sm:gap-4">
 						<StatItem
 							label="Activity Points"
@@ -942,7 +1077,7 @@ export default function Profile({ userId }: { userId?: number }) {
 									<div className="flex justify-center">
 										<button
 											type="button"
-											className="interactive px-4 sm:px-6 py-2 rounded-lg sm:rounded-full bg-gradient-to-tr from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:shadow-lg min-w-[100px] sm:min-w-[120px] text-sm sm:text-base"
+											className="px-4 sm:px-6 py-2 rounded-lg sm:rounded-full bg-gradient-to-tr from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:shadow-lg min-w-[100px] sm:min-w-[120px] text-sm sm:text-base whitespace-nowrap"
 											onClick={async () => {
 												if (!socialName || !socialUrl || !session?.user?.id)
 													return;
@@ -1191,7 +1326,7 @@ export default function Profile({ userId }: { userId?: number }) {
 				<Link href="/events" className="inline-block">
 					<button
 						type="button"
-						className="interactive px-5 sm:px-6 md:px-8 py-2 sm:py-3 font-semibold bg-gradient-to-tr from-orange-500 to-yellow-400 rounded-full shadow transition hover:scale-105 hover:shadow-lg text-white text-sm sm:text-base md:text-lg"
+						className="px-5 sm:px-6 md:px-8 py-2 sm:py-3 font-semibold bg-gradient-to-tr from-orange-500 to-yellow-400 rounded-full shadow transition hover:scale-105 hover:shadow-lg text-white text-sm sm:text-base md:text-lg whitespace-nowrap"
 					>
 						Browse Events
 					</button>

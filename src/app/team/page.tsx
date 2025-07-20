@@ -81,7 +81,41 @@ export default function Team() {
 						Dynamic and Agile
 					</p>
 
-					<div className="flex flex-wrap justify-center gap-4 mt-8 max-w-6xl mx-auto">
+					<div className="md:hidden mt-8 max-w-sm mx-auto relative">
+						<select
+							value={selectedYearIndex}
+							onChange={(e) => setSelectedYearIndex(Number(e.target.value))}
+							className="w-full px-6 py-4 pr-12 rounded-2xl text-sm font-bold bg-gradient-to-br from-purple-500 via-indigo-600 to-blue-600 text-white border border-purple-400/50 shadow-[0_0_30px_rgba(139,92,246,0.5)] backdrop-blur-xl appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400"
+						>
+							{yearOptions.map((year, index) => (
+								<option
+									key={year.id}
+									value={index}
+									className="bg-slate-800 text-white"
+								>
+									{year.label}
+								</option>
+							))}
+						</select>
+						<div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+							<svg
+								className="w-5 h-5 text-white"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+								aria-hidden="true"
+							>
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth={2}
+									d="M19 9l-7 7-7-7"
+								/>
+							</svg>
+						</div>
+					</div>
+
+					<div className="hidden md:flex flex-wrap justify-center gap-4 mt-8 max-w-6xl mx-auto">
 						{yearOptions.map((year, index) => (
 							<button
 								key={year.id}
