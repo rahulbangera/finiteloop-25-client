@@ -1027,7 +1027,9 @@ export default function Profile({ userId }: { userId?: number }) {
 										toast.error("Payment failed");
 									}}
 									type="submit"
-								/>
+								>
+									Pay Membership
+								</PaymentButton>
 							</div>
 						)}
 					</div>
