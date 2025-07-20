@@ -162,7 +162,7 @@ export default function Leaderboard() {
 						<span>Name</span>
 						<span>Points</span>
 					</div>
-					<Scrollbar permanentTrackY={false} style={{ maxHeight: 250 }}>
+					<Scrollbar permanentTrackY={false}>
 						<div className="overflow-y-auto">
 							{restUsers.map((user) => (
 								<UserCard

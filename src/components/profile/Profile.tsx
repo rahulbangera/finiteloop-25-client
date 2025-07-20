@@ -620,9 +620,11 @@ export default function Profile({ userId }: { userId?: number }) {
 				`${process.env.NEXT_PUBLIC_SERVER_URL}/api/user/update-user`,
 				{
 					method: "PATCH",
-					headers: { "Content-Type": "application/json" },
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${session?.user?.accessToken}`,
+					},
 					body: JSON.stringify({
-						userId: session?.user.id,
 						name: form.name.trim(),
 						usn: form.usn.trim(),
 						year: form.year.trim(),
@@ -653,12 +655,10 @@ export default function Profile({ userId }: { userId?: number }) {
 		const link = session.user.userLinks[idx];
 
 		const schema = z.object({
-			userId: z.number().min(1),
 			linkName: z.string().min(1),
 		});
 
 		const payload = {
-			userId: session.user.id,
 			linkName: link.linkName,
 		};
 
@@ -674,7 +674,10 @@ export default function Profile({ userId }: { userId?: number }) {
 				`${process.env.NEXT_PUBLIC_SERVER_URL}/api/user/removeUserLink`,
 				{
 					method: "POST",
-					headers: { "Content-Type": "application/json" },
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${session?.user?.accessToken}`,
+					},
 					body: JSON.stringify(payload),
 				},
 			);
@@ -1092,13 +1095,11 @@ export default function Profile({ userId }: { userId?: number }) {
 												const schema = z.object({
 													linkName: z.string().min(1),
 													url: z.string().url(),
-													userId: z.number().min(1),
 												});
 
 												const payload = {
 													linkName: socialName,
 													url: socialUrl,
-													userId: session.user.id,
 												};
 
 												const result = schema.safeParse(payload);
@@ -1115,7 +1116,10 @@ export default function Profile({ userId }: { userId?: number }) {
 														`${process.env.NEXT_PUBLIC_SERVER_URL}/api/user/addUserLink`,
 														{
 															method: "POST",
-															headers: { "Content-Type": "application/json" },
+															headers: {
+																"Content-Type": "application/json",
+																Authorization: `Bearer ${session?.user?.accessToken}`,
+															},
 															body: JSON.stringify(payload),
 														},
 													);

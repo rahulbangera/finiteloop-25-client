@@ -230,6 +230,7 @@ const EventsPage = () => {
 		}
 	}, [drawerOpen]);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <to be fixed>
 	useEffect(() => {
 		setShowTeamDialog(false);
 		setSoloConfirm(false);
@@ -253,8 +254,11 @@ const EventsPage = () => {
 							`${process.env.NEXT_PUBLIC_SERVER_URL}/api/events/checkSolo`,
 							{
 								method: "POST",
-								headers: { "Content-Type": "application/json" },
-								body: JSON.stringify({ userId, eventId: selectedEvent.id }),
+								headers: {
+									"Content-Type": "application/json",
+									Authorization: `Bearer ${session?.user?.accessToken}`,
+								},
+								body: JSON.stringify({ eventId: selectedEvent.id }),
 							},
 						);
 						const jsonSolo = await resSolo.json();
@@ -274,8 +278,11 @@ const EventsPage = () => {
 							`${process.env.NEXT_PUBLIC_SERVER_URL}/api/events/getTeam`,
 							{
 								method: "POST",
-								headers: { "Content-Type": "application/json" },
-								body: JSON.stringify({ userId, eventId: selectedEvent.id }),
+								headers: {
+									"Content-Type": "application/json",
+									Authorization: `Bearer ${session?.user?.accessToken}`,
+								},
+								body: JSON.stringify({ eventId: selectedEvent.id }),
 							},
 						);
 						const jsonTeam = await resTeam.json();
@@ -398,8 +405,11 @@ const EventsPage = () => {
 					`${process.env.NEXT_PUBLIC_SERVER_URL}/api/events/registerSolo`,
 					{
 						method: "POST",
-						headers: { "Content-Type": "application/json" },
-						body: JSON.stringify({ userId, eventId: selectedEvent.id }),
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${session?.user?.accessToken}`,
+						},
+						body: JSON.stringify({ eventId: selectedEvent.id }),
 					},
 				);
 				const json = await res.json();
@@ -436,9 +446,11 @@ const EventsPage = () => {
 				`${process.env.NEXT_PUBLIC_SERVER_URL}/api/events/createTeam`,
 				{
 					method: "POST",
-					headers: { "Content-Type": "application/json" },
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${session?.user?.accessToken}`,
+					},
 					body: JSON.stringify({
-						userId,
 						eventId: selectedEvent.id,
 						teamName: teamState.teamName,
 					}),
@@ -488,9 +500,11 @@ const EventsPage = () => {
 				`${process.env.NEXT_PUBLIC_SERVER_URL}/api/events/joinTeam`,
 				{
 					method: "POST",
-					headers: { "Content-Type": "application/json" },
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${session?.user?.accessToken}`,
+					},
 					body: JSON.stringify({
-						userId,
 						teamId: teamState.teamId,
 						eventId: selectedEvent.id,
 					}),
@@ -538,8 +552,11 @@ const EventsPage = () => {
 				`${process.env.NEXT_PUBLIC_SERVER_URL}/api/events/confirmTeam`,
 				{
 					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ userId, teamId: teamState.createdTeamId }),
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${session?.user?.accessToken}`,
+					},
+					body: JSON.stringify({ teamId: teamState.createdTeamId }),
 				},
 			);
 			const json = await res.json();
@@ -566,8 +583,11 @@ const EventsPage = () => {
 				`${process.env.NEXT_PUBLIC_SERVER_URL}/api/events/deleteTeam`,
 				{
 					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ userId, teamId: teamState.createdTeamId }),
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${session?.user?.accessToken}`,
+					},
+					body: JSON.stringify({ teamId: teamState.createdTeamId }),
 				},
 			);
 			const json = await res.json();
@@ -635,7 +655,7 @@ const EventsPage = () => {
 						</div>
 						<button
 							type="button"
-							className="flex-shrink-0 flex items-center justify-center w-24 h-24 md:w-32 md:h-32 bg-purple-100 dark:bg-indigo-900 rounded-xl border border-purple-300 dark:border-indigo-700 cursor-pointer"
+							className="flex-shrink-0 flex items-center justify-center w-24 h-24 md:w-32 md:h-32 bg-purple-100 dark:bg-zinc-400 rounded-xl border border-purple-300 dark:border-indigo-700 cursor-pointer"
 							onClick={() => setShowQrModal(true)}
 							onKeyDown={(e) => {
 								if (e.key === "Enter" || e.key === " ") {
@@ -649,13 +669,13 @@ const EventsPage = () => {
 								value={teamState.createdTeamId}
 								size={112}
 								bgColor="#F3E8FF"
-								fgColor="#6e11b0"
+								fgColor="#59168b"
 								className="w-20 h-20 md:w-28 md:h-28 object-contain rounded-xl"
 							/>
 						</button>
 						{showQrModal && (
 							<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-								<div className="relative bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-xl flex flex-col items-center">
+								<div className="relative bg-gray-400 dark:bg-zinc-400 p-6 rounded-xl shadow-xl flex flex-col items-center">
 									<button
 										type="button"
 										onClick={() => setShowQrModal(false)}
@@ -668,7 +688,7 @@ const EventsPage = () => {
 										value={teamState.createdTeamId}
 										size={256}
 										bgColor="#F3E8FF"
-										fgColor="#7C3AED"
+										fgColor="#59168b"
 										className="w-64 h-64 object-contain p-3"
 									/>
 									<div className="mt-2 text-center text-purple-900 dark:text-purple-100 break-all font-mono">
@@ -1060,7 +1080,7 @@ const EventsPage = () => {
 																<div className="flex flex-row items-left">
 																	<button
 																		type="button"
-																		className="flex-shrink-0 flex items-center justify-center w-24 h-24 md:w-32 md:h-32 bg-purple-100 dark:bg-indigo-900 rounded-xl border border-purple-300 dark:border-indigo-700 cursor-pointer"
+																		className="flex-shrink-0 flex items-center justify-center w-24 h-24 md:w-32 md:h-32 bg-purple-100 dark:bg-zinc-400 rounded-xl border border-purple-300 dark:border-indigo-700 cursor-pointer"
 																		onClick={() => setShowQrModal(true)}
 																		onKeyDown={(e) => {
 																			if (e.key === "Enter" || e.key === " ") {
@@ -1074,7 +1094,7 @@ const EventsPage = () => {
 																			value={teamState.createdTeamId}
 																			size={112}
 																			bgColor="#F3E8FF"
-																			fgColor="#6e11b0"
+																			fgColor="#59168b"
 																			className="w-20 h-20 md:w-28 md:h-28 object-contain rounded-xl"
 																		/>
 																	</button>
@@ -1102,7 +1122,7 @@ const EventsPage = () => {
 																</div>
 																{showQrModal && (
 																	<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-																		<div className="relative bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-xl flex flex-col items-center">
+																		<div className="relative bg-gray-400 dark:bg-zinc-400 p-6 rounded-xl shadow-xl flex flex-col items-center">
 																			<button
 																				type="button"
 																				onClick={() => setShowQrModal(false)}
@@ -1115,7 +1135,7 @@ const EventsPage = () => {
 																				value={teamState.createdTeamId}
 																				size={256}
 																				bgColor="#F3E8FF"
-																				fgColor="#7C3AED"
+																				fgColor="#59168b"
 																				className="w-64 h-64 object-contain p-3"
 																			/>
 																			<div className="mt-2 text-center text-purple-900 dark:text-purple-100 break-all font-mono">
@@ -1182,7 +1202,7 @@ const EventsPage = () => {
 															<div className="flex flex-row items-left">
 																<button
 																	type="button"
-																	className="flex-shrink-0 flex items-center justify-center w-24 h-24 md:w-32 md:h-32 bg-purple-100 dark:bg-indigo-900 rounded-xl border border-purple-300 dark:border-indigo-700 cursor-pointer"
+																	className="flex-shrink-0 flex items-center justify-center w-24 h-24 md:w-32 md:h-32 bg-purple-100 dark:bg-zinc-400 rounded-xl border border-purple-300 dark:border-indigo-700 cursor-pointer"
 																	onClick={() => setShowQrModal(true)}
 																	onKeyDown={(e) => {
 																		if (e.key === "Enter" || e.key === " ") {
@@ -1196,7 +1216,7 @@ const EventsPage = () => {
 																		value={teamState.createdTeamId}
 																		size={112}
 																		bgColor="#F3E8FF"
-																		fgColor="#6e11b0"
+																		fgColor="#59168b"
 																		className="w-20 h-20 md:w-28 md:h-28 object-contain rounded-xl"
 																	/>
 																</button>
@@ -1224,7 +1244,7 @@ const EventsPage = () => {
 															</div>
 															{showQrModal && (
 																<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-																	<div className="relative bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-xl flex flex-col items-center">
+																	<div className="relative bg-gray-400 dark:bg-zinc-400 p-6 rounded-xl shadow-xl flex flex-col items-center">
 																		<button
 																			type="button"
 																			onClick={() => setShowQrModal(false)}
@@ -1237,7 +1257,7 @@ const EventsPage = () => {
 																			value={teamState.createdTeamId}
 																			size={256}
 																			bgColor="#F3E8FF"
-																			fgColor="#7C3AED"
+																			fgColor="#59168b"
 																			className="w-64 h-64 object-contain p-3"
 																		/>
 																		<div className="mt-2 text-center text-purple-900 dark:text-purple-100 break-all font-mono">
