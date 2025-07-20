@@ -165,30 +165,30 @@ export default function Team() {
 					) : (
 						filteredMembers.map((member) => (
 							<div key={member.id} className="group relative">
-								<div className="relative w-80 h-[24rem] bg-white/10 dark:bg-gradient-to-br dark:from-slate-900/40 dark:via-blue-900/20 dark:to-purple-900/30 backdrop-blur-xl border border-purple-200/50 dark:border-slate-700/50 rounded-3xl overflow-hidden transition-all duration-500 hover:scale-105 hover:border-purple-400/70 dark:hover:border-blue-500/50 hover:shadow-2xl hover:shadow-purple-500/20 dark:hover:shadow-blue-500/20">
+								<div className="relative w-80 h-[18rem] bg-white/10 dark:bg-gradient-to-br dark:from-slate-900/40 dark:via-blue-900/20 dark:to-purple-900/30 backdrop-blur-xl border border-purple-200/50 dark:border-slate-700/50 rounded-3xl overflow-hidden transition-all duration-500 hover:scale-105 hover:border-purple-400/70 dark:hover:border-blue-500/50 hover:shadow-2xl hover:shadow-purple-500/20 dark:hover:shadow-blue-500/20">
 									<div className="absolute inset-0 bg-gradient-to-r from-purple-300/20 via-pink-300/20 to-blue-300/20 dark:from-blue-600/10 dark:via-purple-600/10 dark:to-pink-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
 									<div className="absolute top-4 right-4 w-3 h-3 bg-gradient-to-r from-purple-400 to-pink-400 dark:from-blue-400 dark:to-cyan-400 rounded-full opacity-70 animate-pulse"></div>
 									<div className="absolute bottom-6 left-6 w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 dark:from-purple-400 dark:to-pink-400 rounded-full opacity-60 animate-ping"></div>
 
-									<div className="relative z-10 flex flex-col items-center text-center p-6 h-full">
-										<div className="relative mb-4 group-hover:scale-110 transition-transform duration-500">
+									<div className="relative z-10 flex flex-col items-center text-center p-4 h-full">
+										<div className="relative mb-3 group-hover:scale-110 transition-transform duration-500">
 											<div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 dark:from-blue-500 dark:via-purple-500 dark:to-pink-500 p-1 animate-spin opacity-0 group-hover:opacity-100 transition-opacity duration-500">
 												<div className="w-full h-full rounded-full bg-white dark:bg-slate-900"></div>
 											</div>
-											<div className="relative w-40 h-40 rounded-full overflow-hidden border-3 border-purple-300/50 dark:border-slate-600/50 group-hover:border-purple-500/70 dark:group-hover:border-blue-400/70 transition-colors duration-500 shadow-2xl">
+											<div className="relative w-32 h-32 rounded-full overflow-hidden border-3 border-purple-300/50 dark:border-slate-600/50 group-hover:border-purple-500/70 dark:group-hover:border-blue-400/70 transition-colors duration-500 shadow-2xl">
 												<Image
 													src={member.image}
 													alt={member.name}
-													width={160}
-													height={160}
+													width={128}
+													height={128}
 													className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
 												/>
 											</div>
 											<div className="absolute inset-0 rounded-full border-2 border-purple-400/50 dark:border-blue-400/30 scale-110 opacity-0 group-hover:opacity-100 transition-opacity duration-700 animate-spin"></div>
 										</div>
 
-										<div className="mb-4 space-y-1">
+										<div className="mb-3 space-y-1">
 											<h3 className="text-lg font-bold text-gray-800 dark:text-white group-hover:text-purple-600 dark:group-hover:text-blue-200 transition-colors duration-300">
 												{member.name}
 											</h3>
