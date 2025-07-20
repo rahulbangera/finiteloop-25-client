@@ -230,7 +230,7 @@ const EventsPage = () => {
 		}
 	}, [drawerOpen]);
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <to be fixed>
 	useEffect(() => {
 		setShowTeamDialog(false);
 		setSoloConfirm(false);
@@ -668,6 +668,8 @@ const EventsPage = () => {
 							<QRCodeSVG
 								value={teamState.createdTeamId}
 								size={112}
+								bgColor="#F3E8FF"
+								fgColor="#59168b"
 								className="w-20 h-20 md:w-28 md:h-28 object-contain rounded-xl"
 							/>
 						</button>
@@ -685,6 +687,8 @@ const EventsPage = () => {
 									<QRCodeSVG
 										value={teamState.createdTeamId}
 										size={256}
+										bgColor="#F3E8FF"
+										fgColor="#59168b"
 										className="w-64 h-64 object-contain p-3"
 									/>
 									<div className="mt-2 text-center text-purple-900 dark:text-purple-100 break-all font-mono">
@@ -1089,6 +1093,8 @@ const EventsPage = () => {
 																		<QRCodeSVG
 																			value={teamState.createdTeamId}
 																			size={112}
+																			bgColor="#F3E8FF"
+																			fgColor="#59168b"
 																			className="w-20 h-20 md:w-28 md:h-28 object-contain rounded-xl"
 																		/>
 																	</button>
@@ -1128,6 +1134,8 @@ const EventsPage = () => {
 																			<QRCodeSVG
 																				value={teamState.createdTeamId}
 																				size={256}
+																				bgColor="#F3E8FF"
+																				fgColor="#59168b"
 																				className="w-64 h-64 object-contain p-3"
 																			/>
 																			<div className="mt-2 text-center text-purple-900 dark:text-purple-100 break-all font-mono">
@@ -1207,6 +1215,8 @@ const EventsPage = () => {
 																	<QRCodeSVG
 																		value={teamState.createdTeamId}
 																		size={112}
+																		bgColor="#F3E8FF"
+																		fgColor="#59168b"
 																		className="w-20 h-20 md:w-28 md:h-28 object-contain rounded-xl"
 																	/>
 																</button>
@@ -1246,6 +1256,8 @@ const EventsPage = () => {
 																		<QRCodeSVG
 																			value={teamState.createdTeamId}
 																			size={256}
+																			bgColor="#F3E8FF"
+																			fgColor="#59168b"
 																			className="w-64 h-64 object-contain p-3"
 																		/>
 																		<div className="mt-2 text-center text-purple-900 dark:text-purple-100 break-all font-mono">
