@@ -517,17 +517,25 @@ export default function Profile({ userId }: { userId?: number }) {
 
 	useEffect(() => {
 		if (session?.user) {
+			let branchId = "";
+			if (session.user.branch && branches.length > 0) {
+				const found = branches.find(
+					(b) =>
+						b.name.toLowerCase() === session.user.branch.toLowerCase() ||
+						b.id === session.user.branch,
+				);
+				if (found) branchId = found.id;
+			}
 			setForm({
 				name: session.user.name || "",
 				usn: session.user.usn || "",
 				year: session.user.year || "",
 				bio: session.user.bio || "",
-				branch: session.user.branch || "",
+				branch: branchId || "",
 			});
 		}
-	}, [session]);
+	}, [session, branches]);
 
-	// Fetch user data when viewing another user's profile
 	useEffect(() => {
 		const fetchUserData = async () => {
 			if (!isViewingOtherProfile || !userId) return;
@@ -632,6 +640,27 @@ export default function Profile({ userId }: { userId?: number }) {
 				throw new Error(errorData.message || "Failed to update profile");
 			}
 			await update();
+
+			if (session?.user) {
+				const userRes = await fetch(
+					`${process.env.NEXT_PUBLIC_SERVER_URL}/api/user/searchbyId`,
+					{
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({ userId: session.user.id }),
+					},
+				);
+				if (userRes.ok) {
+					const data = await userRes.json();
+					setForm({
+						name: data.name || "",
+						usn: data.usn || "",
+						year: data.year || "",
+						bio: data.bio || "",
+						branch: data.branch || data.Branch?.id || "",
+					});
+				}
+			}
 			toast.success("Profile updated successfully!");
 			setEditMode(false);
 		} catch (err) {
