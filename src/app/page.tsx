@@ -11,23 +11,19 @@ const page = () => {
 			/>
 
 			<div
-				className="md:hidden absolute top-[10%] right-0 w-[40rem] h-[40rem] pointer-events-none z-0 transform -translate-y-1/2 bg-contain bg-no-repeat"
+				className="md:hidden absolute top-[7%] right-0 w-[40rem] h-[40rem] pointer-events-none z-0 transform -translate-y-1/2 bg-contain bg-no-repeat"
 				style={{
 					backgroundImage: "url('/mobile_rocket1.png')",
 					backgroundPosition: "center right",
 				}}
 			/>
 
-			<div className="h-screen flex items-center justify-center md:justify-start relative z-10">
+			<div className="h-screen flex items-start md:items-center justify-center md:justify-start relative z-10 mt-36 md:mt-0">
 				<div className="w-full md:w-3/5 lg:w-2/3 xl:w-3/5 px-8 pr-4 pl-8 sm:px-10 sm:pr-6 sm:pl-10 md:px-16 lg:px-20 text-left">
 					<div className="space-y-4 lg:space-y-6">
 						<h1 className="lilita-font text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-flc-yellow leading-tight tracking-wide">
 							<span className="md:hidden">
-								Finite
-								<br />
-								Loop
-								<br />
-								Club
+								Finite Loop <br /> Club
 							</span>
 							<span className="hidden md:inline">
 								Finite Loop
