@@ -11,6 +11,8 @@ import { SiLeetcode } from "react-icons/si";
 import { MdDelete } from "react-icons/md";
 import type { AppUser } from "@/lib/auth";
 import { useWhatsAppShare, WHATSAPP_SHARE_CONFIG } from "./WhatsAppShare";
+import { Button } from "../ui/button";
+import { useRouter } from "next/navigation";
 
 function ProfileDetail({
 	label,
@@ -367,6 +369,7 @@ function EditProfileDialog({
 }
 
 export default function Profile({ userId }: { userId?: number }) {
+	const router = useRouter();
 	const { data: session, update } = useSession();
 	const [editMode, setEditMode] = useState(false);
 	const [form, setForm] = useState({
@@ -1015,21 +1018,12 @@ export default function Profile({ userId }: { userId?: number }) {
 
 						{!isViewingOtherProfile && getRoleName(currentUser) === "USER" && (
 							<div className="flex justify-center">
-								<PaymentButton
-									title="Pay Membership"
-									paymentType="MEMBERSHIP"
-									description="Club Membership"
-									onSuccess={async (_paymentId) => {
-										await update();
-										toast.success("Payment successful");
-									}}
-									onFailure={() => {
-										toast.error("Payment failed");
-									}}
-									type="submit"
+								<Button
+									onClick={() => router.push("/auth/join-flc")}
+									className="w-full px-6 py-4 rounded-2xl text-sm font-bold bg-gradient-to-br from-purple-500 via-indigo-600 to-blue-600 hover:from-purple-600 hover:via-indigo-700 hover:to-blue-700 text-white border border-purple-400/50 shadow-[0_0_30px_rgba(139,92,246,0.5)] backdrop-blur-xl appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400"
 								>
-									Pay Membership
-								</PaymentButton>
+									Register Now
+								</Button>
 							</div>
 						)}
 					</div>
