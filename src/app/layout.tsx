@@ -19,14 +19,14 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en" suppressHydrationWarning>
-			<body>
+			<body className="min-h-screen flex flex-col">
 				<Providers>
 					<Toaster />
 					<Navbar />
 					<div className="fixed inset-0 -z-10 pointer-events-none">
 						<Background />
 					</div>
-					{children}
+					<main className="flex-1">{children}</main>
 					<Footer />
 				</Providers>
 			</body>
