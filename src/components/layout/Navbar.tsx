@@ -233,7 +233,6 @@ export default function NavBar() {
 									</div>
 								</button>
 
-								{/* Dropdown Menu */}
 								{isProfileDropdownOpen && (
 									<div className="absolute right-0 top-full mt-2 w-52 bg-white/40 dark:bg-white/25 backdrop-blur-3xl rounded-2xl shadow-2xl border border-white/30 dark:border-white/20 overflow-hidden z-50 p-2">
 										<Link href="/profile">
@@ -362,14 +361,14 @@ export default function NavBar() {
 						aria-label="Close menu"
 					/>
 
-					<div className="md:hidden fixed top-24 right-0 left-0 z-50 mx-5">
+					<div className="md:hidden fixed top-24 right-0 left-0 z-50 mx-4">
 						<div className="bg-white/30 dark:bg-black/40 backdrop-blur-3xl rounded-3xl shadow-2xl p-6">
 							<div>
 								<Link href="/team">
 									<button
 										type="button"
 										onClick={toggleMenu}
-										className="relative bg-white/40 dark:bg-white/30 hover:bg-white/50 dark:hover:bg-white/40 backdrop-blur-2xl rounded-2xl h-14 w-full flex justify-center items-center font-semibold transition-all duration-300 cursor-pointer shadow-lg hover:scale-[1.01] hover:shadow-xl group overflow-hidden text-gray-800 dark:text-white tracking-wide mb-6"
+										className="relative bg-white/40 dark:bg-white/30 hover:bg-white/50 dark:hover:bg-white/40 backdrop-blur-2xl rounded-2xl h-14 w-full flex justify-center items-center font-semibold transition-all duration-300 cursor-pointer shadow-lg hover:scale-[1.01] hover:shadow-xl group overflow-hidden text-gray-800 dark:text-white tracking-wide mb-3"
 									>
 										<div className="absolute inset-0 bg-gradient-to-r from-white/15 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 										<span className="relative text-base">Team</span>
@@ -379,7 +378,7 @@ export default function NavBar() {
 									<button
 										type="button"
 										onClick={toggleMenu}
-										className="relative bg-white/40 dark:bg-white/30 hover:bg-white/50 dark:hover:bg-white/40 backdrop-blur-2xl rounded-2xl h-14 w-full flex justify-center items-center font-semibold transition-all duration-300 cursor-pointer shadow-lg hover:scale-[1.01] hover:shadow-xl group overflow-hidden text-gray-800 dark:text-white tracking-wide mb-6"
+										className="relative bg-white/40 dark:bg-white/30 hover:bg-white/50 dark:hover:bg-white/40 backdrop-blur-2xl rounded-2xl h-14 w-full flex justify-center items-center font-semibold transition-all duration-300 cursor-pointer shadow-lg hover:scale-[1.01] hover:shadow-xl group overflow-hidden text-gray-800 dark:text-white tracking-wide mb-3"
 									>
 										<div className="absolute inset-0 bg-gradient-to-r from-white/15 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 										<span className="relative text-base">Events</span>
@@ -389,7 +388,7 @@ export default function NavBar() {
 									<button
 										type="button"
 										onClick={toggleMenu}
-										className="relative bg-white/40 dark:bg-white/30 hover:bg-white/50 dark:hover:bg-white/40 backdrop-blur-2xl rounded-2xl h-14 w-full flex justify-center items-center font-semibold transition-all duration-300 cursor-pointer shadow-lg hover:scale-[1.01] hover:shadow-xl group overflow-hidden text-gray-800 dark:text-white tracking-wide mb-6"
+										className="relative bg-white/40 dark:bg-white/30 hover:bg-white/50 dark:hover:bg-white/40 backdrop-blur-2xl rounded-2xl h-14 w-full flex justify-center items-center font-semibold transition-all duration-300 cursor-pointer shadow-lg hover:scale-[1.01] hover:shadow-xl group overflow-hidden text-gray-800 dark:text-white tracking-wide"
 									>
 										<div className="absolute inset-0 bg-gradient-to-r from-white/15 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 										<span className="relative text-base">Leaderboard</span>
@@ -399,12 +398,12 @@ export default function NavBar() {
 
 							<div className="mt-6 pt-6 border-t border-white/60 dark:border-white/50">
 								{session ? (
-									<div className="space-y-4">
+									<div>
 										<Link href="/profile">
 											<button
 												type="button"
 												onClick={toggleMenu}
-												className="relative bg-white/40 dark:bg-white/30 hover:bg-white/50 dark:hover:bg-white/40 backdrop-blur-2xl rounded-2xl h-14 w-full flex justify-center items-center font-semibold transition-all duration-300 cursor-pointer shadow-lg hover:scale-[1.01] hover:shadow-xl group overflow-hidden text-gray-800 dark:text-white tracking-wide"
+												className="relative bg-white/40 dark:bg-white/30 hover:bg-white/50 dark:hover:bg-white/40 backdrop-blur-2xl rounded-2xl h-14 w-full flex justify-center items-center font-semibold transition-all duration-300 cursor-pointer shadow-lg hover:scale-[1.01] hover:shadow-xl group overflow-hidden text-gray-800 dark:text-white tracking-wide mb-3"
 											>
 												<div className="absolute inset-0 bg-gradient-to-r from-white/15 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 												<User

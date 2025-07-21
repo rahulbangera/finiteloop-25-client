@@ -6,13 +6,7 @@ import PaymentButton from "../razorpay/paymentButton";
 import { toast } from "react-toastify";
 import { useSession } from "next-auth/react";
 import { z } from "zod";
-import {
-	FaInstagram,
-	FaLinkedin,
-	FaGithub,
-	FaGlobe,
-	FaShare,
-} from "react-icons/fa";
+import { FaInstagram, FaLinkedin, FaGithub, FaGlobe } from "react-icons/fa";
 import { SiLeetcode } from "react-icons/si";
 import { MdDelete } from "react-icons/md";
 import type { AppUser } from "@/lib/auth";
@@ -523,17 +517,25 @@ export default function Profile({ userId }: { userId?: number }) {
 
 	useEffect(() => {
 		if (session?.user) {
+			let branchId = "";
+			if (session.user.branch && branches.length > 0) {
+				const found = branches.find(
+					(b) =>
+						b.name.toLowerCase() === session.user.branch.toLowerCase() ||
+						b.id === session.user.branch,
+				);
+				if (found) branchId = found.id;
+			}
 			setForm({
 				name: session.user.name || "",
 				usn: session.user.usn || "",
 				year: session.user.year || "",
 				bio: session.user.bio || "",
-				branch: session.user.branch || "",
+				branch: branchId || "",
 			});
 		}
-	}, [session]);
+	}, [session, branches]);
 
-	// Fetch user data when viewing another user's profile
 	useEffect(() => {
 		const fetchUserData = async () => {
 			if (!isViewingOtherProfile || !userId) return;
@@ -638,6 +640,27 @@ export default function Profile({ userId }: { userId?: number }) {
 				throw new Error(errorData.message || "Failed to update profile");
 			}
 			await update();
+
+			if (session?.user) {
+				const userRes = await fetch(
+					`${process.env.NEXT_PUBLIC_SERVER_URL}/api/user/searchbyId`,
+					{
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({ userId: session.user.id }),
+					},
+				);
+				if (userRes.ok) {
+					const data = await userRes.json();
+					setForm({
+						name: data.name || "",
+						usn: data.usn || "",
+						year: data.year || "",
+						bio: data.bio || "",
+						branch: data.branch || data.Branch?.id || "",
+					});
+				}
+			}
 			toast.success("Profile updated successfully!");
 			setEditMode(false);
 		} catch (err) {
@@ -778,9 +801,22 @@ export default function Profile({ userId }: { userId?: number }) {
 					{!isViewingOtherProfile && (
 						<button
 							type="button"
-							className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 text-xs sm:text-sm whitespace-nowrap"
+							className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-neutral-800/80 hover:bg-neutral-700/80 border border-neutral-600/50 hover:border-orange-400/50 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200 text-sm backdrop-blur-sm"
 							onClick={handleEdit}
 						>
+							<svg
+								width="14"
+								height="14"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								strokeWidth="2"
+								className="text-orange-400"
+							>
+								<title>Edit</title>
+								<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+								<path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+							</svg>
 							<span className="hidden sm:inline">Edit Profile</span>
 							<span className="sm:hidden">Edit</span>
 						</button>
@@ -790,29 +826,42 @@ export default function Profile({ userId }: { userId?: number }) {
 							<>
 								<button
 									type="button"
-									className="flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl bg-green-500 hover:bg-green-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 text-xs sm:text-sm disabled:opacity-50 whitespace-nowrap"
+									className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-neutral-800/80 hover:bg-neutral-700/80 border border-neutral-600/50 hover:border-blue-400/50 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200 text-sm disabled:opacity-50 backdrop-blur-sm"
 									onClick={handleShareProfile}
 									disabled={shareLoading}
 									title="Share Profile"
 								>
 									{shareLoading ? (
-										<div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-white border-t-transparent"></div>
+										<div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
 									) : (
 										<>
-											<FaShare className="text-xs sm:text-sm" />
-											<span className="hidden sm:inline">Share</span>
 											<svg
-												width="12"
-												height="12"
-												viewBox="0 0 24 24"
-												fill="none"
-												stroke="currentColor"
-												strokeWidth="2"
-												className="ml-1"
+												xmlns="http://www.w3.org/2000/svg"
+												height="20"
+												viewBox="0 -960 960 960"
+												width="20"
+												fill="#5084C1"
 											>
-												<title>Dropdown Arrow</title>
-												<polyline points="6,9 12,15 18,9"></polyline>
+												<title>Share</title>
+												<path d="M680-80q-50 0-85-35t-35-85q0-6 3-28L282-392q-16 15-37 23.5t-45 8.5q-50 0-85-35t-35-85q0-50 35-85t85-35q24 0 45 8.5t37 23.5l281-164q-2-7-2.5-13.5T560-760q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35q-24 0-45-8.5T598-672L317-508q2 7 2.5 13.5t.5 14.5q0 8-.5 14.5T317-452l281 164q16-15 37-23.5t45-8.5q50 0 85 35t35 85q0 50-35 85t-85 35Zm0-80q17 0 28.5-11.5T720-200q0-17-11.5-28.5T680-240q-17 0-28.5 11.5T640-200q0 17 11.5 28.5T680-160ZM200-440q17 0 28.5-11.5T240-480q0-17-11.5-28.5T200-520q-17 0-28.5 11.5T160-480q0 17 11.5 28.5T200-440Zm480-280q17 0 28.5-11.5T720-760q0-17-11.5-28.5T680-800q-17 0-28.5 11.5T640-760q0 17 11.5 28.5T680-720Zm0 520ZM200-480Zm480-280Z" />
 											</svg>
+											{isViewingOtherProfile && (
+												<>
+													<span className="hidden sm:inline">Share</span>
+													<svg
+														width="12"
+														height="12"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														strokeWidth="2"
+														className="ml-1"
+													>
+														<title>Dropdown Arrow</title>
+														<polyline points="6,9 12,15 18,9"></polyline>
+													</svg>
+												</>
+											)}
 										</>
 									)}
 								</button>
@@ -883,17 +932,28 @@ export default function Profile({ userId }: { userId?: number }) {
 						) : (
 							<button
 								type="button"
-								className="flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl bg-green-500 hover:bg-green-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 text-xs sm:text-sm disabled:opacity-50 whitespace-nowrap"
+								className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-neutral-800/80 hover:bg-neutral-700/80 border border-neutral-600/50 hover:border-blue-400/50 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200 text-sm disabled:opacity-50 backdrop-blur-sm"
 								onClick={handleCopyLink}
 								disabled={shareLoading}
 								title="Share Profile Link"
 							>
 								{shareLoading ? (
-									<div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-white border-t-transparent"></div>
+									<div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
 								) : (
 									<>
-										<FaShare className="text-xs sm:text-sm" />
-										<span className="hidden sm:inline">Share</span>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											height="20"
+											viewBox="0 -960 960 960"
+											width="20"
+											fill="#5084C1"
+										>
+											<title>Share</title>
+											<path d="M680-80q-50 0-85-35t-35-85q0-6 3-28L282-392q-16 15-37 23.5t-45 8.5q-50 0-85-35t-35-85q0-50 35-85t85-35q24 0 45 8.5t37 23.5l281-164q-2-7-2.5-13.5T560-760q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35q-24 0-45-8.5T598-672L317-508q2 7 2.5 13.5t.5 14.5q0 8-.5 14.5T317-452l281 164q16-15 37-23.5t45-8.5q50 0 85 35t35 85q0 50-35 85t-85 35Zm0-80q17 0 28.5-11.5T720-200q0-17-11.5-28.5T680-240q-17 0-28.5 11.5T640-200q0 17 11.5 28.5T680-160ZM200-440q17 0 28.5-11.5T240-480q0-17-11.5-28.5T200-520q-17 0-28.5 11.5T160-480q0 17 11.5 28.5T200-440Zm480-280q17 0 28.5-11.5T720-760q0-17-11.5-28.5T680-800q-17 0-28.5 11.5T640-760q0 17 11.5 28.5T680-720Zm0 520ZM200-480Zm480-280Z" />
+										</svg>
+										{isViewingOtherProfile && (
+											<span className="hidden sm:inline">Share</span>
+										)}
 									</>
 								)}
 							</button>
@@ -923,28 +983,30 @@ export default function Profile({ userId }: { userId?: number }) {
 									{currentUser?.name}
 								</h1>
 								<span
-									className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold transition-all duration-200
+									className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 border backdrop-blur-sm
 										${
 											getRoleName(currentUser) === "ADMIN"
-												? "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg shadow-red-500/25"
+												? "bg-red-500/10 border-red-400/30 text-red-300 hover:bg-red-500/20 hover:border-red-400/50"
 												: getRoleName(currentUser) === "MEMBER"
-													? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/25"
-													: "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25"
+													? "bg-emerald-500/10 border-emerald-400/30 text-emerald-300 hover:bg-emerald-500/20 hover:border-emerald-400/50"
+													: "bg-slate-500/10 border-slate-400/30 text-slate-300 hover:bg-slate-500/20 hover:border-slate-400/50"
 										}`}
 									title={`Role: ${getRoleName(currentUser)}`}
 								>
-									<span className="text-sm">
+									<div
+										className={`w-2 h-2 rounded-full ${
+											getRoleName(currentUser) === "ADMIN"
+												? "bg-red-400"
+												: getRoleName(currentUser) === "MEMBER"
+													? "bg-emerald-400"
+													: "bg-slate-400"
+										}`}
+									></div>
+									<span className="font-semibold text-xs uppercase tracking-wider">
 										{getRoleName(currentUser) === "ADMIN"
-											? "🛡️"
+											? "Admin"
 											: getRoleName(currentUser) === "MEMBER"
-												? "⭐"
-												: "👤"}
-									</span>
-									<span className="font-bold">
-										{getRoleName(currentUser) === "ADMIN"
-											? "ADMIN"
-											: getRoleName(currentUser) === "MEMBER"
-												? "MEMBER"
+												? "Member"
 												: getRoleName(currentUser)}
 									</span>
 								</span>

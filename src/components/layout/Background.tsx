@@ -1,17 +1,17 @@
 "use client";
-import { useTheme } from "next-themes";
+// import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-import Galaxy from "@/components/elements/Galaxy";
+// import Galaxy from "@/components/elements/Galaxy";
 
 export default function BG() {
-	const { resolvedTheme } = useTheme();
+	// const { resolvedTheme } = useTheme();
 	const [mounted, setMounted] = useState(false);
 
 	useEffect(() => setMounted(true), []);
 
 	if (!mounted) return null;
 
-	const isLight = resolvedTheme === "light";
+	// const isLight = resolvedTheme === "light";
 
 	return (
 		<section className="relative min-h-screen w-full overflow-hidden">
@@ -19,7 +19,7 @@ export default function BG() {
 			<div className="absolute z-10 flex h-screen w-full items-center justify-center bg-[radial-gradient(at_top_right,_#FBCFF4,_#E4CCF8,_#C4E2F7,_#FEF9FF)] dark:bg-[radial-gradient(at_top_right,_#7F439D,_#33107C,_#060329)]"></div>
 
 			{/* Galaxy effect overlay - premium quality */}
-			<div className="absolute z-20 h-screen w-full opacity-25">
+			{/* <div className="absolute z-20 h-screen w-full opacity-25">
 				<Galaxy
 					density={0.5}
 					starSpeed={0.1}
@@ -36,10 +36,10 @@ export default function BG() {
 					focal={[0.5, 0.4]}
 					className="pointer-events-none"
 				/>
-			</div>
+			</div> */}
 
 			{/* Additional subtle particle layer for depth */}
-			<div className="absolute z-15 h-screen w-full opacity-15">
+			{/* <div className="absolute z-15 h-screen w-full opacity-15">
 				<Galaxy
 					density={0.8}
 					starSpeed={0.03}
@@ -55,7 +55,7 @@ export default function BG() {
 					focal={[0.6, 0.6]}
 					className="pointer-events-none"
 				/>
-			</div>
+			</div> */}
 		</section>
 	);
 }

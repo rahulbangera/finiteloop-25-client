@@ -18,14 +18,24 @@ export default function UserCard({
 	const highlight = userId === highlightUserId;
 
 	return (
-		<div
-			className={`h-12 flex flex-row justify-between items-center px-4 ${
+		<button
+			type="button"
+			className={`h-12 flex flex-row justify-between items-center px-4 w-full cursor-pointer hover:bg-opacity-80 transition-all duration-200 bg-transparent border-none text-left ${
 				highlight ? "bg-yellow-200 dark:bg-yellow-800 font-bold" : ""
 			} ${className}`}
+			onClick={() => {
+				window.location.assign(`/profile/${userId}`);
+			}}
+			onKeyDown={(e) => {
+				if (e.key === "Enter" || e.key === " ") {
+					e.preventDefault();
+					window.location.assign(`/profile/${userId}`);
+				}
+			}}
 		>
 			<span>{rank}</span>
 			<span>{name}</span>
 			<span>{points}</span>
-		</div>
+		</button>
 	);
 }
