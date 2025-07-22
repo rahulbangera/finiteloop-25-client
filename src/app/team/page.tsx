@@ -2,73 +2,126 @@
 
 import Image from "next/image";
 import { FaLinkedinIn, FaGithub, FaInstagram } from "react-icons/fa";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+
+interface UserLink {
+	id: string;
+	platform: string;
+	url: string;
+	userId: string;
+}
 
 interface TeamMember {
 	id: number;
 	name: string;
-	role: string;
+	image: string | null;
+	userLink: UserLink[];
 	year: string;
-	image: string;
-	linkedin?: string;
-	github?: string;
-	instagram?: string;
+	position: string;
+	type: string;
+	priority: number;
 }
 
-const teamMembers: TeamMember[] = [
-	{
-		id: 1,
-		name: "Nandan Pai",
-		role: "President",
-		year: "2025-2026",
-		image:
-			"https://www.finiteloop.co.in/_next/image?url=https%3A%2F%2Fres.cloudinary.com%2Fdh0sqelog%2Fimage%2Fupload%2Fv1725429201%2Fyroqa88zfxcsblwyr0en.jpg&w=1920&q=75",
-		linkedin: "test",
-		github: "test",
-		instagram: "test",
-	},
-	{
-		id: 2,
-		name: "Nandan Pai",
-		role: "President",
-		year: "2024-2025",
-		image:
-			"https://www.finiteloop.co.in/_next/image?url=https%3A%2F%2Fres.cloudinary.com%2Fdh0sqelog%2Fimage%2Fupload%2Fv1725429201%2Fyroqa88zfxcsblwyr0en.jpg&w=1920&q=75",
-		linkedin: "test",
-		github: "test",
-		instagram: "test",
-	},
-	{
-		id: 3,
-		name: "Nandan Pai",
-		role: "President",
-		year: "2025-2026",
-		image:
-			"https://www.finiteloop.co.in/_next/image?url=https%3A%2F%2Fres.cloudinary.com%2Fdh0sqelog%2Fimage%2Fupload%2Fv1725429201%2Fyroqa88zfxcsblwyr0en.jpg&w=1920&q=75",
-		linkedin: "test",
-		github: "test",
-		instagram: "test",
-	},
-];
+interface APIResponse {
+	success: boolean;
+	data: TeamMember[];
+	error?: string;
+}
 
 export default function Team() {
+	const router = useRouter();
 	const [selectedYearIndex, setSelectedYearIndex] = useState(5);
+	const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
 
 	const yearOptions = [
-		{ id: "2016-2020", label: "2016-2020" },
-		{ id: "2021-2022", label: "2021-2022" },
-		{ id: "2022-2023", label: "2022-2023" },
-		{ id: "2023-2024", label: "2023-2024" },
-		{ id: "2024-2025", label: "2024-2025" },
-		{ id: "2025-2026", label: "2025-2026" },
+		{ id: "2020", label: "2020" },
+		{ id: "2021", label: "2021" },
+		{ id: "2022", label: "2022" },
+		{ id: "2023", label: "2023" },
+		{ id: "2024", label: "2024" },
+		{ id: "2025", label: "2025" },
 		{ id: "faculty", label: "Faculty" },
 	];
+
+	useEffect(() => {
+		const fetchTeamMembers = async () => {
+			try {
+				setLoading(true);
+				const response = await fetch(
+					`${process.env.NEXT_PUBLIC_SERVER_URL}/api/core/getAll`,
+				);
+
+				if (!response.ok) {
+					throw new Error(`HTTP error! status: ${response.status}`);
+				}
+
+				const result: APIResponse = await response.json();
+
+				if (result.success && result.data) {
+					setTeamMembers(result.data);
+				} else {
+					throw new Error(result.error || "Failed to fetch team members");
+				}
+			} catch (err) {
+				console.error("Error fetching team members:", err);
+				setError(err instanceof Error ? err.message : "An error occurred");
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		fetchTeamMembers();
+	}, []);
 
 	const selectedYear = yearOptions[selectedYearIndex].label;
 
 	const filteredMembers = teamMembers.filter(
 		(member) => member.year === selectedYear,
 	);
+
+	const getSocialLink = (
+		userLinks: UserLink[],
+		platform: string,
+	): string | undefined => {
+		const link = userLinks.find(
+			(link) => link.platform.toLowerCase() === platform.toLowerCase(),
+		);
+		return link?.url;
+	};
+
+	if (loading) {
+		return (
+			<main className="min-h-screen py-20 px-4 relative flex items-center justify-center">
+				<div className="text-center">
+					<div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-500 mx-auto mb-4"></div>
+					<p className="text-lg text-gray-600 dark:text-gray-400">
+						Loading team members...
+					</p>
+				</div>
+			</main>
+		);
+	}
+
+	if (error) {
+		return (
+			<main className="min-h-screen py-20 px-4 relative flex items-center justify-center">
+				<div className="text-center">
+					<div className="text-red-500 text-xl mb-4">⚠️ Error Loading Team</div>
+					<p className="text-gray-600 dark:text-gray-400">{error}</p>
+					<button
+						type="button"
+						onClick={() => router.refresh()}
+						className="mt-4 px-6 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
+					>
+						Try Again
+					</button>
+				</div>
+			</main>
+		);
+	}
 
 	return (
 		<main className="min-h-screen py-20 px-4 relative">
@@ -177,13 +230,25 @@ export default function Team() {
 												<div className="w-full h-full rounded-full bg-white dark:bg-slate-900"></div>
 											</div>
 											<div className="relative w-32 h-32 rounded-full overflow-hidden border-3 border-purple-300/50 dark:border-slate-600/50 group-hover:border-purple-500/70 dark:group-hover:border-blue-400/70 transition-colors duration-500 shadow-2xl">
-												<Image
-													src={member.image}
-													alt={member.name}
-													width={128}
-													height={128}
-													className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-												/>
+												{member.image ? (
+													<Image
+														src={member.image}
+														alt={member.name}
+														width={128}
+														height={128}
+														className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+													/>
+												) : (
+													<div className="w-full h-full bg-gradient-to-br from-purple-400 to-blue-500 dark:from-blue-400 dark:to-purple-500 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+														<span className="text-white text-2xl font-bold">
+															{member.name
+																.split(" ")
+																.map((n) => n[0])
+																.join("")
+																.slice(0, 2)}
+														</span>
+													</div>
+												)}
 											</div>
 											<div className="absolute inset-0 rounded-full border-2 border-purple-400/50 dark:border-blue-400/30 scale-110 opacity-0 group-hover:opacity-100 transition-opacity duration-700 animate-spin"></div>
 										</div>
@@ -193,14 +258,14 @@ export default function Team() {
 												{member.name}
 											</h3>
 											<p className="text-xs font-medium text-purple-600 dark:text-orange-400 uppercase tracking-wider">
-												{member.role}
+												{member.position}
 											</p>
 										</div>
 
 										<div className="flex space-x-3 mt-auto">
-											{member.linkedin && (
+											{getSocialLink(member.userLink, "linkedin") && (
 												<a
-													href={`https://linkedin.com/in/${member.linkedin}`}
+													href={getSocialLink(member.userLink, "linkedin")}
 													target="_blank"
 													rel="noopener noreferrer"
 													className="w-9 h-9 bg-white/50 dark:bg-slate-800/50 border border-purple-300/50 dark:border-slate-600/50 rounded-xl flex items-center justify-center text-gray-600 dark:text-slate-400 hover:text-blue-500 dark:hover:text-blue-400 hover:border-blue-400/50 hover:bg-blue-100/50 dark:hover:bg-blue-500/10 hover:scale-110 transition-all duration-300"
@@ -211,9 +276,9 @@ export default function Team() {
 													<span className="sr-only">LinkedIn</span>
 												</a>
 											)}
-											{member.github && (
+											{getSocialLink(member.userLink, "github") && (
 												<a
-													href={`https://github.com/${member.github}`}
+													href={getSocialLink(member.userLink, "github")}
 													target="_blank"
 													rel="noopener noreferrer"
 													className="w-9 h-9 bg-white/50 dark:bg-slate-800/50 border border-purple-300/50 dark:border-slate-600/50 rounded-xl flex items-center justify-center text-gray-600 dark:text-slate-400 hover:text-purple-500 dark:hover:text-purple-400 hover:border-purple-400/50 hover:bg-purple-100/50 dark:hover:bg-purple-500/10 hover:scale-110 transition-all duration-300"
@@ -224,9 +289,9 @@ export default function Team() {
 													<span className="sr-only">GitHub</span>
 												</a>
 											)}
-											{member.instagram && (
+											{getSocialLink(member.userLink, "instagram") && (
 												<a
-													href={`https://instagram.com/${member.instagram}`}
+													href={getSocialLink(member.userLink, "instagram")}
 													target="_blank"
 													rel="noopener noreferrer"
 													className="w-9 h-9 bg-white/50 dark:bg-slate-800/50 border border-purple-300/50 dark:border-slate-600/50 rounded-xl flex items-center justify-center text-gray-600 dark:text-slate-400 hover:text-pink-500 dark:hover:text-pink-400 hover:border-pink-400/50 hover:bg-pink-100/50 dark:hover:bg-pink-500/10 hover:scale-110 transition-all duration-300"
