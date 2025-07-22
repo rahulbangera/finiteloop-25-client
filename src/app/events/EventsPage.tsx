@@ -2,6 +2,7 @@
 import Card from "@/components/elements/Card";
 import Radio from "@/components/elements/Radio";
 import PaymentButton from "@/components/razorpay/paymentButton";
+import { Button } from "@/components/ui/button";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import gsap from "gsap";
 import { X } from "lucide-react";
@@ -92,6 +93,7 @@ const EventsPage = () => {
 		createTeam: false,
 		confirmTeam: false,
 		deleteTeam: false,
+		leaveTeam: false,
 		joinTeam: false,
 		checkAvailable: false,
 	});
@@ -109,6 +111,7 @@ const EventsPage = () => {
 	const [joining, setJoining] = useState(false);
 	const [showQrModal, setShowQrModal] = useState(false);
 	const [teamInitialized, setTeamInitialized] = useState(false);
+	const [showLeaveDialog, setShowLeaveDialog] = useState(false);
 	const [teamSize, setTeamSize] = useState("");
 	const imageRef = useRef<HTMLImageElement>(null);
 	const router = useRouter();
@@ -139,6 +142,7 @@ const EventsPage = () => {
 						"2024-25": [],
 						"2025-26": [],
 					};
+					console.log("Fetched events:", json.data);
 					for (const event of json.data) {
 						const yearKey = getEventYear(event.fromDate);
 						grouped[yearKey].push(event);
@@ -607,6 +611,44 @@ const EventsPage = () => {
 		}
 	};
 
+	const leaveTeam = async () => {
+		if (!selectedEvent) return;
+		if (!userId) {
+			toast.error("Login to register");
+			setLoading((prev) => ({ ...prev, leaveTeam: false }));
+			return;
+		}
+		if (!teamState.createdTeamId) return;
+		try {
+			setLoading((prev) => ({ ...prev, leaveTeam: true }));
+			const res = await fetch(
+				`${process.env.NEXT_PUBLIC_SERVER_URL}/api/events/leaveTeam`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${session?.user?.accessToken}`,
+					},
+					body: JSON.stringify({ teamId: teamState.createdTeamId }),
+				},
+			);
+			const json = await res.json();
+			if (json.success) {
+				toast.success("Left team successfully");
+				setTeamState((prev) => ({
+					...prev,
+					createdTeamId: "",
+					members: [],
+					action: "NONE",
+				}));
+			} else toast.error(json.error || "Failed to leave team");
+		} catch {
+			toast.error("Error leaving team");
+		} finally {
+			setLoading((prev) => ({ ...prev, leaveTeam: false }));
+		}
+	};
+
 	const renderTeamRegistration = () => {
 		if (!teamInitialized) return null;
 
@@ -761,9 +803,13 @@ const EventsPage = () => {
 							</button>
 						</div>
 					) : (
-						<div className="text-base md:text-lg text-purple-800 dark:text-purple-200">
-							Only the team leader can confirm the team.
-						</div>
+						<Button
+							disabled={loading.leaveTeam || !userId}
+							onClick={() => setShowLeaveDialog(true)}
+							className={BUTTON_CLASSES.destructive}
+						>
+							Leave Team
+						</Button>
 					)}
 					<div className="flex items-center gap-4 mt-2">
 						<div className="text-base md:text-lg text-purple-800 dark:text-purple-200 font-semibold">
@@ -1039,11 +1085,19 @@ const EventsPage = () => {
 								</div>
 							</div>
 							<div className="flex flex-col gap-4 mt-6">
-								{selectedEvent?.toDate &&
-								new Date(selectedEvent.toDate) < new Date() ? (
+								{(selectedEvent?.toDate &&
+									new Date(selectedEvent.toDate) < new Date()) ||
+								selectedEvent?.state === "COMPLETED" ? (
 									<div className="w-full rounded-xl border border-gray-400 bg-gray-100 dark:bg-gray-900 dark:border-gray-700 p-4 text-center">
 										<span className="text-gray-800 dark:text-gray-300 font-semibold text-lg md:text-xl">
 											Event has been completed
+										</span>
+									</div>
+								) : selectedEvent?.state === "LIVE" &&
+									new Date(selectedEvent.deadline) < new Date() ? (
+									<div className="w-full rounded-xl border border-green-500 bg-green-100 dark:bg-green-950 dark:border-green-400 p-4 text-center">
+										<span className="text-green-800 dark:text-green-300 font-semibold text-lg md:text-xl">
+											Event is Live
 										</span>
 									</div>
 								) : selectedEvent?.deadline &&
@@ -1309,6 +1363,37 @@ const EventsPage = () => {
 										</button>
 									</>
 								) : null}
+								{showLeaveDialog && (
+									<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs">
+										<div className="bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-xl max-w-md w-[90%]">
+											<h2 className="text-lg font-bold text-zinc-800 dark:text-zinc-100 mb-4">
+												Leave Team
+											</h2>
+											<p className="text-sm text-zinc-600 dark:text-zinc-300	 mb-6">
+												Are you sure you want to leave the team?
+											</p>
+											<div className="flex justify-center gap-3">
+												<button
+													type="button"
+													className={BUTTON_CLASSES.primary}
+													onClick={async () => {
+														await leaveTeam();
+														setShowLeaveDialog(false);
+													}}
+												>
+													{loading.leaveTeam ? "Leaving Team..." : "Yes, Leave"}
+												</button>
+												<button
+													type="button"
+													onClick={() => setShowLeaveDialog(false)}
+													className={BUTTON_CLASSES.secondary}
+												>
+													Cancel
+												</button>
+											</div>
+										</div>
+									</div>
+								)}
 								{showTeamDialog && (
 									<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs">
 										<div className="bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-xl max-w-md w-[90%]">
