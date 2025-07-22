@@ -1095,18 +1095,188 @@ const EventsPage = () => {
 									</div>
 								) : selectedEvent?.state === "LIVE" &&
 									new Date(selectedEvent.deadline) < new Date() ? (
-									<div className="w-full rounded-xl border border-green-500 bg-green-100 dark:bg-green-950 dark:border-green-400 p-4 text-center">
-										<span className="text-green-800 dark:text-green-300 font-semibold text-lg md:text-xl">
-											Event is Live
-										</span>
-									</div>
+									<>
+										<div className="w-full rounded-xl border border-green-500 bg-green-100 dark:bg-green-950 dark:border-green-400 p-4 text-center">
+											<span className="text-green-800 dark:text-green-300 font-semibold text-lg md:text-xl">
+												Event is Live
+											</span>
+										</div>
+										{selectedEvent?.eventType === "SOLO" &&
+											teamInitialized &&
+											registered &&
+											teamState.createdTeamId && (
+												<>
+													<div className="flex flex-row items-left">
+														<button
+															type="button"
+															className="flex-shrink-0 flex items-center justify-center w-24 h-24 md:w-32 md:h-32 bg-purple-100 dark:bg-zinc-400 rounded-xl border border-purple-300 dark:border-indigo-700 cursor-pointer"
+															onClick={() => setShowQrModal(true)}
+															onKeyDown={(e) => {
+																if (e.key === "Enter" || e.key === " ") {
+																	setShowQrModal(true);
+																}
+															}}
+															aria-label="Show QR Code"
+															tabIndex={0}
+														>
+															<QRCodeSVG
+																value={teamState.createdTeamId}
+																size={112}
+																bgColor="#F3E8FF"
+																fgColor="#59168b"
+																className="w-20 h-20 md:w-28 md:h-28 object-contain rounded-xl"
+															/>
+														</button>
+														<div className="flex flex-col ml-4">
+															<div className="text-lg md:text-xl font-semibold text-purple-800 dark:text-purple-200">
+																Team ID:
+															</div>
+															<div className="px-2 py-1 rounded-lg text-purple-900 dark:text-purple-100 text-lg md:text-xl break-all font-mono">
+																{teamState.createdTeamId}
+															</div>
+															<button
+																type="button"
+																onClick={() => {
+																	navigator.clipboard.writeText(
+																		teamState.createdTeamId,
+																	);
+																	toast.success("Copied Team ID");
+																}}
+																className={`${BUTTON_CLASSES.secondary} px-2 py-1 w-20 text-xs rounded-lg border border-purple-300 dark:border-indigo-700 hover:bg-purple-200 dark:hover:bg-indigo-800 transition`}
+																title="Copy Team ID"
+															>
+																Copy
+															</button>
+														</div>
+													</div>
+													{showQrModal && (
+														<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+															<div className="relative bg-gray-400 dark:bg-zinc-400 p-6 rounded-xl shadow-xl flex flex-col items-center">
+																<button
+																	type="button"
+																	onClick={() => setShowQrModal(false)}
+																	className="absolute top-2 right-2 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+																	aria-label="Close"
+																>
+																	<X className="h-6 w-6" />
+																</button>
+																<QRCodeSVG
+																	value={teamState.createdTeamId}
+																	size={256}
+																	bgColor="#F3E8FF"
+																	fgColor="#59168b"
+																	className="w-64 h-64 object-contain p-3"
+																/>
+																<div className="mt-2 text-center text-purple-900 dark:text-purple-100 break-all font-mono">
+																	{teamState.createdTeamId}
+																</div>
+															</div>
+														</div>
+													)}
+												</>
+											)}
+										{selectedEvent?.eventType === "TEAM" &&
+											renderTeamRegistration()}
+										<button
+											type="button"
+											onClick={handleCopyLink}
+											className={BUTTON_CLASSES.secondary}
+										>
+											Copy Link
+										</button>
+									</>
 								) : selectedEvent?.deadline &&
 									new Date(selectedEvent.deadline) < new Date() ? (
-									<div className="w-full rounded-xl border border-red-500 bg-red-100 dark:bg-red-950 dark:border-red-400 p-4 text-center">
-										<span className="text-red-800 dark:text-red-300 font-semibold text-lg md:text-xl">
-											Registrations are Closed
-										</span>
-									</div>
+									<>
+										<div className="w-full rounded-xl border border-red-500 bg-red-100 dark:bg-red-950 dark:border-red-400 p-4 text-center">
+											<span className="text-red-800 dark:text-red-300 font-semibold text-lg md:text-xl">
+												Registrations are Closed
+											</span>
+										</div>
+										{selectedEvent?.eventType === "SOLO" &&
+											teamInitialized &&
+											registered &&
+											teamState.createdTeamId && (
+												<>
+													<div className="flex flex-row items-left">
+														<button
+															type="button"
+															className="flex-shrink-0 flex items-center justify-center w-24 h-24 md:w-32 md:h-32 bg-purple-100 dark:bg-zinc-400 rounded-xl border border-purple-300 dark:border-indigo-700 cursor-pointer"
+															onClick={() => setShowQrModal(true)}
+															onKeyDown={(e) => {
+																if (e.key === "Enter" || e.key === " ") {
+																	setShowQrModal(true);
+																}
+															}}
+															aria-label="Show QR Code"
+															tabIndex={0}
+														>
+															<QRCodeSVG
+																value={teamState.createdTeamId}
+																size={112}
+																bgColor="#F3E8FF"
+																fgColor="#59168b"
+																className="w-20 h-20 md:w-28 md:h-28 object-contain rounded-xl"
+															/>
+														</button>
+														<div className="flex flex-col ml-4">
+															<div className="text-lg md:text-xl font-semibold text-purple-800 dark:text-purple-200">
+																Team ID:
+															</div>
+															<div className="px-2 py-1 rounded-lg text-purple-900 dark:text-purple-100 text-lg md:text-xl break-all font-mono">
+																{teamState.createdTeamId}
+															</div>
+															<button
+																type="button"
+																onClick={() => {
+																	navigator.clipboard.writeText(
+																		teamState.createdTeamId,
+																	);
+																	toast.success("Copied Team ID");
+																}}
+																className={`${BUTTON_CLASSES.secondary} px-2 py-1 w-20 text-xs rounded-lg border border-purple-300 dark:border-indigo-700 hover:bg-purple-200 dark:hover:bg-indigo-800 transition`}
+																title="Copy Team ID"
+															>
+																Copy
+															</button>
+														</div>
+													</div>
+													{showQrModal && (
+														<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+															<div className="relative bg-gray-400 dark:bg-zinc-400 p-6 rounded-xl shadow-xl flex flex-col items-center">
+																<button
+																	type="button"
+																	onClick={() => setShowQrModal(false)}
+																	className="absolute top-2 right-2 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+																	aria-label="Close"
+																>
+																	<X className="h-6 w-6" />
+																</button>
+																<QRCodeSVG
+																	value={teamState.createdTeamId}
+																	size={256}
+																	bgColor="#F3E8FF"
+																	fgColor="#59168b"
+																	className="w-64 h-64 object-contain p-3"
+																/>
+																<div className="mt-2 text-center text-purple-900 dark:text-purple-100 break-all font-mono">
+																	{teamState.createdTeamId}
+																</div>
+															</div>
+														</div>
+													)}
+												</>
+											)}
+										{selectedEvent?.eventType === "TEAM" &&
+											renderTeamRegistration()}
+										<button
+											type="button"
+											onClick={handleCopyLink}
+											className={BUTTON_CLASSES.secondary}
+										>
+											Copy Link
+										</button>
+									</>
 								) : loading.checkingRegistration ? (
 									<button
 										type="button"
