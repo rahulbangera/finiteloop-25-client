@@ -746,7 +746,9 @@ const EventsPage = () => {
 								Team has been confirmed!
 							</span>
 						</div>
-					) : teamState.isLeader ? (
+					) : teamState.isLeader &&
+						selectedEvent?.deadline &&
+						new Date(selectedEvent.deadline) > new Date() ? (
 						<div className="flex gap-2">
 							{selectedEvent &&
 							(selectedEvent?.flcAmount > 0 ||
@@ -767,6 +769,8 @@ const EventsPage = () => {
 										loading.confirmTeam ||
 										!userId ||
 										teamState.isConfirmed ||
+										(selectedEvent.deadline &&
+											new Date(selectedEvent.deadline) <= new Date()) ||
 										!selectedEvent ||
 										teamState.members.length + 1 < selectedEvent.minTeamSize ||
 										teamState.members.length + 1 > selectedEvent.maxTeamSize
@@ -802,7 +806,9 @@ const EventsPage = () => {
 								{loading.deleteTeam ? "Deleting..." : "Delete Team"}
 							</button>
 						</div>
-					) : (
+					) : !teamState.isLeader &&
+						selectedEvent?.deadline &&
+						new Date(selectedEvent.deadline) > new Date() ? (
 						<Button
 							disabled={loading.leaveTeam || !userId}
 							onClick={() => setShowLeaveDialog(true)}
@@ -810,6 +816,15 @@ const EventsPage = () => {
 						>
 							Leave Team
 						</Button>
+					) : (
+						selectedEvent?.deadline &&
+						new Date(selectedEvent.deadline) <= new Date() && (
+							<div className="w-full rounded-xl border border-red-500 bg-red-100 dark:bg-red-950 dark:border-red-400 p-4 text-center">
+								<span className="text-red-800 dark:text-red-300 font-semibold text-lg md:text-xl">
+									Team registration has ended!
+								</span>
+							</div>
+						)
 					)}
 					<div className="flex items-center gap-4 mt-2">
 						<div className="text-base md:text-lg text-purple-800 dark:text-purple-200 font-semibold">
@@ -1104,6 +1119,7 @@ const EventsPage = () => {
 										{selectedEvent?.eventType === "SOLO" &&
 											teamInitialized &&
 											registered &&
+											teamState.isConfirmed &&
 											teamState.createdTeamId && (
 												<>
 													<div className="flex flex-row items-left">
@@ -1186,6 +1202,7 @@ const EventsPage = () => {
 										</button>
 									</>
 								) : selectedEvent?.deadline &&
+									!registered &&
 									new Date(selectedEvent.deadline) < new Date() ? (
 									<>
 										<div className="w-full rounded-xl border border-red-500 bg-red-100 dark:bg-red-950 dark:border-red-400 p-4 text-center">
@@ -1196,6 +1213,7 @@ const EventsPage = () => {
 										{selectedEvent?.eventType === "SOLO" &&
 											teamInitialized &&
 											registered &&
+											teamState.isConfirmed &&
 											teamState.createdTeamId && (
 												<>
 													<div className="flex flex-row items-left">
@@ -1277,6 +1295,15 @@ const EventsPage = () => {
 											Copy Link
 										</button>
 									</>
+								) : registered &&
+									selectedEvent?.deadline &&
+									new Date(selectedEvent.deadline) < new Date() &&
+									!teamState.isConfirmed ? (
+									<div className="w-full rounded-xl border border-yellow-400 bg-yellow-100 dark:bg-yellow-950 dark:border-yellow-500 p-4 text-center">
+										<span className="text-yellow-900 dark:text-yellow-200 font-semibold text-lg md:text-xl">
+											Registration was successful but not confirmed!
+										</span>
+									</div>
 								) : loading.checkingRegistration ? (
 									<button
 										type="button"
@@ -1492,34 +1519,40 @@ const EventsPage = () => {
 															)}
 														</>
 													)}
-												<button
-													type="button"
-													onClick={() => setSoloConfirm(true)}
-													disabled={
-														teamState.registering ||
-														loading.checkingRegistration ||
-														(registered && teamState.isConfirmed) ||
-														loading.register
-													}
-													className={
-														registered && teamState.isConfirmed
-															? BUTTON_CLASSES.disabled
-															: BUTTON_CLASSES.primary
-													}
-												>
-													{loading.checkingRegistration
-														? "Checking..."
-														: teamState.registering || loading.register
-															? "Processing..."
-															: registered && teamState.isConfirmed
-																? "Registered"
-																: registered &&
-																		!teamState.isConfirmed &&
-																		(selectedEvent?.flcAmount > 0 ||
-																			selectedEvent?.nonFlcAmount > 0)
-																	? "Pay to Confirm"
-																	: "Register"}
-												</button>
+												{selectedEvent.deadline &&
+													new Date(selectedEvent.deadline) > new Date() && (
+														<button
+															type="button"
+															onClick={() => setSoloConfirm(true)}
+															disabled={
+																teamState.registering ||
+																loading.checkingRegistration ||
+																(selectedEvent.deadline &&
+																	new Date(selectedEvent.deadline) <
+																		new Date()) ||
+																(registered && teamState.isConfirmed) ||
+																loading.register
+															}
+															className={
+																registered && teamState.isConfirmed
+																	? BUTTON_CLASSES.disabled
+																	: BUTTON_CLASSES.primary
+															}
+														>
+															{loading.checkingRegistration
+																? "Checking..."
+																: teamState.registering || loading.register
+																	? "Processing..."
+																	: registered && teamState.isConfirmed
+																		? "Registered"
+																		: registered &&
+																				!teamState.isConfirmed &&
+																				(selectedEvent?.flcAmount > 0 ||
+																					selectedEvent?.nonFlcAmount > 0)
+																			? "Pay to Confirm"
+																			: "Register"}
+														</button>
+													)}
 											</>
 										)}
 										{selectedEvent?.eventType === "TEAM" &&
@@ -1654,6 +1687,8 @@ const EventsPage = () => {
 													</button>
 												) : selectedEvent &&
 													registered &&
+													selectedEvent.deadline &&
+													new Date(selectedEvent.deadline) < new Date() &&
 													!teamState.isConfirmed &&
 													(selectedEvent.flcAmount > 0 ||
 														selectedEvent?.nonFlcAmount) ? (
@@ -1678,6 +1713,9 @@ const EventsPage = () => {
 														disabled={
 															loading.confirmTeam ||
 															!userId ||
+															(selectedEvent.deadline &&
+																new Date(selectedEvent.deadline) <
+																	new Date()) ||
 															!selectedEvent ||
 															teamState.isConfirmed
 														}
@@ -1694,7 +1732,7 @@ const EventsPage = () => {
 													>
 														{loading.confirmTeam
 															? "Confirming..."
-															: "Pay to Confirm"}
+															: "Pay to Confirm1"}
 													</PaymentButton>
 												) : null}
 												<button
