@@ -21,7 +21,7 @@ export default function Toaster() {
 
 	return (
 		<ToastContainer
-			position="top-right"
+			position="bottom-right"
 			theme={isDark ? "dark" : "light"}
 			autoClose={3000}
 			hideProgressBar={false}

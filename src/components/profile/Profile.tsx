@@ -1,18 +1,17 @@
 "use client";
-import Link from "next/link";
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import PaymentButton from "../razorpay/paymentButton";
-import { toast } from "react-toastify";
-import { useSession } from "next-auth/react";
-import { z } from "zod";
-import { FaInstagram, FaLinkedin, FaGithub, FaGlobe } from "react-icons/fa";
-import { SiLeetcode } from "react-icons/si";
-import { MdDelete } from "react-icons/md";
 import type { AppUser } from "@/lib/auth";
-import { useWhatsAppShare, WHATSAPP_SHARE_CONFIG } from "./WhatsAppShare";
-import { Button } from "../ui/button";
+import { useSession } from "next-auth/react";
+import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { FaGithub, FaGlobe, FaInstagram, FaLinkedin } from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
+import { SiLeetcode } from "react-icons/si";
+import { toast } from "react-toastify";
+import { z } from "zod";
+import { Button } from "../ui/button";
+import { useWhatsAppShare, WHATSAPP_SHARE_CONFIG } from "./WhatsAppShare";
 
 function ProfileDetail({
 	label,

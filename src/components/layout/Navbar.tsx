@@ -47,7 +47,7 @@ export default function NavBar() {
 			case "member":
 				return "text-green-600 dark:text-green-400";
 			case "user":
-				return "text-blue-600 dark:text-blue-400";
+				return "text-blue-600 dark:text-blue-200";
 			default:
 				return "text-gray-800 dark:text-white";
 		}
@@ -63,7 +63,7 @@ export default function NavBar() {
 			case "member":
 				return `${baseClasses} text-green-600 dark:text-green-400`;
 			case "user":
-				return `${baseClasses} text-blue-600 dark:text-blue-400`;
+				return `${baseClasses} text-blue-600 dark:text-blue-200`;
 			default:
 				return `${baseClasses} text-gray-800 dark:text-white`;
 		}
@@ -150,6 +150,17 @@ export default function NavBar() {
 								<div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 								<span className="relative font-semibold text-gray-800 dark:text-white tracking-wide">
 									Team
+								</span>
+							</button>
+						</Link>
+						<Link href="/blogs">
+							<button
+								type="button"
+								className="relative bg-white/35 dark:bg-white/25 hover:bg-white/45 dark:hover:bg-white/35 backdrop-blur-2xl rounded-2xl px-6 py-3 justify-center items-center flex shadow-lg cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-xl group overflow-hidden"
+							>
+								<div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+								<span className="relative font-semibold text-gray-800 dark:text-white tracking-wide">
+									Blogs
 								</span>
 							</button>
 						</Link>
@@ -372,6 +383,16 @@ export default function NavBar() {
 									>
 										<div className="absolute inset-0 bg-gradient-to-r from-white/15 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 										<span className="relative text-base">Team</span>
+									</button>
+								</Link>
+								<Link href="/blogs">
+									<button
+										type="button"
+										onClick={toggleMenu}
+										className="relative bg-white/40 dark:bg-white/30 hover:bg-white/50 dark:hover:bg-white/40 backdrop-blur-2xl rounded-2xl h-14 w-full flex justify-center items-center font-semibold transition-all duration-300 cursor-pointer shadow-lg hover:scale-[1.01] hover:shadow-xl group overflow-hidden text-gray-800 dark:text-white tracking-wide mb-3"
+									>
+										<div className="absolute inset-0 bg-gradient-to-r from-white/15 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+										<span className="relative text-base">Blogs</span>
 									</button>
 								</Link>
 								<Link href="/events">

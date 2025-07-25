@@ -995,7 +995,7 @@ const EventsPage = () => {
 							className="outline-none w-full text-left"
 						>
 							<Card image={event.imgSrc}>
-								<div className="comic-font flex flex-col items-center justify-center h-full w-full">
+								<div className="comic-font flex flex-col items-center justify-center h-full w-full p-3">
 									<div className="text-md md:text-sm text-black dark:text-white">
 										{event.category}
 									</div>
