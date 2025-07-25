@@ -134,79 +134,122 @@ export default function Team() {
 						Dynamic and Agile
 					</p>
 
-					<div className="md:hidden mt-8 max-w-sm mx-auto relative">
-						<select
-							value={selectedYearIndex}
-							onChange={(e) => setSelectedYearIndex(Number(e.target.value))}
-							className="w-full px-6 py-4 pr-12 rounded-2xl text-sm font-bold bg-gradient-to-br from-purple-500 via-indigo-600 to-blue-600 text-white border border-purple-400/50 shadow-[0_0_30px_rgba(139,92,246,0.5)] backdrop-blur-xl appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400"
-						>
-							{yearOptions.map((year, index) => (
-								<option
-									key={year.id}
-									value={index}
-									className="bg-slate-800 text-white"
-								>
-									{year.label}
-								</option>
-							))}
-						</select>
-						<div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-							<svg
-								className="w-5 h-5 text-white"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-								aria-hidden="true"
+					<div className="md:hidden mt-8 max-w-sm mx-auto space-y-3">
+						<div className="relative">
+							<select
+								value={selectedYearIndex}
+								onChange={(e) => setSelectedYearIndex(Number(e.target.value))}
+								className="w-full px-6 py-4 pr-12 rounded-2xl text-sm font-bold bg-gradient-to-br from-purple-500 via-indigo-600 to-blue-600 text-white border border-purple-400/50 shadow-[0_0_20px_rgba(139,92,246,0.4)] backdrop-blur-xl appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400 transition-all duration-300"
 							>
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth={2}
-									d="M19 9l-7 7-7-7"
-								/>
-							</svg>
+								{yearOptions.slice(0, -1).map((year, index) => (
+									<option
+										key={year.id}
+										value={index}
+										className="bg-slate-800 text-white"
+									>
+										{year.label}
+									</option>
+								))}
+							</select>
+							<div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+								<svg
+									className="w-5 h-5 text-white"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									aria-hidden="true"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M19 9l-7 7-7-7"
+									/>
+								</svg>
+							</div>
 						</div>
+
+						<button
+							type="button"
+							onClick={() => setSelectedYearIndex(yearOptions.length - 1)}
+							className={`w-full group relative px-6 py-4 rounded-2xl text-sm font-bold transition-all duration-500 backdrop-blur-xl border overflow-hidden ${
+								selectedYearIndex === yearOptions.length - 1
+									? "bg-gradient-to-br from-amber-500 via-orange-600 to-red-600 text-white border-amber-400/50 shadow-[0_0_20px_rgba(245,158,11,0.4)] scale-105"
+									: "bg-white/20 dark:bg-white/5 text-gray-700 dark:text-gray-300 border-white/30 dark:border-white/10 hover:bg-white/30 dark:hover:bg-white/10 hover:border-amber-300/50 dark:hover:border-amber-400/30 hover:scale-105"
+							}`}
+						>
+							<span className="relative z-10 tracking-wide">Faculty</span>
+						</button>
 					</div>
 
-					<div className="hidden md:flex flex-wrap justify-center gap-4 mt-8 max-w-6xl mx-auto">
-						{yearOptions.map((year, index) => (
-							<button
-								key={year.id}
-								type="button"
-								onClick={() => setSelectedYearIndex(index)}
-								className={`group relative px-8 py-4 rounded-2xl text-sm font-bold transition-all duration-500 backdrop-blur-xl border overflow-hidden ${
-									selectedYearIndex === index
-										? "bg-gradient-to-br from-purple-500 via-indigo-600 to-blue-600 text-white border-purple-400/50 shadow-[0_0_30px_rgba(139,92,246,0.5),0_0_60px_rgba(99,102,241,0.3)] scale-105"
-										: "bg-white/20 dark:bg-white/5 text-gray-700 dark:text-gray-300 border-white/30 dark:border-white/10 hover:bg-white/30 dark:hover:bg-white/10 hover:border-purple-300/50 dark:hover:border-purple-400/30 hover:scale-105 hover:shadow-[0_0_20px_rgba(139,92,246,0.2)]"
-								}`}
+					<div className="hidden md:flex justify-center gap-4 mt-8 max-w-4xl mx-auto">
+						<div className="relative">
+							<select
+								value={selectedYearIndex}
+								onChange={(e) => setSelectedYearIndex(Number(e.target.value))}
+								className="px-8 py-4 pr-12 rounded-2xl text-sm font-bold bg-gradient-to-br from-purple-500 via-indigo-600 to-blue-600 text-white border border-purple-400/50 shadow-[0_0_20px_rgba(139,92,246,0.4)] backdrop-blur-xl appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400 min-w-[200px] transition-all duration-300"
 							>
-								<div
-									className={`absolute inset-0 rounded-2xl transition-opacity duration-500 ${
-										selectedYearIndex === index
-											? "bg-gradient-to-br from-purple-400/20 via-indigo-500/20 to-blue-500/20 opacity-100"
-											: "bg-gradient-to-br from-purple-300/10 via-pink-300/10 to-blue-300/10 opacity-0 group-hover:opacity-100"
-									}`}
-								></div>
+								{yearOptions.slice(0, -1).map((year, index) => (
+									<option
+										key={year.id}
+										value={index}
+										className="bg-slate-800 text-white"
+									>
+										{year.label}
+									</option>
+								))}
+							</select>
+							<div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+								<svg
+									className="w-5 h-5 text-white"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									aria-hidden="true"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M19 9l-7 7-7-7"
+									/>
+								</svg>
+							</div>
+						</div>
 
-								{selectedYearIndex === index && (
-									<div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-500 opacity-30 animate-pulse"></div>
-								)}
+						<button
+							type="button"
+							onClick={() => setSelectedYearIndex(yearOptions.length - 1)}
+							className={`group relative px-8 py-4 rounded-2xl text-sm font-bold transition-all duration-500 backdrop-blur-xl border overflow-hidden ${
+								selectedYearIndex === yearOptions.length - 1
+									? "bg-gradient-to-br from-amber-500 via-orange-600 to-red-600 text-white border-amber-400/50 shadow-[0_0_20px_rgba(245,158,11,0.4),0_0_40px_rgba(251,146,60,0.2)] scale-105"
+									: "bg-white/20 dark:bg-white/5 text-gray-700 dark:text-gray-300 border-white/30 dark:border-white/10 hover:bg-white/30 dark:hover:bg-white/10 hover:border-amber-300/50 dark:hover:border-amber-400/30 hover:scale-105 hover:shadow-[0_0_15px_rgba(245,158,11,0.2)]"
+							}`}
+						>
+							<div
+								className={`absolute inset-0 rounded-2xl transition-opacity duration-500 ${
+									selectedYearIndex === yearOptions.length - 1
+										? "bg-gradient-to-br from-amber-400/20 via-orange-500/20 to-red-500/20 opacity-100"
+										: "bg-gradient-to-br from-amber-300/10 via-orange-300/10 to-red-300/10 opacity-0 group-hover:opacity-100"
+								}`}
+							></div>
 
-								{selectedYearIndex === index && (
-									<>
-										<div className="absolute top-2 right-2 w-1 h-1 bg-white/80 rounded-full animate-ping"></div>
-										<div className="absolute bottom-2 left-2 w-1.5 h-1.5 bg-white/60 rounded-full animate-pulse delay-300"></div>
-										<div className="absolute top-1/2 left-1 w-1 h-1 bg-white/70 rounded-full animate-bounce delay-500"></div>
-									</>
-								)}
+							{selectedYearIndex === yearOptions.length - 1 && (
+								<div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 opacity-30 animate-pulse"></div>
+							)}
 
-								<span className="relative z-10 tracking-wide">
-									{year.label}
-								</span>
+							{selectedYearIndex === yearOptions.length - 1 && (
+								<>
+									<div className="absolute top-2 right-2 w-1 h-1 bg-white/80 rounded-full animate-ping"></div>
+									<div className="absolute bottom-2 left-2 w-1.5 h-1.5 bg-white/60 rounded-full animate-pulse delay-300"></div>
+									<div className="absolute top-1/2 left-1 w-1 h-1 bg-white/70 rounded-full animate-bounce delay-500"></div>
+								</>
+							)}
 
-								<div className="absolute inset-0 -top-full bg-gradient-to-b from-transparent via-white/20 to-transparent transform -skew-x-12 transition-transform duration-700 group-hover:translate-y-full"></div>
-							</button>
-						))}
+							<span className="relative z-10 tracking-wide">Faculty</span>
+
+							<div className="absolute inset-0 -top-full bg-gradient-to-b from-transparent via-white/20 to-transparent transform -skew-x-12 transition-transform duration-700 group-hover:translate-y-full"></div>
+						</button>
 					</div>
 				</div>
 
