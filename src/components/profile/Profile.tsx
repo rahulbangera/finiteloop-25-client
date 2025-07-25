@@ -1291,16 +1291,17 @@ export default function Profile({ userId }: { userId?: number }) {
 														target="_blank"
 														rel="noopener noreferrer"
 														className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0 transition-all duration-200"
-														title={`Visit ${platformNames[link.linkName] || link.linkName} profile`}
+														title={`Visit ${platformNames[link.linkName.toLowerCase()] || link.linkName} profile`}
 													>
-														{icons[link.linkName] || (
+														{icons[link.linkName.toLowerCase()] || (
 															<div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-tr from-gray-600 to-gray-700 flex items-center justify-center shadow-lg flex-shrink-0">
 																<FaGlobe className="text-white text-sm sm:text-lg" />
 															</div>
 														)}
 														<div className="flex flex-col min-w-0 flex-1">
 															<span className="text-xs sm:text-sm font-semibold text-white capitalize group-hover:text-orange-400 transition-colors truncate">
-																{platformNames[link.linkName] || link.linkName}
+																{platformNames[link.linkName.toLowerCase()] ||
+																	link.linkName}
 															</span>
 															<span className="text-xs text-gray-400 truncate max-w-[100px] sm:max-w-[120px]">
 																{
