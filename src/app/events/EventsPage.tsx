@@ -1,17 +1,17 @@
 "use client";
-import Card from "@/components/elements/Card";
-import Radio from "@/components/elements/Radio";
-import PaymentButton from "@/components/razorpay/paymentButton";
-import { Button } from "@/components/ui/button";
-import EventWhatsAppShare from "@/components/events/EventWhatsAppShare";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import gsap from "gsap";
 import { X } from "lucide-react";
-import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { QRCodeSVG } from "qrcode.react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
+import Card from "@/components/elements/Card";
+import Radio from "@/components/elements/Radio";
+import EventWhatsAppShare from "@/components/events/EventWhatsAppShare";
+import PaymentButton from "@/components/razorpay/paymentButton";
+import { Button } from "@/components/ui/button";
 import "react-toastify/dist/ReactToastify.css";
 import { Drawer } from "vaul";
 
@@ -37,6 +37,12 @@ type Event = {
 	isLegacy: boolean;
 	createdAt: string;
 	updatedAt: string;
+	Organiser?: {
+		name: string;
+		email: string;
+		phone: string;
+		eventId: number;
+	}[];
 };
 type EventsByYear = Record<EventYear, Event[]>;
 type TeamState = {
@@ -1375,6 +1381,45 @@ const EventsPage = () => {
 									__html: selectedEvent?.description || "",
 								}}
 							/>
+
+							{/* Organisers Section */}
+							{selectedEvent?.Organiser &&
+								selectedEvent.Organiser.length > 0 && (
+									<div className="w-full mt-4">
+										<h3 className="font-bold text-lg md:text-xl text-purple-900 dark:text-purple-100 mb-3 text-center">
+											Event Organisers
+										</h3>
+										<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+											{selectedEvent.Organiser.map((organiser, index) => (
+												<div
+													key={organiser.email || `organiser-${index}`}
+													className="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/30 dark:to-indigo-900/30 rounded-xl p-4 border border-purple-200 dark:border-purple-700 shadow-sm"
+												>
+													<div className="text-center">
+														<h4 className="font-semibold text-purple-900 dark:text-purple-100 text-base md:text-lg mb-2">
+															{organiser.name}
+														</h4>
+														<div className="space-y-1">
+															<a
+																href={`mailto:${organiser.email}`}
+																className="block text-sm text-purple-700 dark:text-purple-300 hover:text-purple-900 dark:hover:text-purple-100 transition-colors duration-200 break-all"
+															>
+																📧 {organiser.email}
+															</a>
+															<a
+																href={`tel:${organiser.phone}`}
+																className="block text-sm text-purple-700 dark:text-purple-300 hover:text-purple-900 dark:hover:text-purple-100 transition-colors duration-200"
+															>
+																📞 {organiser.phone}
+															</a>
+														</div>
+													</div>
+												</div>
+											))}
+										</div>
+									</div>
+								)}
+
 							<div className="w-full mt-2">
 								<div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-4 text-base md:text-lg justify-center items-center">
 									{[

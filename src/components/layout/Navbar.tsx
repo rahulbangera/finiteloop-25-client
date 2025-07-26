@@ -1,10 +1,10 @@
 "use client";
 import { LogIn, LogOut, Moon, Sun, User } from "lucide-react";
-import { signOut, useSession } from "next-auth/react";
-import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut, useSession } from "next-auth/react";
+import { useTheme } from "next-themes";
 import { useEffect, useRef, useState } from "react";
 import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
 import { toast } from "react-toastify";
@@ -41,13 +41,17 @@ export default function NavBar() {
 	const getRoleColor = (role: string) => {
 		switch (role?.toLowerCase()) {
 			case "admin":
-				return "text-red-600 dark:text-red-400";
+				return "text-red-600";
 			case "moderator":
 				return "text-orange-600 dark:text-orange-400";
 			case "member":
 				return "text-green-600 dark:text-green-400";
+			case "developer":
+				return "text-purple-600 dark:text-purple-400";
+			case "cp":
+				return "text-cyan-600 dark:text-cyan-400";
 			case "user":
-				return "text-blue-600 dark:text-blue-200";
+				return "text-blue-600 dark:text-blue-400";
 			default:
 				return "text-gray-800 dark:text-white";
 		}
@@ -62,8 +66,12 @@ export default function NavBar() {
 				return `${baseClasses} text-orange-600 dark:text-orange-400`;
 			case "member":
 				return `${baseClasses} text-green-600 dark:text-green-400`;
+			case "developer":
+				return `${baseClasses} text-purple-600 dark:text-purple-400`;
+			case "cp":
+				return `${baseClasses} text-cyan-600 dark:text-cyan-400`;
 			case "user":
-				return `${baseClasses} text-blue-600 dark:text-blue-200`;
+				return `${baseClasses} text-blue-600 dark:text-blue-400`;
 			default:
 				return `${baseClasses} text-gray-800 dark:text-white`;
 		}
@@ -129,7 +137,7 @@ export default function NavBar() {
 						</div>
 					</Link>
 					{pathname !== "/" && (
-						<div className="flex flex-col">
+						<div className="relative bg-white/35 dark:bg-white/25 backdrop-blur-2xl rounded-2xl px-4 py-2 shadow-lg">
 							<h1 className="text-xl font-bold text-gray-800 dark:text-white leading-tight">
 								Finite Loop Club
 							</h1>
@@ -311,7 +319,7 @@ export default function NavBar() {
 						</div>
 					</Link>
 					{pathname !== "/" && (
-						<div className="flex flex-col">
+						<div className="relative bg-white/35 dark:bg-white/25 backdrop-blur-2xl rounded-2xl px-3 py-2 shadow-lg">
 							<h1 className="text-lg font-bold text-gray-800 dark:text-white leading-tight">
 								Finite Loop Club
 							</h1>

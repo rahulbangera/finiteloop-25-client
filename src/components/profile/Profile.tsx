@@ -1,15 +1,15 @@
 "use client";
-import type { AppUser } from "@/lib/auth";
-import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { FaGithub, FaGlobe, FaInstagram, FaLinkedin } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { SiLeetcode } from "react-icons/si";
 import { toast } from "react-toastify";
 import { z } from "zod";
+import type { AppUser } from "@/lib/auth";
 import { Button } from "../ui/button";
 import { useWhatsAppShare, WHATSAPP_SHARE_CONFIG } from "./WhatsAppShare";
 
@@ -956,7 +956,7 @@ export default function Profile({ userId }: { userId?: number }) {
 											priority
 										/>
 									) : (
-										<img
+										<Image
 											src={generateRandomAvatar(currentUser?.name || "default")}
 											alt="Profile"
 											width={120}
@@ -969,7 +969,7 @@ export default function Profile({ userId }: { userId?: number }) {
 							</div>
 
 							<div className="flex flex-col items-center sm:items-start flex-1 min-w-0 text-center sm:text-left">
-								<h1 className="text-2xl sm:text-3xl md:text-3xl font-bold mb-2 text-white">
+								<h1 className="text-2xl sm:text-3xl md:text-3xl font-bold mb-2 dark:text-white text-black/85">
 									{currentUser?.name}
 								</h1>
 								<span
@@ -1341,12 +1341,12 @@ export default function Profile({ userId }: { userId?: number }) {
 							) : (
 								<div className="bg-gradient-to-tr from-neutral-800/50 to-neutral-900/50 border border-neutral-700/30 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center">
 									<div className="text-3xl sm:text-4xl mb-3 opacity-50">🔗</div>
-									<p className="text-sm sm:text-base text-gray-400 mb-1">
+									<p className="text-sm sm:text-base dark:text-gray-400 mb-1 text-white">
 										{isViewingOtherProfile
 											? `${currentUser?.name || "This user"} hasn't shared their social handles yet`
 											: "You haven't added any social links yet"}
 									</p>
-									<p className="text-xs text-gray-500">
+									<p className="text-xs dark:text-gray-500 text-white">
 										{isViewingOtherProfile
 											? "Check back later to see their social profiles"
 											: "Add your social media profiles above to connect with others"}

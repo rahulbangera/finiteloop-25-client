@@ -1,5 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Lilita+One&family=Comic+Neue:wght@300;400;700&display=swap");
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -45,17 +45,17 @@
 	--radius-lg: var(--radius);
 	--radius-xl: calc(var(--radius) + 4px);
 	--animate-meteor: meteor 5s linear infinite;
-  @keyframes meteor {
-  0% {
-    transform: rotate(var(--angle)) translateX(0);
-    opacity: 1;
+	@keyframes meteor {
+		0% {
+			transform: rotate(var(--angle)) translateX(0);
+			opacity: 1;
 		}
-  70% {
-    opacity: 1;
+		70% {
+			opacity: 1;
 		}
-  100% {
-    transform: rotate(var(--angle)) translateX(-500px);
-    opacity: 0;
+		100% {
+			transform: rotate(var(--angle)) translateX(-500px);
+			opacity: 0;
 		}
 	}
 }
@@ -114,9 +114,8 @@ body {
 }
 
 .roboto-mono {
-  font-family: 'Roboto Mono', monospace;
+	font-family: "Roboto Mono", monospace;
 }
-
 
 :root {
 	--background: #ffffff;
@@ -206,10 +205,10 @@ body {
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
+	* {
+		@apply border-border outline-ring/50;
 	}
-  body {
-    @apply bg-background text-foreground;
+	body {
+		@apply bg-background text-foreground;
 	}
 }

@@ -1,9 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { FaLinkedinIn, FaGithub, FaInstagram } from "react-icons/fa";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { FaGithub, FaInstagram, FaLinkedinIn } from "react-icons/fa";
 
 interface UserLink {
 	id: string;
@@ -30,7 +29,6 @@ interface APIResponse {
 }
 
 export default function Team() {
-	const router = useRouter();
 	const [selectedYearIndex, setSelectedYearIndex] = useState(5);
 	const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -287,7 +285,7 @@ export default function Team() {
 												className="w-full h-full object-contain"
 											/>
 										) : (
-											<img
+											<Image
 												src={generateRandomAvatar(member.name)}
 												alt={member.name}
 												width={320}
@@ -295,8 +293,7 @@ export default function Team() {
 												className="w-full h-full object-contain"
 											/>
 										)}
-									</div>
-
+									</div>{" "}
 									<div className="relative z-10 flex flex-col items-center text-center p-6">
 										<div className="mb-4 space-y-2">
 											<h3 className="text-lg font-bold text-gray-800 dark:text-white">

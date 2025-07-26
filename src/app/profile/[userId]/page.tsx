@@ -1,5 +1,5 @@
-import Profile from "@/components/profile/Profile";
 import { notFound } from "next/navigation";
+import Profile from "@/components/profile/Profile";
 
 interface ProfilePageProps {
 	params: Promise<{
