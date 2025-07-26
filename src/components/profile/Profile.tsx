@@ -440,6 +440,16 @@ export default function Profile({ userId }: { userId?: number }) {
 			: (user as unknown as { role: { name: string } }).role?.name;
 	};
 
+	const generateRandomAvatar = (name: string): string => {
+		const seed = name?.toLowerCase().replace(/\s+/g, "") || "default";
+		const hash = seed.split("").reduce((a, b) => {
+			a = (a << 5) - a + b.charCodeAt(0);
+			return a & a;
+		}, 0);
+		const avatarId = Math.abs(hash) % 1000;
+		return `https://www.gravatar.com/avatar/${avatarId}?s=120&d=identicon&r=pg`;
+	};
+
 	const getUserLinks = (user: AppUser | null | undefined) => {
 		if (!user) return [];
 		return (
@@ -766,38 +776,6 @@ export default function Profile({ userId }: { userId?: number }) {
 
 	return (
 		<section className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 px-3 sm:px-4 py-4 sm:py-6 md:py-10 max-w-full sm:max-w-4xl lg:max-w-6xl mx-auto mt-16 sm:mt-20 animate-fade-in">
-			{/* Profile Viewing Indicator */}
-			{isViewingOtherProfile && (
-				<div className="col-span-full mb-4">
-					<div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-xl p-3 sm:p-4 backdrop-blur-sm">
-						<div className="flex items-center gap-2 sm:gap-3 text-sm sm:text-base text-white">
-							<div className="w-8 h-8 rounded-full bg-blue-500/30 flex items-center justify-center flex-shrink-0">
-								<svg
-									width="16"
-									height="16"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="2"
-									className="text-blue-400"
-								>
-									<title>User Profile</title>
-									<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-									<circle cx="12" cy="7" r="4"></circle>
-								</svg>
-							</div>
-							<span className="font-medium">
-								You are viewing{" "}
-								<span className="text-blue-400 font-semibold">
-									{currentUser?.name || "someone's"}
-								</span>{" "}
-								profile
-							</span>
-						</div>
-					</div>
-				</div>
-			)}
-
 			<div className="card profile-card bg-gradient-to-tr from-white/20 via-white/10 to-white/5 dark:from-neutral-900/40 dark:to-neutral-800/20 border border-black dark:border-white rounded-xl sm:rounded-2xl overflow-hidden shadow transition backdrop-blur-sm relative">
 				<div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 flex gap-2">
 					{!isViewingOtherProfile && (
@@ -968,14 +946,24 @@ export default function Profile({ userId }: { userId?: number }) {
 						<div className="flex flex-col sm:flex-row items-center sm:items-center gap-6 pt-8 sm:pt-0">
 							<div className="relative flex-shrink-0">
 								<div className="relative group">
-									<Image
-										src={currentUser?.image || "/testing/160x160.svg"}
-										alt="Profile"
-										width={120}
-										height={120}
-										className="w-24 h-24 sm:w-28 sm:h-28 md:w-30 md:h-30 rounded-full border-4 border-orange-400 object-cover shadow-lg transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl"
-										priority
-									/>
+									{currentUser?.image ? (
+										<Image
+											src={currentUser.image}
+											alt="Profile"
+											width={120}
+											height={120}
+											className="w-24 h-24 sm:w-28 sm:h-28 md:w-30 md:h-30 rounded-full border-4 border-orange-400 object-cover shadow-lg transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl"
+											priority
+										/>
+									) : (
+										<img
+											src={generateRandomAvatar(currentUser?.name || "default")}
+											alt="Profile"
+											width={120}
+											height={120}
+											className="w-24 h-24 sm:w-28 sm:h-28 md:w-30 md:h-30 rounded-full border-4 border-orange-400 object-cover shadow-lg transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl"
+										/>
+									)}
 									<div className="absolute inset-0 rounded-full bg-gradient-to-tr from-orange-400/10 to-yellow-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 								</div>
 							</div>

@@ -2,7 +2,24 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
 	images: {
-		domains: ["www.finiteloop.co.in", "res.cloudinary.com", "placehold.co"],
+		remotePatterns: [
+			{
+				protocol: "https",
+				hostname: "www.finiteloop.co.in",
+			},
+			{
+				protocol: "https",
+				hostname: "res.cloudinary.com",
+			},
+			{
+				protocol: "https",
+				hostname: "placehold.co",
+			},
+			{
+				protocol: "https",
+				hostname: "www.gravatar.com",
+			},
+		],
 	},
 };
 
