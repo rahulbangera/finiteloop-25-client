@@ -57,9 +57,14 @@ type TeamState = {
 };
 
 const getEventYear = (dateStr: string): EventYear => {
-	const year = new Date(dateStr).getFullYear();
-	if (year <= 2023) return "2023-24";
-	if (year === 2024) return "2024-25";
+	const eventDate = new Date(dateStr);
+	const year = eventDate.getFullYear();
+	const month = eventDate.getMonth();
+
+	const academicYear = month < 5 ? year - 1 : year;
+
+	if (academicYear <= 2023) return "2023-24";
+	if (academicYear === 2024) return "2024-25";
 	return "2025-26";
 };
 
@@ -1386,29 +1391,30 @@ const EventsPage = () => {
 							{selectedEvent?.Organiser &&
 								selectedEvent.Organiser.length > 0 && (
 									<div className="w-full mt-4">
-										<h3 className="font-bold text-lg md:text-xl text-purple-900 dark:text-purple-100 mb-3 text-center">
+										<h3 className="font-semibold text-base text-purple-900 dark:text-purple-100 mb-2">
 											Event Organisers
 										</h3>
-										<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+										<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
 											{selectedEvent.Organiser.map((organiser, index) => (
 												<div
 													key={organiser.email || `organiser-${index}`}
-													className="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/30 dark:to-indigo-900/30 rounded-xl p-4 border border-purple-200 dark:border-purple-700 shadow-sm"
+													className="bg-white/50 dark:bg-indigo-950/50 rounded-lg p-3 border border-purple-200/50 dark:border-indigo-700/50"
 												>
-													<div className="text-center">
-														<h4 className="font-semibold text-purple-900 dark:text-purple-100 text-base md:text-lg mb-2">
+													<div className="flex flex-col space-y-1">
+														<h4 className="font-medium text-purple-900 dark:text-purple-100 text-sm truncate">
 															{organiser.name}
 														</h4>
-														<div className="space-y-1">
+														<div className="flex flex-col space-y-0.5">
 															<a
 																href={`mailto:${organiser.email}`}
-																className="block text-sm text-purple-700 dark:text-purple-300 hover:text-purple-900 dark:hover:text-purple-100 transition-colors duration-200 break-all"
+																className="text-xs text-purple-600 dark:text-purple-300 hover:text-purple-800 dark:hover:text-purple-100 transition-colors truncate"
+																title={organiser.email}
 															>
-																📧 {organiser.email}
+																✉ {organiser.email}
 															</a>
 															<a
 																href={`tel:${organiser.phone}`}
-																className="block text-sm text-purple-700 dark:text-purple-300 hover:text-purple-900 dark:hover:text-purple-100 transition-colors duration-200"
+																className="text-xs text-purple-600 dark:text-purple-300 hover:text-purple-800 dark:hover:text-purple-100 transition-colors"
 															>
 																📞 {organiser.phone}
 															</a>
