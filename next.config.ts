@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
 		remotePatterns: [
 			{
 				protocol: "https",
-				hostname: "www.finiteloop.co.in",
+				hostname: "www.finiteloop.club",
 			},
 			{
 				protocol: "https",
