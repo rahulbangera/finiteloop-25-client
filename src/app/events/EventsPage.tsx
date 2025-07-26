@@ -41,6 +41,7 @@ type Event = {
 type EventsByYear = Record<EventYear, Event[]>;
 type TeamState = {
 	registering: boolean;
+	leaderId: string;
 	isConfirmed: boolean;
 	isLeader: boolean;
 	action: "NONE" | "CREATE" | "JOIN";
@@ -107,6 +108,7 @@ const EventsPage = () => {
 		action: "NONE",
 		isLeader: false,
 		teamId: "",
+		leaderId: "",
 		isConfirmed: false,
 		createdTeamId: "",
 		members: [],
@@ -340,6 +342,7 @@ const EventsPage = () => {
 								...prev,
 								isConfirmed: jsonTeam.data.isConfirmed || false,
 								teamName: jsonTeam.data.teamName || "",
+								leaderId: jsonTeam.data.leaderId || "",
 								isLeader: jsonTeam.data.isLeader || false,
 								registering: true,
 								createdTeamId: jsonTeam.data.teamId,
@@ -454,6 +457,7 @@ const EventsPage = () => {
 				registering: false,
 				action: "NONE",
 				isLeader: false,
+				leaderId: "",
 				teamId: "",
 				createdTeamId: "",
 				members: [],
@@ -510,6 +514,7 @@ const EventsPage = () => {
 					setTeamState((prev) => ({
 						...prev,
 						createdTeamId: json.data.teamId,
+						leaderId: userId,
 					}));
 					setTimeout(() => refreshRegistrationData(), 500);
 				} else toast.error(json.error || "Failed to register");
@@ -584,6 +589,7 @@ const EventsPage = () => {
 							...prev,
 							isConfirmed: jsonTeam.data.isConfirmed || false,
 							teamName: jsonTeam.data.teamName || "",
+							leaderId: jsonTeam.data.leaderId || "",
 							isLeader: jsonTeam.data.isLeader || false,
 							registering: true,
 							createdTeamId: jsonTeam.data.teamId,
@@ -598,6 +604,7 @@ const EventsPage = () => {
 							isLeader: false,
 							registering: true,
 							createdTeamId: "",
+							leaderId: "",
 							members: [],
 							action: "NONE",
 						}));
@@ -660,6 +667,7 @@ const EventsPage = () => {
 					...prev,
 					createdTeamId: json.data.teamId,
 					isLeader: true,
+					leaderId: userId,
 					members: Array.isArray(json.data?.members)
 						? json.data.members.map((m: { id: string; name: string }) => ({
 								id: m.id,
@@ -984,16 +992,24 @@ const EventsPage = () => {
 										(selectedEvent.deadline &&
 											new Date(selectedEvent.deadline) <= new Date()) ||
 										!selectedEvent ||
-										teamState.members.length + 1 < selectedEvent.minTeamSize ||
-										teamState.members.length + 1 > selectedEvent.maxTeamSize
+										teamState.members.length < selectedEvent.minTeamSize ||
+										teamState.members.length > selectedEvent.maxTeamSize
 									}
 									onSuccess={async (_paymentId) => {
+										setLoading((prev) => ({
+											...prev,
+											confirmTeam: false,
+										}));
 										toast.success("Payment successful");
 										// Refresh the drawer data to show updated state
 										setTimeout(() => refreshRegistrationData(), 500);
 									}}
-									onFailure={() => {
-										toast.error("Payment failed");
+									onFailure={(error) => {
+										setLoading((prev) => ({
+											...prev,
+											confirmTeam: false,
+										}));
+										toast.error(error || "Payment failed");
 									}}
 								>
 									{loading.confirmTeam
@@ -1056,7 +1072,7 @@ const EventsPage = () => {
 										{m.name}
 										{session?.user?.id === m.id
 											? " (You)"
-											: idx === 0
+											: m.id === teamState.leaderId
 												? " (Leader)"
 												: ""}
 									</li>
@@ -1207,7 +1223,8 @@ const EventsPage = () => {
 
 		if (
 			selectedEvent?.deadline &&
-			new Date(selectedEvent.deadline) > new Date()
+			new Date(selectedEvent.deadline) > new Date() &&
+			selectedEvent.state === "PUBLISHED"
 		) {
 			return (
 				<div className="flex flex-col gap-3 mt-4">
@@ -1236,6 +1253,7 @@ const EventsPage = () => {
 								teamName: "",
 								isConfirmed: false,
 								isLeader: false,
+								leaderId: "",
 								registering: false,
 								createdTeamId: "",
 								members: [],
@@ -1434,8 +1452,9 @@ const EventsPage = () => {
 											Event has been completed
 										</span>
 									</div>
-								) : selectedEvent?.state === "LIVE" &&
-									new Date(selectedEvent.deadline) < new Date() ? (
+								) : selectedEvent &&
+									(selectedEvent?.state === "LIVE" ||
+										new Date(selectedEvent.deadline) < new Date()) ? (
 									<>
 										<div className="w-full rounded-xl border border-green-500 bg-green-100 dark:bg-green-950 dark:border-green-400 p-4 text-center">
 											<span className="text-green-800 dark:text-green-300 font-semibold text-lg md:text-xl">
@@ -2088,12 +2107,21 @@ const EventsPage = () => {
 														teamId={teamState.createdTeamId}
 														onSuccess={async (_paymentId) => {
 															toast.success("Payment successful");
+															setLoading((prev) => ({
+																...prev,
+																confirmTeam: false,
+															}));
 															setSoloConfirm(false);
 															// Refresh the drawer data to show updated state
 															setTimeout(() => refreshRegistrationData(), 500);
 														}}
-														onFailure={() => {
-															toast.error("Payment failed");
+														onFailure={(error) => {
+															setLoading((prev) => ({
+																...prev,
+																confirmTeam: false,
+															}));
+
+															toast.error(error || "Payment failed");
 															setSoloConfirm(false);
 														}}
 													>

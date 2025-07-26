@@ -335,9 +335,9 @@ export default function JoinFLCForm() {
 												toast.success("Payment successful");
 												await update();
 											}}
-											onFailure={() => {
+											onFailure={(error) => {
 												setIsPaymentLoading(false);
-												toast.error("Payment failed");
+												toast.error(error || "Payment failed");
 											}}
 											type="submit"
 										>

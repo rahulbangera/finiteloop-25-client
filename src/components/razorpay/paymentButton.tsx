@@ -10,7 +10,7 @@ const PaymentButton = forwardRef<
 		onStart?: () => void;
 		description: string;
 		onSuccess: (paymentId: string) => void;
-		onFailure: () => void;
+		onFailure: (error?: string) => void;
 		onEnd?: () => void;
 	} & (
 			| {
@@ -90,7 +90,11 @@ const PaymentButton = forwardRef<
 						const orderData = await order.json();
 						if (!orderData || !orderData.orderId) {
 							console.error("Failed to create order", orderData);
-							onFailure();
+							if (orderData.error) {
+								onFailure(orderData.error);
+							} else {
+								onFailure();
+							}
 							return;
 						}
 
@@ -109,6 +113,10 @@ const PaymentButton = forwardRef<
 								"https://vl59x2gjdl.ufs.sh/f/p1uQPjI1vqk0iimoIO8hMqK8NUVTCw59vED26JxRc7z4kGea",
 							notes: {
 								address: "NMAM Institute of Technology, Nitte, Karnataka",
+								paymentType: paymentType,
+								paymentName: description,
+								teamId: teamId,
+								sessionUserId: session.data.user.id,
 							},
 							theme: {
 								color: "#3399cc",
