@@ -18,6 +18,10 @@ interface RazorPayOptions {
 	};
 	notes: {
 		address: string;
+		paymentType?: string;
+		sessionUserId?: string;
+		teamId?: string;
+		paymentName?: string;
 	};
 	theme: {
 		color: string;
