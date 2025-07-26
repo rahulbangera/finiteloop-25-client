@@ -19,7 +19,6 @@ type EventYear = "2023-24" | "2024-25" | "2025-26";
 type Event = {
 	id: number;
 	name: string;
-	slug: string | null;
 	imgSrc: string;
 	description: string | null;
 	venue: string | null;
@@ -1369,9 +1368,13 @@ const EventsPage = () => {
 									/>
 								</div>
 							)}
-							<p className="comic-font text-purple-900 dark:text-purple-100 text-md md:text-lg whitespace-pre-line break-words leading-relaxed">
-								{selectedEvent?.description}
-							</p>
+							<div
+								className="comic-font text-purple-900 dark:text-purple-100 text-md md:text-lg whitespace-pre-line break-words leading-relaxed"
+								// biome-ignore lint/security/noDangerouslySetInnerHtml: <rendering HTML content>
+								dangerouslySetInnerHTML={{
+									__html: selectedEvent?.description || "",
+								}}
+							/>
 							<div className="w-full mt-2">
 								<div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-4 text-base md:text-lg justify-center items-center">
 									{[
@@ -2080,7 +2083,7 @@ const EventsPage = () => {
 												) : selectedEvent &&
 													registered &&
 													selectedEvent.deadline &&
-													new Date(selectedEvent.deadline) < new Date() &&
+													new Date(selectedEvent.deadline) > new Date() &&
 													!teamState.isConfirmed &&
 													(selectedEvent.flcAmount > 0 ||
 														selectedEvent?.nonFlcAmount) ? (
@@ -2125,7 +2128,7 @@ const EventsPage = () => {
 													>
 														{loading.confirmTeam
 															? "Confirming..."
-															: "Pay to Confirm1"}
+															: "Pay to Confirm"}
 													</PaymentButton>
 												) : null}
 												<button

@@ -53,10 +53,6 @@ export default function JoinFLCForm() {
 		mode: "onChange",
 	});
 
-	useEffect(() => {
-		console.log(joined);
-	}, [joined]);
-
 	const checkJoinStatus = async () => {
 		if (!session) return;
 		try {
@@ -335,9 +331,9 @@ export default function JoinFLCForm() {
 												setIsPaymentLoading(true);
 											}}
 											onSuccess={async (_paymentId) => {
-												await update();
 												setIsPaymentLoading(false);
 												toast.success("Payment successful");
+												await update();
 											}}
 											onFailure={() => {
 												setIsPaymentLoading(false);
@@ -354,6 +350,7 @@ export default function JoinFLCForm() {
 											If you have paid the registration fee but the status is
 											not updated, please contact us.
 										</p>
+										<Button onClick={() => update()}>Refresh Status</Button>
 									</div>
 								)
 							) : (

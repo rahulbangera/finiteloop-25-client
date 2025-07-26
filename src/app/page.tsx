@@ -4,7 +4,7 @@ const page = () => {
 	return (
 		<div className="min-h-screen relative">
 			<div
-				className="hidden md:block absolute top-0 right-0 w-3/5 lg:w-1/2 xl:w-3/5 h-screen pointer-events-none z-0 bg-[url('/desktop_rocket_light.webp')] dark:bg-[url('/desktop_rocket_dark.png')] bg-contain bg-no-repeat"
+				className="hidden md:block absolute top-0 right-0 w-3/5 lg:w-1/2 xl:w-3/5 h-screen pointer-events-none z-0 bg-[url('/desktop_rocket_light.webp')] dark:bg-[url('/desktop_rocket_dark.webp')] bg-contain bg-no-repeat"
 				style={{
 					backgroundPosition: "right top",
 				}}
