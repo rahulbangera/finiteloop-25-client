@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
@@ -12,6 +12,8 @@ import "react-toastify/dist/ReactToastify.css";
 
 const LoginForm = () => {
 	const router = useRouter();
+	const searchParams = useSearchParams();
+	const returnTo = searchParams.get("returnTo");
 
 	const {
 		register,
@@ -30,7 +32,10 @@ const LoginForm = () => {
 
 		if (res?.ok) {
 			toast.success("Login successful! Redirecting", { autoClose: 1500 });
-			setTimeout(() => router.push("/"), 1600);
+			setTimeout(() => {
+				const redirectUrl = returnTo ? decodeURIComponent(returnTo) : "/";
+				router.push(redirectUrl);
+			}, 1600);
 		} else {
 			toast.error(res?.error || "Login failed. Please try again.");
 		}
@@ -61,6 +66,13 @@ const LoginForm = () => {
 						</div>
 
 						<div className="flex flex-col justify-center md:w-1/2 w-full">
+							{returnTo && (
+								<div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+									<p className="text-blue-700 dark:text-blue-300 text-sm text-center">
+										🎯 Login to join the team and continue with your invitation!
+									</p>
+								</div>
+							)}
 							<form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
 								<div className="text-center mb-4 md:mb-6">
 									<h2 className="text-slate-800 dark:text-white text-xl md:text-2xl font-medium">
