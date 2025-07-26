@@ -3,6 +3,7 @@ import Card from "@/components/elements/Card";
 import Radio from "@/components/elements/Radio";
 import PaymentButton from "@/components/razorpay/paymentButton";
 import { Button } from "@/components/ui/button";
+import EventWhatsAppShare from "@/components/events/EventWhatsAppShare";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import gsap from "gsap";
 import { X } from "lucide-react";
@@ -79,6 +80,10 @@ const EventsPage = () => {
 	const [showTeamDialog, setShowTeamDialog] = useState(false);
 	const [drawerOpen, setDrawerOpen] = useState(false);
 	const [initialSlug, setInitialSlug] = useState<string | null>(null);
+	const [teamInviteId, setTeamInviteId] = useState<string | null>(null);
+	const [isTeamInviteFlow, setIsTeamInviteFlow] = useState(false);
+	const [teamInviteProcessed, setTeamInviteProcessed] = useState(false);
+	const [isClosingDrawer, setIsClosingDrawer] = useState(false);
 	const [eventsByYear, setEventsByYear] = useState<EventsByYear>({
 		"2023-24": [],
 		"2024-25": [],
@@ -115,7 +120,7 @@ const EventsPage = () => {
 	const imageRef = useRef<HTMLImageElement>(null);
 	const router = useRouter();
 	const searchParams = useSearchParams();
-	const { data: session } = useSession();
+	const { data: session, status: sessionStatus } = useSession();
 	const userId = session?.user?.id;
 	const [drawerDirection, setDrawerDirection] = useState<"right" | "bottom">(
 		"right",
@@ -141,7 +146,6 @@ const EventsPage = () => {
 						"2024-25": [],
 						"2025-26": [],
 					};
-					console.log("Fetched events:", json.data);
 					for (const event of json.data) {
 						const yearKey = getEventYear(event.fromDate);
 						grouped[yearKey].push(event);
@@ -154,8 +158,8 @@ const EventsPage = () => {
 					}
 					setEventsByYear(grouped);
 				}
-			} catch (error) {
-				console.error("Failed to fetch events:", error);
+			} catch (_error) {
+				// Failed to fetch events
 			} finally {
 				setLoading((prev) => ({ ...prev, events: false }));
 			}
@@ -164,12 +168,21 @@ const EventsPage = () => {
 	}, []);
 
 	useEffect(() => {
+		if (isClosingDrawer) return;
+
 		const slug = searchParams.get("id");
+		const teamInvite = searchParams.get("teamInvite");
+
 		if (slug && !initialSlug) setInitialSlug(slug);
-	}, [searchParams, initialSlug]);
+
+		if (teamInvite && !teamInviteId) {
+			setTeamInviteId(teamInvite);
+			setIsTeamInviteFlow(true);
+		}
+	}, [searchParams, initialSlug, teamInviteId, isClosingDrawer]);
 
 	useEffect(() => {
-		if (!initialSlug || loading.events) return;
+		if (!initialSlug || loading.events || isClosingDrawer) return;
 		let found: { event: Event; year: EventYear } | null = null;
 		for (const year in eventsByYear) {
 			const yearKey = year as EventYear;
@@ -183,35 +196,60 @@ const EventsPage = () => {
 		}
 		if (found) {
 			setSelectedEvent(found.event);
-			setDrawerOpen(true);
 			const yearIndex =
 				found.year === "2023-24" ? 0 : found.year === "2024-25" ? 1 : 2;
 			setSelectedYearData({ year: found.year, index: yearIndex });
-		}
-	}, [initialSlug, eventsByYear, loading.events]);
 
-	useEffect(() => {
-		if (!drawerOpen) {
-			const params = new URLSearchParams(window.location.search);
-			params.delete("id");
-			const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
-			window.history.replaceState({}, "", newUrl);
-			setSelectedEvent(null);
-			setRegistered(false);
-			setTeamState({
-				teamName: "",
-				isConfirmed: false,
-				registering: false,
-				action: "NONE",
-				isLeader: false,
-				teamId: "",
-				createdTeamId: "",
-				members: [],
-			});
-			setTeamInitialized(false);
-			setAvailable(null);
+			if (
+				teamInviteId &&
+				found.event.eventType === "TEAM" &&
+				isTeamInviteFlow &&
+				!teamInviteProcessed
+			) {
+				if (sessionStatus === "loading") {
+					return;
+				}
+
+				if (sessionStatus === "unauthenticated" || !userId) {
+					toast.info("Please login to join the team!");
+					router.push(
+						`/auth/login?returnTo=${encodeURIComponent(window.location.href)}`,
+					);
+					return;
+				}
+
+				if (sessionStatus === "authenticated" && userId) {
+					setDrawerOpen(true);
+					setTeamInviteProcessed(true);
+					toast.success(`Welcome! Ready to join team: ${teamInviteId}`, {
+						autoClose: 3000,
+					});
+
+					setTeamState((prev) => ({
+						...prev,
+						action: "JOIN",
+						teamId: teamInviteId,
+					}));
+				}
+			} else if (!isTeamInviteFlow || teamInviteProcessed) {
+				if (!drawerOpen) {
+					setDrawerOpen(true);
+				}
+			}
 		}
-	}, [drawerOpen]);
+	}, [
+		initialSlug,
+		eventsByYear,
+		loading.events,
+		teamInviteId,
+		isTeamInviteFlow,
+		sessionStatus,
+		userId,
+		teamInviteProcessed,
+		drawerOpen,
+		isClosingDrawer,
+		router.push,
+	]);
 
 	useEffect(() => {
 		const checkMobile = () => {
@@ -306,25 +344,33 @@ const EventsPage = () => {
 								registering: true,
 								createdTeamId: jsonTeam.data.teamId,
 								members,
-								action: "NONE",
+								action:
+									prev.action === "JOIN" && prev.teamId && isTeamInviteFlow
+										? prev.action
+										: "NONE",
+								teamId:
+									prev.action === "JOIN" && prev.teamId && isTeamInviteFlow
+										? prev.teamId
+										: "",
 							}));
 							setRegistered(true);
 						} else {
-							setTeamState((prev) => ({
-								...prev,
-								teamName: "",
-								isConfirmed: false,
-								isLeader: false,
-								registering: true,
-								createdTeamId: "",
-								members: [],
-								action: "NONE",
-							}));
+							if (!isTeamInviteFlow) {
+								setTeamState((prev) => ({
+									...prev,
+									teamName: "",
+									isConfirmed: false,
+									isLeader: false,
+									registering: true,
+									createdTeamId: "",
+									members: [],
+									action: "NONE",
+								}));
+							}
 						}
 					}
 				}
 
-				// Then, check availability
 				const resAvailable = await fetch(
 					`${process.env.NEXT_PUBLIC_SERVER_URL}/api/events/check-available`,
 					{
@@ -341,8 +387,7 @@ const EventsPage = () => {
 				}
 
 				if (!isRegistered) setTeamInitialized(true);
-			} catch (err) {
-				console.error("Error checking registration/availability:", err);
+			} catch (_err) {
 				setAvailable(null);
 			} finally {
 				setTeamInitialized(true);
@@ -359,6 +404,10 @@ const EventsPage = () => {
 		setTeamInitialized(false);
 
 		if (selectedEvent) {
+			if (teamState.action === "JOIN") {
+				setTeamInitialized(true);
+			}
+
 			checkRegistrationAndAvailable();
 		}
 		if (selectedEvent) {
@@ -368,7 +417,7 @@ const EventsPage = () => {
 					: `${selectedEvent.minTeamSize} - ${selectedEvent.maxTeamSize}  `;
 			setTeamSize(size);
 		}
-	}, [selectedEvent, userId]);
+	}, [selectedEvent, userId, isTeamInviteFlow, teamState.action]);
 
 	const handleToggleChange = (e: React.ChangeEvent<HTMLDivElement>) => {
 		const id = (e.target as HTMLElement).id;
@@ -380,7 +429,46 @@ const EventsPage = () => {
 			setSelectedYearData({ year: "2025-26", index: 2 });
 	};
 
+	const handleDrawerClose = (open: boolean) => {
+		if (!open && drawerOpen) {
+			setIsClosingDrawer(true);
+		}
+		setDrawerOpen(open);
+
+		if (!open) {
+			const params = new URLSearchParams(window.location.search);
+			params.delete("id");
+			params.delete("teamInvite");
+			const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+			window.history.replaceState({}, "", newUrl);
+
+			setSelectedEvent(null);
+			setRegistered(false);
+			setInitialSlug(null);
+			setTeamInviteId(null);
+			setIsTeamInviteFlow(false);
+			setTeamInviteProcessed(true);
+			setTeamState({
+				teamName: "",
+				isConfirmed: false,
+				registering: false,
+				action: "NONE",
+				isLeader: false,
+				teamId: "",
+				createdTeamId: "",
+				members: [],
+			});
+			setTeamInitialized(false);
+			setAvailable(null);
+
+			setTimeout(() => {
+				setIsClosingDrawer(false);
+			}, 100);
+		}
+	};
+
 	const handleCardClick = (event: Event) => {
+		if (isClosingDrawer) return;
 		setSelectedEvent(event);
 		router.push(`?id=${event.id}`, { scroll: false });
 		setDrawerOpen(true);
@@ -423,9 +511,9 @@ const EventsPage = () => {
 						...prev,
 						createdTeamId: json.data.teamId,
 					}));
+					setTimeout(() => refreshRegistrationData(), 500);
 				} else toast.error(json.error || "Failed to register");
-			} catch (err) {
-				console.error("Error registering for event", err);
+			} catch (_err) {
 				toast.error("Something went wrong.");
 			} finally {
 				setTeamState((prev) => ({ ...prev, registering: false }));
@@ -433,9 +521,116 @@ const EventsPage = () => {
 			}
 		}
 	};
-	useEffect(() => {
-		console.log(teamState.isConfirmed);
-	}, [teamState.isConfirmed]);
+
+	const refreshRegistrationData = useCallback(async () => {
+		if (!selectedEvent) return;
+
+		setLoading((prev) => ({
+			...prev,
+			checkingRegistration: true,
+			checkAvailable: true,
+		}));
+
+		try {
+			let _isRegistered = false;
+			if (userId) {
+				if (selectedEvent.eventType === "SOLO") {
+					const resSolo = await fetch(
+						`${process.env.NEXT_PUBLIC_SERVER_URL}/api/events/checkSolo`,
+						{
+							method: "POST",
+							headers: {
+								"Content-Type": "application/json",
+								Authorization: `Bearer ${session?.user?.accessToken}`,
+							},
+							body: JSON.stringify({ eventId: selectedEvent.id }),
+						},
+					);
+					const jsonSolo = await resSolo.json();
+					if (resSolo.ok && jsonSolo.result.success) {
+						setRegistered(true);
+						setTeamState((prev) => ({
+							...prev,
+							isConfirmed: jsonSolo.result.isConfirmed || false,
+							createdTeamId: jsonSolo.result.teamId,
+						}));
+						_isRegistered = true;
+					} else {
+						setRegistered(false);
+					}
+				} else if (selectedEvent.eventType === "TEAM") {
+					const resTeam = await fetch(
+						`${process.env.NEXT_PUBLIC_SERVER_URL}/api/events/getTeam`,
+						{
+							method: "POST",
+							headers: {
+								"Content-Type": "application/json",
+								Authorization: `Bearer ${session?.user?.accessToken}`,
+							},
+							body: JSON.stringify({ eventId: selectedEvent.id }),
+						},
+					);
+					const jsonTeam = await resTeam.json();
+					if (resTeam.ok && jsonTeam.success && jsonTeam.data) {
+						const members = Array.isArray(jsonTeam.data.members)
+							? jsonTeam.data.members.map(
+									(m: { id: string; name: string }) => ({
+										id: m.id,
+										name: m.name,
+									}),
+								)
+							: [];
+						setTeamState((prev) => ({
+							...prev,
+							isConfirmed: jsonTeam.data.isConfirmed || false,
+							teamName: jsonTeam.data.teamName || "",
+							isLeader: jsonTeam.data.isLeader || false,
+							registering: true,
+							createdTeamId: jsonTeam.data.teamId,
+							members,
+						}));
+						setRegistered(true);
+					} else {
+						setTeamState((prev) => ({
+							...prev,
+							teamName: "",
+							isConfirmed: false,
+							isLeader: false,
+							registering: true,
+							createdTeamId: "",
+							members: [],
+							action: "NONE",
+						}));
+					}
+				}
+			}
+
+			const resAvailable = await fetch(
+				`${process.env.NEXT_PUBLIC_SERVER_URL}/api/events/check-available`,
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ eventId: selectedEvent.id }),
+				},
+			);
+			const jsonAvailable = await resAvailable.json();
+			if (resAvailable.ok && typeof jsonAvailable.available === "boolean") {
+				setAvailable(jsonAvailable.available);
+			} else {
+				setAvailable(null);
+			}
+		} catch (_err) {
+			setAvailable(null);
+		} finally {
+			setLoading((prev) => ({
+				...prev,
+				checkAvailable: false,
+				checkingRegistration: false,
+			}));
+		}
+	}, [selectedEvent, userId, session?.user?.accessToken]);
+
+	useEffect(() => {}, []);
 	const createTeam = useCallback(async () => {
 		if (!selectedEvent) return;
 		if (!userId) {
@@ -474,6 +669,7 @@ const EventsPage = () => {
 					action: "NONE",
 				}));
 				toast.success("Team created successfully!");
+				setTimeout(() => refreshRegistrationData(), 500);
 			} else {
 				toast.error(json.error || "Failed to create team");
 				setTeamState((prev) => ({
@@ -487,7 +683,13 @@ const EventsPage = () => {
 		} finally {
 			setLoading((prev) => ({ ...prev, createTeam: false }));
 		}
-	}, [selectedEvent, userId, session, teamState.teamName]);
+	}, [
+		selectedEvent,
+		userId,
+		session,
+		teamState.teamName,
+		refreshRegistrationData,
+	]);
 
 	const joinTeam = useCallback(async () => {
 		if (!selectedEvent) return;
@@ -527,6 +729,7 @@ const EventsPage = () => {
 							}))
 						: [{ id: userId, name: session?.user?.name || "You" }],
 				}));
+				setTimeout(() => refreshRegistrationData(), 500);
 			} else {
 				toast.error(json.error || "Failed to join team");
 				setTeamState((prev) => ({
@@ -539,7 +742,13 @@ const EventsPage = () => {
 		} finally {
 			setLoading((prev) => ({ ...prev, joinTeam: false }));
 		}
-	}, [selectedEvent, userId, teamState.teamId, session]);
+	}, [
+		selectedEvent,
+		userId,
+		teamState.teamId,
+		session,
+		refreshRegistrationData,
+	]);
 
 	const confirmTeam = async () => {
 		if (!selectedEvent) return;
@@ -563,8 +772,10 @@ const EventsPage = () => {
 				},
 			);
 			const json = await res.json();
-			if (json.success) toast.success("Team confirmed!");
-			else toast.error(json.error || "Failed to confirm team");
+			if (json.success) {
+				toast.success("Team confirmed!");
+				setTimeout(() => refreshRegistrationData(), 500);
+			} else toast.error(json.error || "Failed to confirm team");
 		} catch {
 			toast.error("Error confirming team");
 		} finally {
@@ -602,6 +813,7 @@ const EventsPage = () => {
 					members: [],
 					action: "NONE",
 				}));
+				setTimeout(() => refreshRegistrationData(), 500);
 			} else toast.error(json.error || "Failed to delete");
 		} catch {
 			toast.error("Error deleting team");
@@ -640,6 +852,7 @@ const EventsPage = () => {
 					members: [],
 					action: "NONE",
 				}));
+				setTimeout(() => refreshRegistrationData(), 500);
 			} else toast.error(json.error || "Failed to leave team");
 		} catch {
 			toast.error("Error leaving team");
@@ -774,9 +987,10 @@ const EventsPage = () => {
 										teamState.members.length + 1 < selectedEvent.minTeamSize ||
 										teamState.members.length + 1 > selectedEvent.maxTeamSize
 									}
-									onSuccess={async (paymentId) => {
-										console.log("Payment successful:", paymentId);
+									onSuccess={async (_paymentId) => {
 										toast.success("Payment successful");
+										// Refresh the drawer data to show updated state
+										setTimeout(() => refreshRegistrationData(), 500);
 									}}
 									onFailure={() => {
 										toast.error("Payment failed");
@@ -875,41 +1089,118 @@ const EventsPage = () => {
 					toast.error("Login to register");
 					return;
 				}
+				if (!teamState.teamId.trim()) {
+					toast.error("Please enter a team ID");
+					return;
+				}
 				setJoining(true);
 				await joinTeam();
 				setJoining(false);
 			};
 
 			return (
-				<div className="flex flex-col gap-3 mt-4">
-					<input
-						type="text"
-						placeholder="Enter Team ID"
-						value={teamState.teamId}
-						onChange={(e) =>
-							setTeamState((prev) => ({ ...prev, teamId: e.target.value }))
-						}
-						className={BUTTON_CLASSES.input}
-						disabled={joining || loading.joinTeam}
-					/>
-					<button
-						type="button"
-						onClick={handleJoin}
-						className={BUTTON_CLASSES.primary}
-						disabled={!teamState.teamId || joining || loading.joinTeam}
-					>
-						{joining || loading.joinTeam ? "Joining..." : "Join"}
-					</button>
-					<button
-						type="button"
-						onClick={() =>
-							setTeamState((prev) => ({ ...prev, action: "NONE" }))
-						}
-						className={BUTTON_CLASSES.secondary}
-						disabled={joining || loading.joinTeam}
-					>
-						Back
-					</button>
+				<div className="flex flex-col gap-4 mt-4 p-4 border border-purple-200 dark:border-indigo-700 rounded-xl bg-purple-50 dark:bg-indigo-900/30">
+					{isTeamInviteFlow && teamState.teamId && (
+						<div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 border border-green-200 dark:border-green-700 rounded-lg p-4">
+							<div className="flex items-center gap-3 text-green-700 dark:text-green-300 mb-2">
+								<div className="flex items-center justify-center w-8 h-8 bg-green-100 dark:bg-green-800 rounded-full">
+									<span className="text-lg">🎉</span>
+								</div>
+								<span className="font-semibold text-base">
+									You're invited to join this team!
+								</span>
+							</div>
+							<div className="bg-white dark:bg-green-800/20 rounded-md p-2 border border-green-200 dark:border-green-600">
+								<span className="text-green-600 dark:text-green-400 text-sm font-medium">
+									Team ID:{" "}
+								</span>
+								<span className="text-green-800 dark:text-green-200 font-mono text-sm">
+									{teamState.teamId}
+								</span>
+							</div>
+						</div>
+					)}
+
+					<div className="space-y-3">
+						<label
+							htmlFor="team-id-input"
+							className="block text-purple-900 dark:text-purple-100 font-semibold text-sm"
+						>
+							{isTeamInviteFlow && teamState.teamId
+								? "Confirm Team ID"
+								: "Enter Team ID"}
+						</label>
+						<input
+							id="team-id-input"
+							type="text"
+							placeholder={
+								isTeamInviteFlow && teamState.teamId
+									? "Team ID (pre-filled)"
+									: "Enter the team ID you want to join"
+							}
+							value={teamState.teamId}
+							onChange={(e) =>
+								setTeamState((prev) => ({ ...prev, teamId: e.target.value }))
+							}
+							className={`${BUTTON_CLASSES.input} transition-all duration-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent`}
+							disabled={joining || loading.joinTeam}
+							readOnly={isTeamInviteFlow && !!teamState.teamId}
+						/>
+					</div>
+
+					<div className="flex gap-3">
+						<button
+							type="button"
+							onClick={handleJoin}
+							className={`flex-1 transition-all duration-200 ${
+								isTeamInviteFlow && teamState.teamId
+									? "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+									: BUTTON_CLASSES.primary
+							}`}
+							disabled={!teamState.teamId.trim() || joining || loading.joinTeam}
+						>
+							{joining || loading.joinTeam ? (
+								<div className="flex items-center justify-center gap-2">
+									<div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+									<span>Joining...</span>
+								</div>
+							) : isTeamInviteFlow && teamState.teamId ? (
+								<div className="flex items-center justify-center gap-2">
+									<span>✨</span>
+									<span>Accept Invitation</span>
+								</div>
+							) : (
+								"Join Team"
+							)}
+						</button>
+
+						<button
+							type="button"
+							onClick={() => {
+								setTeamState((prev) => ({
+									...prev,
+									action: "NONE",
+									teamId: isTeamInviteFlow ? prev.teamId : "",
+								}));
+								if (isTeamInviteFlow) {
+									setIsTeamInviteFlow(false);
+									setTeamInviteId(null);
+									setTeamInviteProcessed(true);
+								}
+							}}
+							className={`px-6 transition-all duration-200 ${BUTTON_CLASSES.secondary} hover:bg-purple-100 dark:hover:bg-indigo-800`}
+							disabled={joining || loading.joinTeam}
+						>
+							{isTeamInviteFlow && teamState.teamId ? "Decline" : "Cancel"}
+						</button>
+					</div>
+
+					{!isTeamInviteFlow && (
+						<div className="text-xs text-purple-600 dark:text-purple-300 bg-purple-100 dark:bg-indigo-800/30 p-2 rounded-md">
+							💡 <strong>Tip:</strong> Get the team ID from your team leader or
+							the team QR code
+						</div>
+					)}
 				</div>
 			);
 		}
@@ -938,7 +1229,17 @@ const EventsPage = () => {
 								toast.error("Login to register");
 								return;
 							}
-							setTeamState((prev) => ({ ...prev, action: "JOIN" }));
+							setTeamState((prev) => ({
+								...prev,
+								action: "JOIN",
+								teamId: "",
+								teamName: "",
+								isConfirmed: false,
+								isLeader: false,
+								registering: false,
+								createdTeamId: "",
+								members: [],
+							}));
 						}}
 						className={BUTTON_CLASSES.secondary}
 						disabled={loading.joinTeam}
@@ -974,11 +1275,13 @@ const EventsPage = () => {
 				/>
 			</div>
 			<div className="min-h-screen w-[90%] grid justify-center items-start grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mt-2 md:mt-5 md:px-0">
-				{loading.events ? (
+				{loading.events || (isTeamInviteFlow && sessionStatus === "loading") ? (
 					<div className="lilita-font w-full text-4xl md:text-6xl font-bold text-flc-yellow text-center col-span-full md:mt-40">
 						<div className="animate-spin rounded-full h-32 w-32 border-t-4 border-[#FCA410] border-b-4 mx-auto mb-4"></div>
 						<p className="text-3xl lilita-font font-bold text-[#FCA410]">
-							Loading Events...
+							{isTeamInviteFlow && sessionStatus === "loading"
+								? "Checking Authentication..."
+								: "Loading Events..."}
 						</p>
 					</div>
 				) : eventsByYear[selectedYearData.year].length === 0 ? (
@@ -1012,12 +1315,19 @@ const EventsPage = () => {
 			</div>
 			<Drawer.Root
 				open={drawerOpen && !!selectedEvent}
-				onOpenChange={setDrawerOpen}
+				onOpenChange={handleDrawerClose}
 				direction={drawerDirection}
-				modal
+				modal={true}
+				dismissible={true}
 			>
 				<Drawer.Portal>
-					<Drawer.Overlay className="fixed inset-0 bg-black/40 z-40" />
+					<Drawer.Overlay
+						className="fixed inset-0 bg-black/40 z-40 cursor-pointer"
+						onClick={(e) => {
+							e.stopPropagation();
+							handleDrawerClose(false);
+						}}
+					/>
 					<Drawer.Content
 						className={`
 							fixed
@@ -1209,13 +1519,24 @@ const EventsPage = () => {
 											)}
 										{selectedEvent?.eventType === "TEAM" &&
 											renderTeamRegistration()}
-										<button
-											type="button"
-											onClick={handleCopyLink}
-											className={BUTTON_CLASSES.secondary}
-										>
-											Copy Link
-										</button>
+										<div className="flex gap-2">
+											{selectedEvent && (
+												<EventWhatsAppShare
+													event={selectedEvent}
+													teamState={teamState}
+													registered={registered}
+													variant="button"
+													className="flex-1"
+												/>
+											)}
+											<button
+												type="button"
+												onClick={handleCopyLink}
+												className={`${BUTTON_CLASSES.secondary} ${selectedEvent ? "flex-1" : "w-full"}`}
+											>
+												Copy Link
+											</button>
+										</div>
 									</>
 								) : registered &&
 									selectedEvent?.deadline &&
@@ -1313,13 +1634,24 @@ const EventsPage = () => {
 											)}
 										{selectedEvent?.eventType === "TEAM" &&
 											renderTeamRegistration()}
-										<button
-											type="button"
-											onClick={handleCopyLink}
-											className={BUTTON_CLASSES.secondary}
-										>
-											Copy Link
-										</button>
+										<div className="flex gap-2">
+											{selectedEvent && (
+												<EventWhatsAppShare
+													event={selectedEvent}
+													teamState={teamState}
+													registered={registered}
+													variant="button"
+													className="flex-1"
+												/>
+											)}
+											<button
+												type="button"
+												onClick={handleCopyLink}
+												className={`${BUTTON_CLASSES.secondary} ${selectedEvent ? "flex-1" : "w-full"}`}
+											>
+												Copy Link
+											</button>
+										</div>
 									</>
 								) : available === false ? (
 									registered ? (
@@ -1433,13 +1765,24 @@ const EventsPage = () => {
 												)}
 											{selectedEvent?.eventType === "TEAM" &&
 												renderTeamRegistration()}
-											<button
-												type="button"
-												onClick={handleCopyLink}
-												className={BUTTON_CLASSES.secondary}
-											>
-												Copy Link
-											</button>
+											<div className="flex gap-2">
+												{selectedEvent && (
+													<EventWhatsAppShare
+														event={selectedEvent}
+														teamState={teamState}
+														registered={registered}
+														variant="button"
+														className="flex-1"
+													/>
+												)}
+												<button
+													type="button"
+													onClick={handleCopyLink}
+													className={`${BUTTON_CLASSES.secondary} ${selectedEvent ? "flex-1" : "w-full"}`}
+												>
+													Copy Link
+												</button>
+											</div>
 										</>
 									) : (
 										<div className="w-full rounded-xl border border-yellow-400 bg-yellow-100 dark:bg-yellow-950 dark:border-yellow-500 p-4 text-center">
@@ -1455,7 +1798,8 @@ const EventsPage = () => {
 												{teamState.isConfirmed && teamState.createdTeamId && (
 													<div className="w-full rounded-xl border border-green-500 bg-green-100 dark:bg-green-950 dark:border-green-400 p-4 text-center">
 														<span className="text-green-800 dark:text-green-300 font-semibold text-lg md:text-xl">
-															You have been confirmed!
+															🎉 Registration confirmed! You're all set for the
+															event.
 														</span>
 													</div>
 												)}
@@ -1568,13 +1912,24 @@ const EventsPage = () => {
 										)}
 										{selectedEvent?.eventType === "TEAM" &&
 											renderTeamRegistration()}
-										<button
-											type="button"
-											onClick={handleCopyLink}
-											className={BUTTON_CLASSES.secondary}
-										>
-											Copy Link
-										</button>
+										<div className="flex gap-2">
+											{selectedEvent && (
+												<EventWhatsAppShare
+													event={selectedEvent}
+													teamState={teamState}
+													registered={registered}
+													variant="button"
+													className="flex-1"
+												/>
+											)}
+											<button
+												type="button"
+												onClick={handleCopyLink}
+												className={`${BUTTON_CLASSES.secondary} ${selectedEvent ? "flex-1" : "w-full"}`}
+											>
+												Copy Link
+											</button>
+										</div>
 									</>
 								) : null}
 								{showLeaveDialog && (
@@ -1731,10 +2086,11 @@ const EventsPage = () => {
 															teamState.isConfirmed
 														}
 														teamId={teamState.createdTeamId}
-														onSuccess={async (paymentId) => {
-															console.log("Payment successful:", paymentId);
+														onSuccess={async (_paymentId) => {
 															toast.success("Payment successful");
 															setSoloConfirm(false);
+															// Refresh the drawer data to show updated state
+															setTimeout(() => refreshRegistrationData(), 500);
 														}}
 														onFailure={() => {
 															toast.error("Payment failed");

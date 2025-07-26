@@ -8,12 +8,12 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { set, type z } from "zod";
+import type { z } from "zod";
 import PaymentButton from "../razorpay/paymentButton";
 import { Button } from "../ui/button";
 
 export default function JoinFLCForm() {
-	const router = useRouter();
+	const _router = useRouter();
 	const [isPaymentLoading, setIsPaymentLoading] = useState(false);
 	const [statusLoading, setStatusLoading] = useState(true);
 	const { data: session, update } = useSession();
