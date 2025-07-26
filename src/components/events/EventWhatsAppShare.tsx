@@ -6,7 +6,6 @@ import { toast } from "react-toastify";
 interface Event {
 	id: number;
 	name: string;
-	slug: string | null;
 	imgSrc: string;
 	description: string | null;
 	venue: string | null;
