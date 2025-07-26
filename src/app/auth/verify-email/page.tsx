@@ -1,8 +1,8 @@
 "use client";
-import VerifyEmailForm from "@/components/auth/VerifyEmailForm";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState, Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import VerifyEmailForm from "@/components/auth/VerifyEmailForm";
 
 function VerifyEmailContent() {
 	const searchParams = useSearchParams();

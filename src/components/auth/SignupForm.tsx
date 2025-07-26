@@ -1,12 +1,12 @@
 "use client";
-import { signUpZ } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import type { z } from "zod";
 import { toast } from "react-toastify";
+import type { z } from "zod";
+import { signUpZ } from "@/lib/validation";
 import "react-toastify/dist/ReactToastify.css";
 
 type SignUpFormData = z.infer<typeof signUpZ>;

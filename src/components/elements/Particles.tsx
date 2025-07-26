@@ -1,6 +1,6 @@
 "use client";
 import type React from "react";
-import { useEffect, useRef, useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 interface ParticlesProps {
 	className?: string;

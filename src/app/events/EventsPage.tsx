@@ -1,17 +1,17 @@
 "use client";
-import Card from "@/components/elements/Card";
-import Radio from "@/components/elements/Radio";
-import PaymentButton from "@/components/razorpay/paymentButton";
-import { Button } from "@/components/ui/button";
-import EventWhatsAppShare from "@/components/events/EventWhatsAppShare";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import gsap from "gsap";
 import { X } from "lucide-react";
-import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { QRCodeSVG } from "qrcode.react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
+import Card from "@/components/elements/Card";
+import Radio from "@/components/elements/Radio";
+import EventWhatsAppShare from "@/components/events/EventWhatsAppShare";
+import PaymentButton from "@/components/razorpay/paymentButton";
+import { Button } from "@/components/ui/button";
 import "react-toastify/dist/ReactToastify.css";
 import { Drawer } from "vaul";
 
@@ -37,6 +37,12 @@ type Event = {
 	isLegacy: boolean;
 	createdAt: string;
 	updatedAt: string;
+	Organiser?: {
+		name: string;
+		email: string;
+		phone: string;
+		eventId: number;
+	}[];
 };
 type EventsByYear = Record<EventYear, Event[]>;
 type TeamState = {
@@ -52,9 +58,14 @@ type TeamState = {
 };
 
 const getEventYear = (dateStr: string): EventYear => {
-	const year = new Date(dateStr).getFullYear();
-	if (year <= 2023) return "2023-24";
-	if (year === 2024) return "2024-25";
+	const eventDate = new Date(dateStr);
+	const year = eventDate.getFullYear();
+	const month = eventDate.getMonth();
+
+	const academicYear = month < 5 ? year - 1 : year;
+
+	if (academicYear <= 2023) return "2023-24";
+	if (academicYear === 2024) return "2024-25";
 	return "2025-26";
 };
 
@@ -885,81 +896,88 @@ const EventsPage = () => {
 		if (teamState.createdTeamId) {
 			return (
 				<div className="flex flex-col gap-3 mt-4">
-					<div className="flex flex-col md:flex-row items-start md:items-center gap-4 w-full">
-						<div className="flex flex-col gap-3 flex-1">
-							<div className="flex items-center gap-2">
-								<span className="font-semibold text-purple-900 dark:text-purple-100 text-lg md:text-xl">
+					<div className="flex flex-col sm:flex-row items-start gap-4 w-full bg-white/50 dark:bg-indigo-900/30 rounded-xl p-4 border border-purple-200 dark:border-indigo-700">
+						<div className="flex flex-col gap-3 flex-1 min-w-0">
+							<div className="flex flex-col sm:flex-row sm:items-center gap-2">
+								<span className="font-semibold text-purple-900 dark:text-purple-100 text-base md:text-lg whitespace-nowrap">
 									Team Name:
 								</span>
-								<span className="px-2 py-1 rounded-lg bg-purple-100 dark:bg-indigo-900 text-purple-700 dark:text-purple-200 text-lg md:text-xl break-all font-mono shadow">
+								<span className="px-3 py-1.5 rounded-lg bg-purple-100 dark:bg-indigo-800 text-purple-700 dark:text-purple-200 text-base md:text-lg font-mono shadow-sm truncate">
 									{teamState.teamName}
 								</span>
 							</div>
-							<div className="flex items-center gap-2">
-								<span className="font-semibold text-purple-900 dark:text-purple-100 text-lg md:text-xl">
+							<div className="flex flex-col sm:flex-row sm:items-center gap-2">
+								<span className="font-semibold text-purple-900 dark:text-purple-100 text-base md:text-lg whitespace-nowrap">
 									Team ID:
 								</span>
-								<span className="px-2 py-1 rounded-lg bg-purple-100 dark:bg-indigo-900 text-purple-700 dark:text-purple-200 text-lg md:text-xl break-all font-mono shadow">
-									{teamState.createdTeamId}
-								</span>
-								<button
-									type="button"
-									onClick={() => {
-										navigator.clipboard.writeText(teamState.createdTeamId);
-										toast.success("Copied Team ID");
-									}}
-									className={`${BUTTON_CLASSES.secondary} px-2 py-1 text-xs rounded-lg border border-purple-300 dark:border-indigo-700 hover:bg-purple-200 dark:hover:bg-indigo-800 transition`}
-									title="Copy Team ID"
-								>
-									Copy
-								</button>
-							</div>
-						</div>
-						<button
-							type="button"
-							className="flex-shrink-0 flex items-center justify-center w-24 h-24 md:w-32 md:h-32 bg-purple-100 dark:bg-zinc-400 rounded-xl border border-purple-300 dark:border-indigo-700 cursor-pointer"
-							onClick={() => setShowQrModal(true)}
-							onKeyDown={(e) => {
-								if (e.key === "Enter" || e.key === " ") {
-									setShowQrModal(true);
-								}
-							}}
-							aria-label="Show QR Code"
-							tabIndex={0}
-						>
-							<QRCodeSVG
-								value={teamState.createdTeamId}
-								size={112}
-								bgColor="#F3E8FF"
-								fgColor="#59168b"
-								className="w-20 h-20 md:w-28 md:h-28 object-contain rounded-xl"
-							/>
-						</button>
-						{showQrModal && (
-							<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-								<div className="relative bg-gray-400 dark:bg-zinc-400 p-6 rounded-xl shadow-xl flex flex-col items-center">
+								<div className="flex items-center gap-2 min-w-0 flex-1">
+									<span
+										className="px-3 py-1.5 rounded-lg bg-purple-100 dark:bg-indigo-800 text-purple-700 dark:text-purple-200 text-base md:text-lg font-mono shadow-sm truncate flex-1"
+										title={teamState.createdTeamId}
+									>
+										{teamState.createdTeamId}
+									</span>
 									<button
 										type="button"
-										onClick={() => setShowQrModal(false)}
-										className="absolute top-2 right-2 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
-										aria-label="Close"
+										onClick={() => {
+											navigator.clipboard.writeText(teamState.createdTeamId);
+											toast.success("Copied Team ID");
+										}}
+										className={`${BUTTON_CLASSES.secondary} px-3 py-1.5 text-xs whitespace-nowrap rounded-lg border border-purple-300 dark:border-indigo-700 hover:bg-purple-200 dark:hover:bg-indigo-800 transition flex-shrink-0`}
+										title="Copy Team ID"
 									>
-										<X className="h-6 w-6" />
+										Copy
 									</button>
-									<QRCodeSVG
-										value={teamState.createdTeamId}
-										size={256}
-										bgColor="#F3E8FF"
-										fgColor="#59168b"
-										className="w-64 h-64 object-contain p-3"
-									/>
-									<div className="mt-2 text-center text-purple-900 dark:text-purple-100 break-all font-mono">
-										{teamState.createdTeamId}
-									</div>
 								</div>
 							</div>
-						)}
+						</div>
+						<div className="flex-shrink-0 flex justify-center sm:justify-end">
+							<button
+								type="button"
+								className="flex items-center justify-center w-20 h-20 md:w-24 md:h-24 bg-purple-100 dark:bg-zinc-400 rounded-xl border border-purple-300 dark:border-indigo-700 cursor-pointer shadow-sm hover:shadow-md transition-shadow"
+								onClick={() => setShowQrModal(true)}
+								onKeyDown={(e) => {
+									if (e.key === "Enter" || e.key === " ") {
+										setShowQrModal(true);
+									}
+								}}
+								aria-label="Show QR Code"
+								tabIndex={0}
+							>
+								<QRCodeSVG
+									value={teamState.createdTeamId}
+									size={80}
+									bgColor="#F3E8FF"
+									fgColor="#59168b"
+									className="w-16 h-16 md:w-20 md:h-20 object-contain"
+								/>
+							</button>
+						</div>
 					</div>
+					{showQrModal && (
+						<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+							<div className="relative bg-white p-6 rounded-xl shadow-xl flex flex-col items-center">
+								<button
+									type="button"
+									onClick={() => setShowQrModal(false)}
+									className="absolute top-2 right-2 text-black hover:text-gray-600"
+									aria-label="Close"
+								>
+									<X className="h-6 w-6" />
+								</button>
+								<QRCodeSVG
+									value={teamState.createdTeamId}
+									size={256}
+									bgColor="#FFFFFF"
+									fgColor="#000000"
+									className="w-64 h-64 object-contain p-3 mx-auto"
+								/>
+								<div className="mt-4 text-center text-black break-all font-mono">
+									{teamState.createdTeamId}
+								</div>
+							</div>
+						</div>
+					)}
 					{teamState.isConfirmed ? (
 						<div className="w-full rounded-xl border border-green-500 bg-green-100 dark:bg-green-950 dark:border-green-400 p-4 text-center">
 							<span className="text-green-800 dark:text-green-300 font-semibold text-lg md:text-xl">
@@ -1386,6 +1404,46 @@ const EventsPage = () => {
 									__html: selectedEvent?.description || "",
 								}}
 							/>
+
+							{/* Organisers Section */}
+							{selectedEvent?.Organiser &&
+								selectedEvent.Organiser.length > 0 && (
+									<div className="w-full mt-4">
+										<h3 className="font-semibold text-base text-purple-900 dark:text-purple-100 mb-2">
+											Event Organisers
+										</h3>
+										<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+											{selectedEvent.Organiser.map((organiser, index) => (
+												<div
+													key={organiser.email || `organiser-${index}`}
+													className="bg-white/50 dark:bg-indigo-950/50 rounded-lg p-3 border border-purple-200/50 dark:border-indigo-700/50"
+												>
+													<div className="flex flex-col space-y-1">
+														<h4 className="font-medium text-purple-900 dark:text-purple-100 text-sm truncate">
+															{organiser.name}
+														</h4>
+														<div className="flex flex-col space-y-0.5">
+															<a
+																href={`mailto:${organiser.email}`}
+																className="text-xs text-purple-600 dark:text-purple-300 hover:text-purple-800 dark:hover:text-purple-100 transition-colors truncate"
+																title={organiser.email}
+															>
+																✉ {organiser.email}
+															</a>
+															<a
+																href={`tel:${organiser.phone}`}
+																className="text-xs text-purple-600 dark:text-purple-300 hover:text-purple-800 dark:hover:text-purple-100 transition-colors"
+															>
+																📞 {organiser.phone}
+															</a>
+														</div>
+													</div>
+												</div>
+											))}
+										</div>
+									</div>
+								)}
+
 							<div className="w-full mt-2">
 								<div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-4 text-base md:text-lg justify-center items-center">
 									{[
@@ -1467,56 +1525,67 @@ const EventsPage = () => {
 											teamState.isConfirmed &&
 											teamState.createdTeamId && (
 												<>
-													<div className="flex flex-row items-left">
-														<button
-															type="button"
-															className="flex-shrink-0 flex items-center justify-center w-24 h-24 md:w-32 md:h-32 bg-purple-100 dark:bg-zinc-400 rounded-xl border border-purple-300 dark:border-indigo-700 cursor-pointer"
-															onClick={() => setShowQrModal(true)}
-															onKeyDown={(e) => {
-																if (e.key === "Enter" || e.key === " ") {
-																	setShowQrModal(true);
-																}
-															}}
-															aria-label="Show QR Code"
-															tabIndex={0}
-														>
-															<QRCodeSVG
-																value={teamState.createdTeamId}
-																size={112}
-																bgColor="#F3E8FF"
-																fgColor="#59168b"
-																className="w-20 h-20 md:w-28 md:h-28 object-contain rounded-xl"
-															/>
-														</button>
-														<div className="flex flex-col ml-4">
-															<div className="text-lg md:text-xl font-semibold text-purple-800 dark:text-purple-200">
-																Team ID:
+													<div className="bg-white/50 dark:bg-indigo-900/30 rounded-xl p-4 border border-purple-200 dark:border-indigo-700">
+														<div className="flex flex-col sm:flex-row items-start gap-4 w-full">
+															<div className="flex flex-col gap-2 flex-1 min-w-0">
+																<div className="flex flex-col sm:flex-row sm:items-center gap-2">
+																	<span className="font-semibold text-purple-800 dark:text-purple-200 text-base md:text-lg whitespace-nowrap">
+																		Team ID:
+																	</span>
+																	<div className="flex items-center gap-2 min-w-0 flex-1">
+																		<span
+																			className="px-3 py-1.5 rounded-lg bg-purple-100 dark:bg-indigo-800 text-purple-700 dark:text-purple-200 text-base md:text-lg font-mono shadow-sm truncate flex-1"
+																			title={teamState.createdTeamId}
+																		>
+																			{teamState.createdTeamId}
+																		</span>
+																		<button
+																			type="button"
+																			onClick={() => {
+																				navigator.clipboard.writeText(
+																					teamState.createdTeamId,
+																				);
+																				toast.success("Copied Team ID");
+																			}}
+																			className={`${BUTTON_CLASSES.secondary} px-3 py-1.5 text-xs whitespace-nowrap rounded-lg border border-purple-300 dark:border-indigo-700 hover:bg-purple-200 dark:hover:bg-indigo-800 transition flex-shrink-0`}
+																			title="Copy Team ID"
+																		>
+																			Copy
+																		</button>
+																	</div>
+																</div>
 															</div>
-															<div className="px-2 py-1 rounded-lg text-purple-900 dark:text-purple-100 text-lg md:text-xl break-all font-mono">
-																{teamState.createdTeamId}
+															<div className="flex-shrink-0 flex justify-center sm:justify-end">
+																<button
+																	type="button"
+																	className="flex items-center justify-center w-20 h-20 md:w-24 md:h-24 bg-purple-100 dark:bg-zinc-400 rounded-xl border border-purple-300 dark:border-indigo-700 cursor-pointer shadow-sm hover:shadow-md transition-shadow"
+																	onClick={() => setShowQrModal(true)}
+																	onKeyDown={(e) => {
+																		if (e.key === "Enter" || e.key === " ") {
+																			setShowQrModal(true);
+																		}
+																	}}
+																	aria-label="Show QR Code"
+																	tabIndex={0}
+																>
+																	<QRCodeSVG
+																		value={teamState.createdTeamId}
+																		size={80}
+																		bgColor="#F3E8FF"
+																		fgColor="#59168b"
+																		className="w-16 h-16 md:w-20 md:h-20 object-contain"
+																	/>
+																</button>
 															</div>
-															<button
-																type="button"
-																onClick={() => {
-																	navigator.clipboard.writeText(
-																		teamState.createdTeamId,
-																	);
-																	toast.success("Copied Team ID");
-																}}
-																className={`${BUTTON_CLASSES.secondary} px-2 py-1 w-20 text-xs rounded-lg border border-purple-300 dark:border-indigo-700 hover:bg-purple-200 dark:hover:bg-indigo-800 transition`}
-																title="Copy Team ID"
-															>
-																Copy
-															</button>
 														</div>
 													</div>
 													{showQrModal && (
 														<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-															<div className="relative bg-gray-400 dark:bg-zinc-400 p-6 rounded-xl shadow-xl flex flex-col items-center">
+															<div className="relative bg-white p-6 rounded-xl shadow-xl flex flex-col items-center">
 																<button
 																	type="button"
 																	onClick={() => setShowQrModal(false)}
-																	className="absolute top-2 right-2 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+																	className="absolute top-2 right-2 text-black hover:text-gray-600"
 																	aria-label="Close"
 																>
 																	<X className="h-6 w-6" />
@@ -1524,11 +1593,11 @@ const EventsPage = () => {
 																<QRCodeSVG
 																	value={teamState.createdTeamId}
 																	size={256}
-																	bgColor="#F3E8FF"
-																	fgColor="#59168b"
-																	className="w-64 h-64 object-contain p-3"
+																	bgColor="#FFFFFF"
+																	fgColor="#000000"
+																	className="w-64 h-64 object-contain p-3 mx-auto"
 																/>
-																<div className="mt-2 text-center text-purple-900 dark:text-purple-100 break-all font-mono">
+																<div className="mt-4 text-center text-black break-all font-mono">
 																	{teamState.createdTeamId}
 																</div>
 															</div>
@@ -1600,7 +1669,7 @@ const EventsPage = () => {
 																size={112}
 																bgColor="#F3E8FF"
 																fgColor="#59168b"
-																className="w-20 h-20 md:w-28 md:h-28 object-contain rounded-xl"
+																className="w-20 h-20 md:w-28 md:h-28 object-contain"
 															/>
 														</button>
 														<div className="flex flex-col ml-4">
@@ -1627,11 +1696,11 @@ const EventsPage = () => {
 													</div>
 													{showQrModal && (
 														<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-															<div className="relative bg-gray-400 dark:bg-zinc-400 p-6 rounded-xl shadow-xl flex flex-col items-center">
+															<div className="relative bg-white p-6 rounded-xl shadow-xl flex flex-col items-center">
 																<button
 																	type="button"
 																	onClick={() => setShowQrModal(false)}
-																	className="absolute top-2 right-2 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+																	className="absolute top-2 right-2 text-black hover:text-gray-600"
 																	aria-label="Close"
 																>
 																	<X className="h-6 w-6" />
@@ -1639,11 +1708,11 @@ const EventsPage = () => {
 																<QRCodeSVG
 																	value={teamState.createdTeamId}
 																	size={256}
-																	bgColor="#F3E8FF"
-																	fgColor="#59168b"
-																	className="w-64 h-64 object-contain p-3"
+																	bgColor="#FFFFFF"
+																	fgColor="#000000"
+																	className="w-64 h-64 object-contain p-3 mx-auto"
 																/>
-																<div className="mt-2 text-center text-purple-900 dark:text-purple-100 break-all font-mono">
+																<div className="mt-4 text-center text-black break-all font-mono">
 																	{teamState.createdTeamId}
 																</div>
 															</div>
@@ -1703,7 +1772,7 @@ const EventsPage = () => {
 																				size={112}
 																				bgColor="#F3E8FF"
 																				fgColor="#59168b"
-																				className="w-20 h-20 md:w-28 md:h-28 object-contain rounded-xl"
+																				className="w-20 h-20 md:w-28 md:h-28 object-contain"
 																			/>
 																		</button>
 																		<div className="flex flex-col ml-4">
@@ -1730,11 +1799,11 @@ const EventsPage = () => {
 																	</div>
 																	{showQrModal && (
 																		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-																			<div className="relative bg-gray-400 dark:bg-zinc-400 p-6 rounded-xl shadow-xl flex flex-col items-center">
+																			<div className="relative bg-white p-6 rounded-xl shadow-xl flex flex-col items-center">
 																				<button
 																					type="button"
 																					onClick={() => setShowQrModal(false)}
-																					className="absolute top-2 right-2 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+																					className="absolute top-2 right-2 text-black hover:text-gray-600"
 																					aria-label="Close"
 																				>
 																					<X className="h-6 w-6" />
@@ -1742,11 +1811,11 @@ const EventsPage = () => {
 																				<QRCodeSVG
 																					value={teamState.createdTeamId}
 																					size={256}
-																					bgColor="#F3E8FF"
-																					fgColor="#59168b"
-																					className="w-64 h-64 object-contain p-3"
+																					bgColor="#FFFFFF"
+																					fgColor="#000000"
+																					className="w-64 h-64 object-contain p-3 mx-auto"
 																				/>
-																				<div className="mt-2 text-center text-purple-900 dark:text-purple-100 break-all font-mono">
+																				<div className="mt-4 text-center text-black break-all font-mono">
 																					{teamState.createdTeamId}
 																				</div>
 																			</div>
@@ -1824,56 +1893,67 @@ const EventsPage = () => {
 												)}
 												{registered && teamState.createdTeamId && (
 													<>
-														<div className="flex flex-row items-left">
-															<button
-																type="button"
-																className="flex-shrink-0 flex items-center justify-center w-24 h-24 md:w-32 md:h-32 bg-purple-100 dark:bg-zinc-400 rounded-xl border border-purple-300 dark:border-indigo-700 cursor-pointer"
-																onClick={() => setShowQrModal(true)}
-																onKeyDown={(e) => {
-																	if (e.key === "Enter" || e.key === " ") {
-																		setShowQrModal(true);
-																	}
-																}}
-																aria-label="Show QR Code"
-																tabIndex={0}
-															>
-																<QRCodeSVG
-																	value={teamState.createdTeamId}
-																	size={112}
-																	bgColor="#F3E8FF"
-																	fgColor="#59168b"
-																	className="w-20 h-20 md:w-28 md:h-28 object-contain rounded-xl"
-																/>
-															</button>
-															<div className="flex flex-col ml-4">
-																<div className="text-lg md:text-xl font-semibold text-purple-800 dark:text-purple-200">
-																	Team ID:
+														<div className="bg-white/50 dark:bg-indigo-900/30 rounded-xl p-4 border border-purple-200 dark:border-indigo-700">
+															<div className="flex flex-col sm:flex-row items-start gap-4 w-full">
+																<div className="flex flex-col gap-2 flex-1 min-w-0">
+																	<div className="flex flex-col sm:flex-row sm:items-center gap-2">
+																		<span className="font-semibold text-purple-800 dark:text-purple-200 text-base md:text-lg whitespace-nowrap">
+																			Team ID:
+																		</span>
+																		<div className="flex items-center gap-2 min-w-0 flex-1">
+																			<span
+																				className="px-3 py-1.5 rounded-lg bg-purple-100 dark:bg-indigo-800 text-purple-700 dark:text-purple-200 text-base md:text-lg font-mono shadow-sm truncate flex-1"
+																				title={teamState.createdTeamId}
+																			>
+																				{teamState.createdTeamId}
+																			</span>
+																			<button
+																				type="button"
+																				onClick={() => {
+																					navigator.clipboard.writeText(
+																						teamState.createdTeamId,
+																					);
+																					toast.success("Copied Team ID");
+																				}}
+																				className={`${BUTTON_CLASSES.secondary} px-3 py-1.5 text-xs whitespace-nowrap rounded-lg border border-purple-300 dark:border-indigo-700 hover:bg-purple-200 dark:hover:bg-indigo-800 transition flex-shrink-0`}
+																				title="Copy Team ID"
+																			>
+																				Copy
+																			</button>
+																		</div>
+																	</div>
 																</div>
-																<div className="px-2 py-1 rounded-lg text-purple-900 dark:text-purple-100 text-lg md:text-xl break-all font-mono">
-																	{teamState.createdTeamId}
+																<div className="flex-shrink-0 flex justify-center sm:justify-end">
+																	<button
+																		type="button"
+																		className="flex items-center justify-center w-20 h-20 md:w-24 md:h-24 bg-purple-100 dark:bg-zinc-400 rounded-xl border border-purple-300 dark:border-indigo-700 cursor-pointer shadow-sm hover:shadow-md transition-shadow"
+																		onClick={() => setShowQrModal(true)}
+																		onKeyDown={(e) => {
+																			if (e.key === "Enter" || e.key === " ") {
+																				setShowQrModal(true);
+																			}
+																		}}
+																		aria-label="Show QR Code"
+																		tabIndex={0}
+																	>
+																		<QRCodeSVG
+																			value={teamState.createdTeamId}
+																			size={80}
+																			bgColor="#F3E8FF"
+																			fgColor="#59168b"
+																			className="w-16 h-16 md:w-20 md:h-20 object-contain"
+																		/>
+																	</button>
 																</div>
-																<button
-																	type="button"
-																	onClick={() => {
-																		navigator.clipboard.writeText(
-																			teamState.createdTeamId,
-																		);
-																		toast.success("Copied Team ID");
-																	}}
-																	className={`${BUTTON_CLASSES.secondary} px-2 py-1 w-20 text-xs rounded-lg border border-purple-300 dark:border-indigo-700 hover:bg-purple-200 dark:hover:bg-indigo-800 transition`}
-																	title="Copy Team ID"
-																>
-																	Copy
-																</button>
 															</div>
 														</div>
 														{showQrModal && (
 															<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-																<div className="relative bg-gray-400 dark:bg-zinc-400 p-6 rounded-xl shadow-xl flex flex-col items-center">
+																<div className="relative bg-white p-6 rounded-xl shadow-xl flex flex-col items-center">
 																	<button
 																		type="button"
 																		onClick={() => setShowQrModal(false)}
-																		className="absolute top-2 right-2 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+																		className="absolute top-2 right-2 text-black hover:text-gray-600"
 																		aria-label="Close"
 																	>
 																		<X className="h-6 w-6" />
@@ -1881,11 +1961,11 @@ const EventsPage = () => {
 																	<QRCodeSVG
 																		value={teamState.createdTeamId}
 																		size={256}
-																		bgColor="#F3E8FF"
-																		fgColor="#59168b"
-																		className="w-64 h-64 object-contain p-3"
+																		bgColor="#FFFFFF"
+																		fgColor="#000000"
+																		className="w-64 h-64 object-contain p-3 mx-auto"
 																	/>
-																	<div className="mt-2 text-center text-purple-900 dark:text-purple-100 break-all font-mono">
+																	<div className="mt-4 text-center text-black break-all font-mono">
 																		{teamState.createdTeamId}
 																	</div>
 																</div>

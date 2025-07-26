@@ -1,7 +1,8 @@
-import { forwardRef } from "react";
-import { useSession } from "next-auth/react";
 import Script from "next/script";
+import { useSession } from "next-auth/react";
+import { forwardRef } from "react";
 import { Button, type ButtonProps } from "../ui/button";
+
 const API_URL = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
 
 const PaymentButton = forwardRef<

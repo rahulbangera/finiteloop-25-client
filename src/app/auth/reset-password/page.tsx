@@ -1,7 +1,7 @@
 "use client";
+import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import ResetPasswordForm from "@/components/auth/ResetPasswordForm";
-import { useSearchParams } from "next/navigation";
 
 function ResetPasswordPageContent() {
 	const searchParams = useSearchParams();

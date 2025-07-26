@@ -1,9 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { FaLinkedinIn, FaGithub, FaInstagram } from "react-icons/fa";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { FaGithub, FaInstagram, FaLinkedinIn } from "react-icons/fa";
 
 interface UserLink {
 	id: string;
@@ -30,14 +29,13 @@ interface APIResponse {
 }
 
 export default function Team() {
-	const router = useRouter();
 	const [selectedYearIndex, setSelectedYearIndex] = useState(5);
 	const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
 	const yearOptions = [
-		{ id: "2020", label: "2020" },
+		{ id: "2016-20", label: "2016-20" },
 		{ id: "2021", label: "2021" },
 		{ id: "2022", label: "2022" },
 		{ id: "2023", label: "2023" },
@@ -60,8 +58,8 @@ export default function Team() {
 
 				const result: APIResponse = await response.json();
 
-				if (result.success && result.data) {
-					setTeamMembers(result.data);
+				if (result.success) {
+					setTeamMembers(result.data || []);
 				} else {
 					throw new Error(result.error || "Failed to fetch team members");
 				}
@@ -92,6 +90,16 @@ export default function Team() {
 		return link?.url;
 	};
 
+	const generateRandomAvatar = (name: string): string => {
+		const seed = name.toLowerCase().replace(/\s+/g, "");
+		const hash = seed.split("").reduce((a, b) => {
+			a = (a << 5) - a + b.charCodeAt(0);
+			return a & a;
+		}, 0);
+		const avatarId = Math.abs(hash) % 1000;
+		return `https://www.gravatar.com/avatar/${avatarId}?s=120&d=identicon&r=pg`;
+	};
+
 	if (loading) {
 		return (
 			<main className="min-h-screen py-20 px-4 relative flex items-center justify-center">
@@ -109,15 +117,9 @@ export default function Team() {
 		return (
 			<main className="min-h-screen py-20 px-4 relative flex items-center justify-center">
 				<div className="text-center">
-					<div className="text-red-500 text-xl mb-4">⚠️ Error Loading Team</div>
-					<p className="text-gray-600 dark:text-gray-400">{error}</p>
-					<button
-						type="button"
-						onClick={() => router.refresh()}
-						className="mt-4 px-6 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
-					>
-						Try Again
-					</button>
+					<p className="text-gray-600 dark:text-gray-400 text-xl">
+						No team data
+					</p>
 				</div>
 			</main>
 		);
@@ -256,62 +258,59 @@ export default function Team() {
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
 					{filteredMembers.length === 0 ? (
 						<div className="col-span-full text-center text-gray-600 dark:text-gray-400 text-xl mt-10">
-							No team members found for {selectedYear}
+							<p className="mb-2">
+								No team members found for{" "}
+								<span className="font-semibold text-purple-600 dark:text-purple-400">
+									{selectedYear}
+								</span>
+							</p>
+							<p className="text-sm text-gray-500 dark:text-gray-500">
+								Try selecting a different year range
+							</p>
 						</div>
 					) : (
 						filteredMembers.map((member) => (
 							<div key={member.id} className="group relative">
-								<div className="relative w-80 h-[18rem] bg-white/10 dark:bg-gradient-to-br dark:from-slate-900/40 dark:via-blue-900/20 dark:to-purple-900/30 backdrop-blur-xl border border-purple-200/50 dark:border-slate-700/50 rounded-3xl overflow-hidden transition-all duration-500 hover:scale-105 hover:border-purple-400/70 dark:hover:border-blue-500/50 hover:shadow-2xl hover:shadow-purple-500/20 dark:hover:shadow-blue-500/20">
-									<div className="absolute inset-0 bg-gradient-to-r from-purple-300/20 via-pink-300/20 to-blue-300/20 dark:from-blue-600/10 dark:via-purple-600/10 dark:to-pink-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+								<div className="relative w-80 bg-white/10 dark:bg-gradient-to-br dark:from-slate-900/40 dark:via-blue-900/20 dark:to-purple-900/30 backdrop-blur-xl border border-purple-200/50 dark:border-slate-700/50 rounded-3xl overflow-hidden shadow-lg">
+									{/* Image Section - Full width at top */}
+									<div className="relative w-full h-64 overflow-hidden bg-gray-100 dark:bg-gray-800">
+										<div className="absolute top-4 right-4 w-3 h-3 bg-gradient-to-r from-purple-400 to-pink-400 dark:from-blue-400 dark:to-cyan-400 rounded-full opacity-70"></div>
 
-									<div className="absolute top-4 right-4 w-3 h-3 bg-gradient-to-r from-purple-400 to-pink-400 dark:from-blue-400 dark:to-cyan-400 rounded-full opacity-70 animate-pulse"></div>
-									<div className="absolute bottom-6 left-6 w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 dark:from-purple-400 dark:to-pink-400 rounded-full opacity-60 animate-ping"></div>
-
-									<div className="relative z-10 flex flex-col items-center text-center p-4 h-full">
-										<div className="relative mb-3 group-hover:scale-110 transition-transform duration-500">
-											<div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 dark:from-blue-500 dark:via-purple-500 dark:to-pink-500 p-1 animate-spin opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-												<div className="w-full h-full rounded-full bg-white dark:bg-slate-900"></div>
-											</div>
-											<div className="relative w-32 h-32 rounded-full overflow-hidden border-3 border-purple-300/50 dark:border-slate-600/50 group-hover:border-purple-500/70 dark:group-hover:border-blue-400/70 transition-colors duration-500 shadow-2xl">
-												{member.image ? (
-													<Image
-														src={member.image}
-														alt={member.name}
-														width={128}
-														height={128}
-														className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-													/>
-												) : (
-													<div className="w-full h-full bg-gradient-to-br from-purple-400 to-blue-500 dark:from-blue-400 dark:to-purple-500 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-														<span className="text-white text-2xl font-bold">
-															{member.name
-																.split(" ")
-																.map((n) => n[0])
-																.join("")
-																.slice(0, 2)}
-														</span>
-													</div>
-												)}
-											</div>
-											<div className="absolute inset-0 rounded-full border-2 border-purple-400/50 dark:border-blue-400/30 scale-110 opacity-0 group-hover:opacity-100 transition-opacity duration-700 animate-spin"></div>
-										</div>
-
-										<div className="mb-3 space-y-1">
-											<h3 className="text-lg font-bold text-gray-800 dark:text-white group-hover:text-purple-600 dark:group-hover:text-blue-200 transition-colors duration-300">
+										{member.image ? (
+											<Image
+												src={member.image}
+												alt={member.name}
+												width={320}
+												height={256}
+												className="w-full h-full object-contain"
+											/>
+										) : (
+											<Image
+												src={generateRandomAvatar(member.name)}
+												alt={member.name}
+												width={320}
+												height={256}
+												className="w-full h-full object-contain"
+											/>
+										)}
+									</div>{" "}
+									<div className="relative z-10 flex flex-col items-center text-center p-6">
+										<div className="mb-4 space-y-2">
+											<h3 className="text-lg font-bold text-gray-800 dark:text-white">
 												{member.name}
 											</h3>
-											<p className="text-xs font-medium text-purple-600 dark:text-orange-400 uppercase tracking-wider">
+											<p className="text-sm font-medium text-purple-600 dark:text-orange-400 uppercase tracking-wider">
 												{member.position}
 											</p>
 										</div>
 
-										<div className="flex space-x-3 mt-auto">
+										<div className="flex space-x-3">
 											{getSocialLink(member.userLink, "linkedin") && (
 												<a
 													href={getSocialLink(member.userLink, "linkedin")}
 													target="_blank"
 													rel="noopener noreferrer"
-													className="w-9 h-9 bg-white/50 dark:bg-slate-800/50 border border-purple-300/50 dark:border-slate-600/50 rounded-xl flex items-center justify-center text-gray-600 dark:text-slate-400 hover:text-blue-500 dark:hover:text-blue-400 hover:border-blue-400/50 hover:bg-blue-100/50 dark:hover:bg-blue-500/10 hover:scale-110 transition-all duration-300"
+													className="w-9 h-9 bg-white/50 dark:bg-slate-800/50 border border-purple-300/50 dark:border-slate-600/50 rounded-xl flex items-center justify-center text-gray-600 dark:text-slate-400 hover:text-blue-500 dark:hover:text-blue-400 hover:border-blue-400/50 hover:bg-blue-100/50 dark:hover:bg-blue-500/10 transition-all duration-300"
 													title="LinkedIn"
 													aria-label={`${member.name}'s LinkedIn profile`}
 												>
@@ -324,7 +323,7 @@ export default function Team() {
 													href={getSocialLink(member.userLink, "github")}
 													target="_blank"
 													rel="noopener noreferrer"
-													className="w-9 h-9 bg-white/50 dark:bg-slate-800/50 border border-purple-300/50 dark:border-slate-600/50 rounded-xl flex items-center justify-center text-gray-600 dark:text-slate-400 hover:text-purple-500 dark:hover:text-purple-400 hover:border-purple-400/50 hover:bg-purple-100/50 dark:hover:bg-purple-500/10 hover:scale-110 transition-all duration-300"
+													className="w-9 h-9 bg-white/50 dark:bg-slate-800/50 border border-purple-300/50 dark:border-slate-600/50 rounded-xl flex items-center justify-center text-gray-600 dark:text-slate-400 hover:text-purple-500 dark:hover:text-purple-400 hover:border-purple-400/50 hover:bg-purple-100/50 dark:hover:bg-purple-500/10 transition-all duration-300"
 													title="GitHub"
 													aria-label={`${member.name}'s GitHub profile`}
 												>
@@ -337,7 +336,7 @@ export default function Team() {
 													href={getSocialLink(member.userLink, "instagram")}
 													target="_blank"
 													rel="noopener noreferrer"
-													className="w-9 h-9 bg-white/50 dark:bg-slate-800/50 border border-purple-300/50 dark:border-slate-600/50 rounded-xl flex items-center justify-center text-gray-600 dark:text-slate-400 hover:text-pink-500 dark:hover:text-pink-400 hover:border-pink-400/50 hover:bg-pink-100/50 dark:hover:bg-pink-500/10 hover:scale-110 transition-all duration-300"
+													className="w-9 h-9 bg-white/50 dark:bg-slate-800/50 border border-purple-300/50 dark:border-slate-600/50 rounded-xl flex items-center justify-center text-gray-600 dark:text-slate-400 hover:text-pink-500 dark:hover:text-pink-400 hover:border-pink-400/50 hover:bg-pink-100/50 dark:hover:bg-pink-500/10 transition-all duration-300"
 													title="Instagram"
 													aria-label={`${member.name}'s Instagram profile`}
 												>
@@ -348,8 +347,6 @@ export default function Team() {
 										</div>
 									</div>
 								</div>
-
-								<div className="absolute inset-0 bg-gradient-to-r from-purple-300/10 via-pink-300/20 to-blue-300/10 dark:from-blue-600/0 dark:via-purple-600/5 dark:to-pink-600/0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 blur-xl scale-110"></div>
 							</div>
 						))
 					)}

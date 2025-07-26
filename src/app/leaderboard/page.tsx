@@ -1,9 +1,9 @@
 "use client";
-import UserCard from "@/components/elements/UserCard";
-import { useSession } from "next-auth/react";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { Scrollbar } from "react-scrollbars-custom";
+import UserCard from "@/components/elements/UserCard";
 
 const podiumStyle = {
 	1: "order-2 z-10", // First place - center
