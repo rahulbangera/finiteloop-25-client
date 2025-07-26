@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 
 interface UserLink {
 	id: string;
-	platform: string;
+	linkName: string;
 	url: string;
 	userId: string;
 }
@@ -84,10 +84,10 @@ export default function Team() {
 
 	const getSocialLink = (
 		userLinks: UserLink[],
-		platform: string,
+		linkName: string,
 	): string | undefined => {
 		const link = userLinks.find(
-			(link) => link.platform.toLowerCase() === platform.toLowerCase(),
+			(link) => link.linkName.toLowerCase() === linkName.toLowerCase(),
 		);
 		return link?.url;
 	};
