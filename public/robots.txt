@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Block admin and API routes
+Disallow: /api/
+Disallow: /auth/reset-password
+Disallow: /auth/verify-email
+
+# Sitemap
+Sitemap: https://www.finiteloop.club/sitemap.xml
