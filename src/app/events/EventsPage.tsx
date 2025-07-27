@@ -1292,7 +1292,10 @@ const EventsPage = () => {
 					}}
 				/>
 			</div>
-			<div className="min-h-screen w-[90%] grid justify-center items-start grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mt-2 md:mt-5 md:px-0">
+			<div
+				className="min-h-screen w-[90%] grid justify-center items-stretch grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mt-2 md:mt-5 md:px-0"
+				style={{ gridAutoRows: "1fr" }}
+			>
 				{loading.events || (isTeamInviteFlow && sessionStatus === "loading") ? (
 					<div className="lilita-font w-full text-4xl md:text-6xl font-bold text-flc-yellow text-center col-span-full md:mt-40">
 						<div className="animate-spin rounded-full h-32 w-32 border-t-4 border-[#FCA410] border-b-4 mx-auto mb-4"></div>
@@ -1315,15 +1318,19 @@ const EventsPage = () => {
 							className="outline-none w-full text-left"
 						>
 							<Card image={event.imgSrc}>
-								<div className="comic-font flex flex-col items-center justify-center h-full w-full p-3">
-									<div className="text-md md:text-sm text-black dark:text-white">
+								<div className="comic-font flex flex-col items-center justify-center text-center space-y-2 h-full">
+									<div className="text-sm md:text-base text-black dark:text-white font-medium opacity-80">
 										{event.category}
 									</div>
-									<div className="text-lg md:text-2xl font-bold text-black dark:text-white">
+									<div className="text-lg md:text-xl lg:text-2xl font-bold text-black dark:text-white leading-tight">
 										{event.name}
 									</div>
-									<div className="text-md md:text-md text-black dark:text-white mb-1">
-										Date: {event.fromDate.split("T")[0]}
+									<div className="text-sm md:text-base text-black dark:text-white opacity-70">
+										{new Date(event.fromDate).toLocaleDateString("en-US", {
+											year: "numeric",
+											month: "short",
+											day: "numeric",
+										})}
 									</div>
 								</div>
 							</Card>
@@ -1375,7 +1382,7 @@ const EventsPage = () => {
 										ref={imageRef}
 										src={selectedEvent.imgSrc}
 										alt={selectedEvent.name}
-										className="rounded-xl h-40 md:h-52 object-cover w-3/4 md:w-2/3 border border-purple-100 dark:border-indigo-800 shadow"
+										className="rounded-xl w-full max-w-md object-contain border border-purple-100 dark:border-indigo-800 shadow"
 									/>
 								</div>
 							)}
