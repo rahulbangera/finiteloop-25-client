@@ -1293,8 +1293,12 @@ const EventsPage = () => {
 				/>
 			</div>
 			<div
-				className="min-h-screen w-[90%] grid justify-center items-stretch grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mt-2 md:mt-5 md:px-0"
-				style={{ gridAutoRows: "1fr" }}
+				key={selectedYearData.year}
+				className="w-[90%] grid justify-center items-stretch grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mt-2 md:mt-5 md:px-0"
+				style={{
+					gridAutoRows: "minmax(400px, 1fr)",
+					display: "grid",
+				}}
 			>
 				{loading.events || (isTeamInviteFlow && sessionStatus === "loading") ? (
 					<div className="lilita-font w-full text-4xl md:text-6xl font-bold text-flc-yellow text-center col-span-full md:mt-40">
@@ -1315,7 +1319,7 @@ const EventsPage = () => {
 							type="button"
 							key={`${event.name}-${event.fromDate}`}
 							onClick={() => handleCardClick(event)}
-							className="outline-none w-full text-left"
+							className="outline-none w-full text-left h-full"
 						>
 							<Card image={event.imgSrc}>
 								<div className="comic-font flex flex-col items-center justify-center text-center space-y-2 h-full">

@@ -17,18 +17,21 @@ export default function Card({ image, children, className }: CardProps) {
 		>
 			<div className="h-full w-full rounded-2xl bg-white/35 dark:bg-white/15 flex flex-col overflow-hidden">
 				{image ? (
-					<div className="flex-shrink-0 w-full p-1">
+					<div
+						className="flex-shrink-0 w-full p-1"
+						style={{ aspectRatio: "4/5" }}
+					>
 						<Image
 							loading="lazy"
-							width={540}
-							height={675}
+							width={1080}
+							height={1350}
 							src={image}
 							alt="Card"
-							className="w-full h-auto rounded-2xl object-cover"
+							className="w-full h-full rounded-2xl object-cover"
 						/>
 					</div>
 				) : null}
-				<div className="flex-1 p-3 flex flex-col justify-center">
+				<div className="flex-1 p-3 flex flex-col justify-center min-h-0">
 					{children}
 				</div>
 			</div>
