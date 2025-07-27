@@ -402,7 +402,7 @@ export default function Profile({ userId }: { userId?: number }) {
 
 	// WhatsApp sharing functionality
 	const { handleWhatsAppShare } = useWhatsAppShare({
-		user: currentUser, // Type assertion handled in WhatsAppShare component
+		user: currentUser,
 		isViewingOtherProfile: !!isViewingOtherProfile,
 		userId: session?.user?.id,
 		onShareComplete: () => setShowShareOptions(false),
@@ -440,14 +440,8 @@ export default function Profile({ userId }: { userId?: number }) {
 			: (user as unknown as { role: { name: string } }).role?.name;
 	};
 
-	const generateRandomAvatar = (name: string): string => {
-		const seed = name?.toLowerCase().replace(/\s+/g, "") || "default";
-		const hash = seed.split("").reduce((a, b) => {
-			a = (a << 5) - a + b.charCodeAt(0);
-			return a & a;
-		}, 0);
-		const avatarId = Math.abs(hash) % 1000;
-		return `https://www.gravatar.com/avatar/${avatarId}?s=120&d=identicon&r=pg`;
+	const getInitialAvatar = (name: string): string => {
+		return (name?.charAt(0) || "U").toUpperCase();
 	};
 
 	const getUserLinks = (user: AppUser | null | undefined) => {
@@ -956,13 +950,11 @@ export default function Profile({ userId }: { userId?: number }) {
 											priority
 										/>
 									) : (
-										<Image
-											src={generateRandomAvatar(currentUser?.name || "default")}
-											alt="Profile"
-											width={120}
-											height={120}
-											className="w-24 h-24 sm:w-28 sm:h-28 md:w-30 md:h-30 rounded-full border-4 border-orange-400 object-cover shadow-lg transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl"
-										/>
+										<div className="w-24 h-24 sm:w-28 sm:h-28 md:w-30 md:h-30 rounded-full border-4 border-orange-400 bg-gradient-to-br from-orange-500 to-yellow-400 flex items-center justify-center shadow-lg transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl">
+											<span className="text-white text-2xl sm:text-3xl md:text-4xl font-bold">
+												{getInitialAvatar(currentUser?.name || "U")}
+											</span>
+										</div>
 									)}
 									<div className="absolute inset-0 rounded-full bg-gradient-to-tr from-orange-400/10 to-yellow-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 								</div>
@@ -976,10 +968,18 @@ export default function Profile({ userId }: { userId?: number }) {
 									className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 border backdrop-blur-sm
 										${
 											getRoleName(currentUser) === "ADMIN"
-												? "bg-red-500/10 border-red-400/30 text-red-300 hover:bg-red-500/20 hover:border-red-400/50"
-												: getRoleName(currentUser) === "MEMBER"
-													? "bg-emerald-500/10 border-emerald-400/30 text-emerald-300 hover:bg-emerald-500/20 hover:border-emerald-400/50"
-													: "bg-slate-500/10 border-slate-400/30 text-slate-300 hover:bg-slate-500/20 hover:border-slate-400/50"
+												? "bg-red-500/20 border-red-400/50 text-red-200 hover:bg-red-500/30 hover:border-red-400/70"
+												: getRoleName(currentUser) === "MODERATOR"
+													? "bg-orange-500/20 border-orange-400/50 text-orange-200 hover:bg-orange-500/30 hover:border-orange-400/70"
+													: getRoleName(currentUser) === "MEMBER"
+														? "bg-emerald-500/20 border-emerald-400/50 text-emerald-200 hover:bg-emerald-500/30 hover:border-emerald-400/70"
+														: getRoleName(currentUser) === "DEVELOPER"
+															? "bg-purple-500/20 border-purple-400/50 text-purple-200 hover:bg-purple-500/30 hover:border-purple-400/70"
+															: getRoleName(currentUser) === "CP"
+																? "bg-yellow-500/20 border-yellow-400/50 text-yellow-200 hover:bg-yellow-500/30 hover:border-yellow-400/70"
+																: getRoleName(currentUser) === "USER"
+																	? "bg-blue-500/20 border-blue-400/50 text-blue-200 hover:bg-blue-500/30 hover:border-blue-400/70"
+																	: "bg-slate-500/20 border-slate-400/50 text-slate-200 hover:bg-slate-500/30 hover:border-slate-400/70"
 										}`}
 									title={`Role: ${getRoleName(currentUser)}`}
 								>
@@ -987,17 +987,33 @@ export default function Profile({ userId }: { userId?: number }) {
 										className={`w-2 h-2 rounded-full ${
 											getRoleName(currentUser) === "ADMIN"
 												? "bg-red-400"
-												: getRoleName(currentUser) === "MEMBER"
-													? "bg-emerald-400"
-													: "bg-slate-400"
+												: getRoleName(currentUser) === "MODERATOR"
+													? "bg-orange-400"
+													: getRoleName(currentUser) === "MEMBER"
+														? "bg-emerald-400"
+														: getRoleName(currentUser) === "DEVELOPER"
+															? "bg-purple-400"
+															: getRoleName(currentUser) === "CP"
+																? "bg-yellow-400"
+																: getRoleName(currentUser) === "USER"
+																	? "bg-blue-400"
+																	: "bg-slate-400"
 										}`}
 									></div>
 									<span className="font-semibold text-xs uppercase tracking-wider">
 										{getRoleName(currentUser) === "ADMIN"
 											? "Admin"
-											: getRoleName(currentUser) === "MEMBER"
-												? "Member"
-												: getRoleName(currentUser)}
+											: getRoleName(currentUser) === "MODERATOR"
+												? "Moderator"
+												: getRoleName(currentUser) === "MEMBER"
+													? "Member"
+													: getRoleName(currentUser) === "DEVELOPER"
+														? "Developer"
+														: getRoleName(currentUser) === "CP"
+															? "CP"
+															: getRoleName(currentUser) === "USER"
+																? "User"
+																: getRoleName(currentUser)}
 									</span>
 								</span>
 							</div>
