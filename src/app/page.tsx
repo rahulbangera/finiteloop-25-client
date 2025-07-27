@@ -1,4 +1,8 @@
 import Benefits from "@/components/sections/Benefits";
+import JsonLd, {
+	organizationSchema,
+	websiteSchema,
+} from "@/components/seo/JsonLd";
 
 const page = () => {
 	return (
@@ -55,6 +59,10 @@ const page = () => {
 			</div>
 
 			<Benefits />
+
+			{/* Structured Data */}
+			<JsonLd data={organizationSchema} />
+			<JsonLd data={websiteSchema} />
 		</div>
 	);
 };
