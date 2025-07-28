@@ -76,9 +76,12 @@ export default function Team() {
 
 	const selectedYear = yearOptions[selectedYearIndex].label;
 
-	const filteredMembers = teamMembers.filter(
-		(member) => member.year === selectedYear,
-	);
+	const filteredMembers = teamMembers.filter((member) => {
+		if (selectedYear === "Faculty") {
+			return member.type === "FACULTY_COORDINATOR";
+		}
+		return member.year === selectedYear;
+	});
 
 	const getSocialLink = (
 		userLinks: UserLink[],
