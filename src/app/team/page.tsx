@@ -271,50 +271,57 @@ export default function Team() {
 					) : (
 						filteredMembers.map((member) => (
 							<div key={member.id} className="group relative">
-								<div className="relative w-80 bg-white/10 dark:bg-gradient-to-br dark:from-slate-900/40 dark:via-blue-900/20 dark:to-purple-900/30 backdrop-blur-xl border border-purple-200/50 dark:border-slate-700/50 rounded-3xl overflow-hidden shadow-lg">
-									{/* Image Section - Full width at top */}
-									<div className="relative w-full h-64 overflow-hidden bg-gray-100 dark:bg-gray-800">
-										<div className="absolute top-4 right-4 w-3 h-3 bg-gradient-to-r from-purple-400 to-pink-400 dark:from-blue-400 dark:to-cyan-400 rounded-full opacity-70"></div>
+								<div className="relative w-80 bg-white/20 dark:bg-gradient-to-br dark:from-slate-900/50 dark:via-blue-900/30 dark:to-purple-900/40 backdrop-blur-xl border border-white/30 dark:border-slate-700/50 rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 hover:bg-white/30 dark:hover:bg-gradient-to-br dark:hover:from-slate-800/60 dark:hover:via-blue-800/40 dark:hover:to-purple-800/50">
+									<div className="relative w-full h-80 overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
+										<div className="absolute top-4 right-4 w-3 h-3 bg-gradient-to-r from-purple-400 to-pink-400 dark:from-blue-400 dark:to-cyan-400 rounded-full opacity-70 animate-pulse"></div>
+										<div className="absolute top-6 right-8 w-2 h-2 bg-gradient-to-r from-pink-300 to-purple-300 dark:from-cyan-300 dark:to-blue-300 rounded-full opacity-50"></div>
+										<div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent z-10"></div>
 
 										{member.image ? (
 											<Image
 												src={member.image}
 												alt={member.name}
 												width={320}
-												height={256}
-												className="w-full h-full object-contain"
+												height={320}
+												className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
 											/>
 										) : (
 											<Image
 												src={generateRandomAvatar(member.name)}
 												alt={member.name}
 												width={320}
-												height={256}
-												className="w-full h-full object-contain"
+												height={320}
+												className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
 											/>
 										)}
-									</div>{" "}
-									<div className="relative z-10 flex flex-col items-center text-center p-6">
+									</div>
+
+									<div className="relative z-10 flex flex-col items-center text-center p-6 bg-gradient-to-t from-white/10 to-transparent dark:from-slate-900/20 dark:to-transparent">
 										<div className="mb-4 space-y-2">
-											<h3 className="text-lg font-bold text-gray-800 dark:text-white">
+											<h3 className="text-xl font-bold text-gray-800 dark:text-white tracking-wide">
 												{member.name}
 											</h3>
-											<p className="text-sm font-medium text-purple-600 dark:text-orange-400 uppercase tracking-wider">
-												{member.position}
-											</p>
+											<div className="inline-block px-3 py-1 bg-gradient-to-r from-purple-500/20 to-pink-500/20 dark:from-blue-500/30 dark:to-purple-500/30 border border-purple-300/30 dark:border-blue-400/30 rounded-full">
+												<p className="text-sm font-semibold text-purple-700 dark:text-blue-300 uppercase tracking-wider">
+													{member.position}
+												</p>
+											</div>
 										</div>
 
-										<div className="flex space-x-3">
+										<div className="flex space-x-4">
 											{getSocialLink(member.userLink, "linkedin") && (
 												<a
 													href={getSocialLink(member.userLink, "linkedin")}
 													target="_blank"
 													rel="noopener noreferrer"
-													className="w-9 h-9 bg-white/50 dark:bg-slate-800/50 border border-purple-300/50 dark:border-slate-600/50 rounded-xl flex items-center justify-center text-gray-600 dark:text-slate-400 hover:text-blue-500 dark:hover:text-blue-400 hover:border-blue-400/50 hover:bg-blue-100/50 dark:hover:bg-blue-500/10 transition-all duration-300"
+													className="group/social w-10 h-10 bg-gradient-to-br from-white/80 to-white/60 dark:from-slate-700/80 dark:to-slate-800/60 border border-white/50 dark:border-slate-600/50 rounded-xl flex items-center justify-center text-gray-600 dark:text-slate-300 hover:text-white hover:bg-gradient-to-br hover:from-blue-500 hover:to-blue-600 hover:border-blue-400/50 hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300 hover:scale-110"
 													title="LinkedIn"
 													aria-label={`${member.name}'s LinkedIn profile`}
 												>
-													<FaLinkedinIn size={14} />
+													<FaLinkedinIn
+														size={16}
+														className="transition-transform duration-300 group-hover/social:scale-110"
+													/>
 													<span className="sr-only">LinkedIn</span>
 												</a>
 											)}
@@ -323,11 +330,14 @@ export default function Team() {
 													href={getSocialLink(member.userLink, "github")}
 													target="_blank"
 													rel="noopener noreferrer"
-													className="w-9 h-9 bg-white/50 dark:bg-slate-800/50 border border-purple-300/50 dark:border-slate-600/50 rounded-xl flex items-center justify-center text-gray-600 dark:text-slate-400 hover:text-purple-500 dark:hover:text-purple-400 hover:border-purple-400/50 hover:bg-purple-100/50 dark:hover:bg-purple-500/10 transition-all duration-300"
+													className="group/social w-10 h-10 bg-gradient-to-br from-white/80 to-white/60 dark:from-slate-700/80 dark:to-slate-800/60 border border-white/50 dark:border-slate-600/50 rounded-xl flex items-center justify-center text-gray-600 dark:text-slate-300 hover:text-white hover:bg-gradient-to-br hover:from-gray-700 hover:to-gray-900 hover:border-gray-600/50 hover:shadow-lg hover:shadow-gray-700/25 transition-all duration-300 hover:scale-110"
 													title="GitHub"
 													aria-label={`${member.name}'s GitHub profile`}
 												>
-													<FaGithub size={14} />
+													<FaGithub
+														size={16}
+														className="transition-transform duration-300 group-hover/social:scale-110"
+													/>
 													<span className="sr-only">GitHub</span>
 												</a>
 											)}
@@ -336,11 +346,14 @@ export default function Team() {
 													href={getSocialLink(member.userLink, "instagram")}
 													target="_blank"
 													rel="noopener noreferrer"
-													className="w-9 h-9 bg-white/50 dark:bg-slate-800/50 border border-purple-300/50 dark:border-slate-600/50 rounded-xl flex items-center justify-center text-gray-600 dark:text-slate-400 hover:text-pink-500 dark:hover:text-pink-400 hover:border-pink-400/50 hover:bg-pink-100/50 dark:hover:bg-pink-500/10 transition-all duration-300"
+													className="group/social w-10 h-10 bg-gradient-to-br from-white/80 to-white/60 dark:from-slate-700/80 dark:to-slate-800/60 border border-white/50 dark:border-slate-600/50 rounded-xl flex items-center justify-center text-gray-600 dark:text-slate-300 hover:text-white hover:bg-gradient-to-br hover:from-pink-500 hover:to-rose-500 hover:border-pink-400/50 hover:shadow-lg hover:shadow-pink-500/25 transition-all duration-300 hover:scale-110"
 													title="Instagram"
 													aria-label={`${member.name}'s Instagram profile`}
 												>
-													<FaInstagram size={14} />
+													<FaInstagram
+														size={16}
+														className="transition-transform duration-300 group-hover/social:scale-110"
+													/>
 													<span className="sr-only">Instagram</span>
 												</a>
 											)}
