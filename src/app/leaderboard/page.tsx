@@ -144,13 +144,31 @@ export default function Leaderboard() {
 							}}
 						>
 							<div className="relative mb-3">
-								<Image
-									src={user.avatar}
-									alt={user.name}
-									className={`rounded-full border-4 shadow-xl transition-all duration-300 ${podiumBorder[user.rank as 1 | 2 | 3]}`}
-									width={user.rank === 1 ? 85 : 70}
-									height={user.rank === 1 ? 85 : 70}
-								/>
+								{user.avatar && user.avatar !== "/testing/avatar_1.jpg" ? (
+									<Image
+										src={user.avatar}
+										alt={user.name}
+										className={`rounded-full border-4 shadow-xl transition-all duration-300 ${podiumBorder[user.rank as 1 | 2 | 3]} object-cover`}
+										width={user.rank === 1 ? 85 : 70}
+										height={user.rank === 1 ? 85 : 70}
+										style={{
+											width: user.rank === 1 ? 85 : 70,
+											height: user.rank === 1 ? 85 : 70,
+										}}
+									/>
+								) : (
+									<div
+										className={`rounded-full border-4 shadow-xl transition-all duration-300 ${podiumBorder[user.rank as 1 | 2 | 3]} flex items-center justify-center font-bold text-white`}
+										style={{
+											width: user.rank === 1 ? 85 : 70,
+											height: user.rank === 1 ? 85 : 70,
+											backgroundColor: `hsl(${(user.name.charCodeAt(0) * 137.5) % 360}, 70%, 50%)`,
+											fontSize: user.rank === 1 ? "34px" : "28px",
+										}}
+									>
+										{user.name.charAt(0).toUpperCase()}
+									</div>
+								)}
 								<span
 									className={`absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 ${podiumRankBg[user.rank as 1 | 2 | 3]} text-white text-sm font-bold rounded-full w-7 h-7 flex items-center justify-center shadow-lg border-2`}
 								>
@@ -229,13 +247,29 @@ export default function Leaderboard() {
 				<div className="flex flex-col gap-4 w-[92%] mb-8 relative border-2 border-[#FCA410] rounded-3xl p-5 shadow-xl bg-gradient-to-tr from-white/20 via-white/10 to-white/5 dark:from-neutral-900/40 dark:to-neutral-800/20 backdrop-blur-sm dark:text-white">
 					<div className="flex flex-row gap-4 items-center">
 						<div className="rounded-xl overflow-hidden shadow-xl border-2 border-[#FCA410] w-20 h-20 flex-shrink-0">
-							<Image
-								src={currentUser?.avatar ?? "/testing/avatar_1.jpg"}
-								alt={currentUser?.name ?? "User"}
-								width={80}
-								height={80}
-								className="object-cover w-full h-full"
-							/>
+							{currentUser?.avatar &&
+							currentUser.avatar !== "/testing/avatar_1.jpg" ? (
+								<Image
+									src={currentUser.avatar}
+									alt={currentUser?.name ?? "User"}
+									width={80}
+									height={80}
+									className="object-cover w-full h-full"
+									style={{
+										width: 80,
+										height: 80,
+									}}
+								/>
+							) : (
+								<div
+									className="w-full h-full flex items-center justify-center font-bold text-white text-2xl"
+									style={{
+										backgroundColor: `hsl(${((currentUser?.name?.charCodeAt(0) ?? 65) * 137.5) % 360}, 70%, 50%)`,
+									}}
+								>
+									{currentUser?.name?.charAt(0).toUpperCase() ?? "U"}
+								</div>
+							)}
 						</div>
 						<div className="flex flex-col flex-1 min-w-0">
 							<p className="text-xs dark:text-gray-300 font-bold tracking-wide">
@@ -324,13 +358,31 @@ export default function Leaderboard() {
 							{/* Content positioned above the podium base */}
 							<div className="flex flex-col items-center mb-3">
 								<div className="relative mb-6">
-									<Image
-										src={user.avatar}
-										alt={user.name}
-										className={`rounded-full border-8 shadow-2xl transition-all duration-500 ${podiumBorder[user.rank as 1 | 2 | 3]}`}
-										width={user.rank === 1 ? 200 : 160}
-										height={user.rank === 1 ? 200 : 160}
-									/>
+									{user.avatar && user.avatar !== "/testing/avatar_1.jpg" ? (
+										<Image
+											src={user.avatar}
+											alt={user.name}
+											className={`rounded-full border-8 shadow-2xl transition-all duration-500 ${podiumBorder[user.rank as 1 | 2 | 3]} object-cover`}
+											width={user.rank === 1 ? 200 : 160}
+											height={user.rank === 1 ? 200 : 160}
+											style={{
+												width: user.rank === 1 ? 200 : 160,
+												height: user.rank === 1 ? 200 : 160,
+											}}
+										/>
+									) : (
+										<div
+											className={`rounded-full border-8 shadow-2xl transition-all duration-500 ${podiumBorder[user.rank as 1 | 2 | 3]} flex items-center justify-center font-bold text-white`}
+											style={{
+												width: user.rank === 1 ? 200 : 160,
+												height: user.rank === 1 ? 200 : 160,
+												backgroundColor: `hsl(${(user.name.charCodeAt(0) * 137.5) % 360}, 70%, 50%)`,
+												fontSize: user.rank === 1 ? "80px" : "64px",
+											}}
+										>
+											{user.name.charAt(0).toUpperCase()}
+										</div>
+									)}
 									<span
 										className={`absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 ${podiumRankBg[user.rank as 1 | 2 | 3]} text-white font-bold rounded-full flex items-center justify-center shadow-xl border-4 border-white ${user.rank === 1 ? "text-xl w-14 h-14" : "text-lg w-12 h-12"}`}
 									>
@@ -414,13 +466,29 @@ export default function Leaderboard() {
 					>
 						<div className="flex flex-row gap-6 h-48">
 							<div className="rounded-2xl overflow-hidden shadow-2xl border-4 border-[#FCA410] flex-shrink-0">
-								<Image
-									src={currentUser?.avatar ?? "/testing/avatar_1.jpg"}
-									alt={currentUser?.name ?? "User"}
-									className="object-cover"
-									width={192}
-									height={192}
-								/>
+								{currentUser?.avatar &&
+								currentUser.avatar !== "/testing/avatar_1.jpg" ? (
+									<Image
+										src={currentUser.avatar}
+										alt={currentUser?.name ?? "User"}
+										className="object-cover"
+										width={192}
+										height={192}
+										style={{
+											width: 192,
+											height: 192,
+										}}
+									/>
+								) : (
+									<div
+										className="w-48 h-48 flex items-center justify-center font-bold text-white text-6xl"
+										style={{
+											backgroundColor: `hsl(${((currentUser?.name?.charCodeAt(0) ?? 65) * 137.5) % 360}, 70%, 50%)`,
+										}}
+									>
+										{currentUser?.name?.charAt(0).toUpperCase() ?? "U"}
+									</div>
+								)}
 							</div>
 							<div className="flex flex-col gap-4 flex-1">
 								<div className="relative bg-gradient-to-tr from-white/20 via-white/10 to-white/5 dark:from-neutral-900/40 dark:to-neutral-800/20 backdrop-blur-sm shadow-xl rounded-2xl h-1/2 dark:text-white flex flex-col justify-center items-center border-2 border-[#FCA410]">
