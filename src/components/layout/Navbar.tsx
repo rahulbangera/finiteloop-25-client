@@ -137,14 +137,17 @@ export default function NavBar() {
 						</div>
 					</Link>
 					{pathname !== "/" && (
-						<div className="relative bg-white/35 dark:bg-white/25 backdrop-blur-2xl rounded-2xl px-4 py-2 shadow-lg">
-							<h1 className="text-xl font-bold text-gray-800 dark:text-white leading-tight">
-								Finite Loop Club
-							</h1>
-							<p className="text-sm text-gray-600 dark:text-gray-300 leading-tight">
-								NMAMIT
-							</p>
-						</div>
+						<Link href="/">
+							<div className="relative bg-gradient-to-r from-white/20 to-white/10 dark:from-white/15 dark:to-white/5 backdrop-blur-2xl rounded-2xl px-4 py-2 shadow-lg hover:from-white/30 hover:to-white/20 dark:hover:from-white/25 dark:hover:to-white/15 transition-all duration-300 cursor-pointer hover:scale-[1.02] hover:shadow-xl group overflow-hidden border border-white/20 dark:border-white/10">
+								<div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+								<h1 className="relative text-xl font-bold text-gray-800 dark:text-white leading-tight drop-shadow-sm">
+									Finite Loop Club
+								</h1>
+								<p className="relative text-sm text-gray-700 dark:text-gray-200 leading-tight drop-shadow-sm">
+									NMAMIT
+								</p>
+							</div>
+						</Link>
 					)}
 				</div>
 
@@ -319,14 +322,17 @@ export default function NavBar() {
 						</div>
 					</Link>
 					{pathname !== "/" && (
-						<div className="relative bg-white/35 dark:bg-white/25 backdrop-blur-2xl rounded-2xl px-3 py-2 shadow-lg">
-							<h1 className="text-lg font-bold text-gray-800 dark:text-white leading-tight">
-								Finite Loop Club
-							</h1>
-							<p className="text-xs text-gray-600 dark:text-gray-300 leading-tight">
-								NMAMIT
-							</p>
-						</div>
+						<Link href="/">
+							<div className="relative bg-gradient-to-r from-white/20 to-white/10 dark:from-white/15 dark:to-white/5 backdrop-blur-2xl rounded-2xl px-3 py-2 shadow-lg hover:from-white/30 hover:to-white/20 dark:hover:from-white/25 dark:hover:to-white/15 transition-all duration-300 cursor-pointer hover:scale-[1.02] hover:shadow-xl group overflow-hidden border border-white/20 dark:border-white/10">
+								<div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+								<h1 className="relative text-lg font-bold text-gray-800 dark:text-white leading-tight drop-shadow-sm">
+									Finite Loop Club
+								</h1>
+								<p className="relative text-xs text-gray-700 dark:text-gray-200 leading-tight drop-shadow-sm">
+									NMAMIT
+								</p>
+							</div>
+						</Link>
 					)}
 				</div>
 

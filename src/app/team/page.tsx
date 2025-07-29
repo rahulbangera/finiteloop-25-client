@@ -291,7 +291,7 @@ export default function Team() {
 					) : (
 						filteredMembers.map((member) => (
 							<div key={member.id} className="group relative">
-								<div className="relative w-80 bg-white/20 dark:bg-gradient-to-br dark:from-slate-900/50 dark:via-blue-900/30 dark:to-purple-900/40 backdrop-blur-xl border border-white/30 dark:border-slate-700/50 rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 hover:bg-white/30 dark:hover:bg-gradient-to-br dark:hover:from-slate-800/60 dark:hover:via-blue-800/40 dark:hover:to-purple-800/50">
+								<div className="relative w-80 h-full flex flex-col bg-white/20 dark:bg-gradient-to-br dark:from-slate-900/50 dark:via-blue-900/30 dark:to-purple-900/40 backdrop-blur-xl border border-white/30 dark:border-slate-700/50 rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 hover:bg-white/30 dark:hover:bg-gradient-to-br dark:hover:from-slate-800/60 dark:hover:via-blue-800/40 dark:hover:to-purple-800/50">
 									<div className="relative w-full h-80 overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
 										<div className="absolute top-4 right-4 w-3 h-3 bg-gradient-to-r from-purple-400 to-pink-400 dark:from-blue-400 dark:to-cyan-400 rounded-full opacity-70 animate-pulse"></div>
 										<div className="absolute top-6 right-8 w-2 h-2 bg-gradient-to-r from-pink-300 to-purple-300 dark:from-cyan-300 dark:to-blue-300 rounded-full opacity-50"></div>
@@ -316,8 +316,8 @@ export default function Team() {
 										)}
 									</div>
 
-									<div className="relative z-10 flex flex-col items-center text-center p-6 bg-gradient-to-t from-white/10 to-transparent dark:from-slate-900/20 dark:to-transparent">
-										<div className="mb-4 space-y-2">
+									<div className="relative z-10 flex flex-col items-center text-center p-6 bg-gradient-to-t from-white/10 to-transparent dark:from-slate-900/20 dark:to-transparent flex-grow">
+										<div className="mb-4 space-y-2 flex-grow flex flex-col justify-center">
 											<h3 className="text-xl font-bold text-gray-800 dark:text-white tracking-wide">
 												{member.name}
 											</h3>
@@ -328,7 +328,7 @@ export default function Team() {
 											</div>
 										</div>
 
-										<div className="flex space-x-4">
+										<div className="flex space-x-4 min-h-[40px] items-center">
 											{getSocialLink(member.userLink, "linkedin") && (
 												<a
 													href={getSocialLink(member.userLink, "linkedin")}
