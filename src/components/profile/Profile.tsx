@@ -392,6 +392,7 @@ export default function Profile({ userId }: { userId?: number }) {
 
 	const [socialName, setSocialName] = useState<string>("");
 	const [socialUrl, setSocialUrl] = useState<string>("");
+	const [socialUsername, setSocialUsername] = useState<string>("");
 	const [addingSocialLink, setAddingSocialLink] = useState(false);
 	const [removingLinkIndex, setRemovingLinkIndex] = useState<number | null>(
 		null,
@@ -1110,17 +1111,17 @@ export default function Profile({ userId }: { userId?: number }) {
 								)}
 							</div>
 						</div>
-							<div className="flex flex-col items-center sm:items-start flex-1 min-w-0 text-center sm:text-left">
-								<h1 className="text-2xl sm:text-3xl md:text-3xl font-bold mb-1 dark:text-white text-black/85">
-									{currentUser?.name}
-								</h1>
-								{currentUser?.id && (
-									<span className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-neutral-700/70 text-gray-200 text-xs font-mono font-semibold border border-neutral-600/50 mb-2">
-										ID: {currentUser.id}
-									</span>
-								)}
-								<span
-									className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 border backdrop-blur-sm
+						<div className="flex flex-col items-center sm:items-start flex-1 min-w-0 text-center sm:text-left">
+							<h1 className="text-2xl sm:text-3xl md:text-3xl font-bold mb-1 dark:text-white text-black/85">
+								{currentUser?.name}
+							</h1>
+							{currentUser?.id && (
+								<span className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-neutral-700/70 text-gray-200 text-xs font-mono font-semibold border border-neutral-600/50 mb-2">
+									ID: {currentUser.id}
+								</span>
+							)}
+							<span
+								className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 border backdrop-blur-sm
 										${
 											getRoleName(currentUser) === "ADMIN"
 												? "bg-red-500/20 border-red-400/50 text-red-700 dark:text-red-200 hover:bg-red-500/30 hover:border-red-400/70"
@@ -1136,28 +1137,12 @@ export default function Profile({ userId }: { userId?: number }) {
 																	? "bg-blue-500/20 border-blue-400/50 text-blue-700 dark:text-blue-200 hover:bg-blue-500/30 hover:border-blue-400/70"
 																	: "bg-slate-500/20 border-slate-400/50 text-slate-700 dark:text-slate-200 hover:bg-slate-500/30 hover:border-slate-400/70"
 										}`}
-									title={`Role: ${getRoleName(currentUser)}`}
-								>
-									<div
-										className={`w-2 h-2 rounded-full ${
-											getRoleName(currentUser) === "ADMIN"
-												? "bg-red-400"
-												: getRoleName(currentUser) === "MODERATOR"
-													? "bg-orange-400"
-													: getRoleName(currentUser) === "MEMBER"
-														? "bg-emerald-400"
-														: getRoleName(currentUser) === "DEVELOPER"
-															? "bg-purple-400"
-															: getRoleName(currentUser) === "CP"
-																? "bg-yellow-400"
-																: getRoleName(currentUser) === "USER"
-																	? "bg-blue-400"
-																	: "bg-slate-400"
-										}`}
-									></div>
-									<span className="font-semibold text-xs uppercase tracking-wider">
-										{getRoleName(currentUser) === "ADMIN"
-											? "Admin"
+								title={`Role: ${getRoleName(currentUser)}`}
+							>
+								<div
+									className={`w-2 h-2 rounded-full ${
+										getRoleName(currentUser) === "ADMIN"
+											? "bg-red-400"
 											: getRoleName(currentUser) === "MODERATOR"
 												? "bg-orange-400"
 												: getRoleName(currentUser) === "MEMBER"
@@ -1171,6 +1156,7 @@ export default function Profile({ userId }: { userId?: number }) {
 																: "bg-slate-400"
 									}`}
 								></div>
+
 								<span className="font-semibold text-xs uppercase tracking-wider">
 									{getRoleName(currentUser) === "ADMIN"
 										? "Admin"
@@ -1271,7 +1257,24 @@ export default function Profile({ userId }: { userId?: number }) {
 											<select
 												className="appearance-none px-3 sm:px-4 py-2 pr-8 rounded-lg sm:rounded-full bg-neutral-900 text-white border border-orange-400 focus:border-yellow-400 focus:outline-none transition-colors w-full focus:ring-2 focus:ring-orange-400/50 cursor-pointer text-sm sm:text-base"
 												value={socialName}
-												onChange={(e) => setSocialName(e.target.value)}
+												onChange={(e) => {
+													const platform = e.target.value;
+													setSocialName(platform);
+
+													setSocialUsername("");
+
+													if (platform && platform !== "portfolio") {
+														const platformUrls: Record<string, string> = {
+															instagram: "https://instagram.com/",
+															linkedin: "https://linkedin.com/in/",
+															github: "https://github.com/",
+															leetcode: "https://leetcode.com/u/",
+														};
+														setSocialUrl(platformUrls[platform] || "");
+													} else {
+														setSocialUrl("");
+													}
+												}}
 												disabled={addingSocialLink}
 											>
 												<option value="">Select Platform</option>
@@ -1296,14 +1299,56 @@ export default function Profile({ userId }: { userId?: number }) {
 												</svg>
 											</div>
 										</div>
-										<input
-											type="url"
-											className="px-3 sm:px-4 py-2 rounded-lg sm:rounded-full bg-neutral-900 text-white border border-orange-400 focus:border-yellow-400 focus:outline-none flex-1 transition-colors focus:ring-2 focus:ring-orange-400/50 text-sm sm:text-base"
-											placeholder="https://example.com/yourprofile"
-											value={socialUrl}
-											onChange={(e) => setSocialUrl(e.target.value)}
-											disabled={addingSocialLink}
-										/>
+
+										{socialName === "portfolio" ? (
+											<input
+												type="url"
+												className="px-3 sm:px-4 py-2 rounded-lg sm:rounded-full bg-neutral-900 text-white border border-orange-400 focus:border-yellow-400 focus:outline-none flex-1 transition-colors focus:ring-2 focus:ring-orange-400/50 text-sm sm:text-base"
+												placeholder="https://yourportfolio.com"
+												value={socialUrl}
+												onChange={(e) => setSocialUrl(e.target.value)}
+												disabled={addingSocialLink}
+											/>
+										) : socialName ? (
+											<div className="flex items-center rounded-lg sm:rounded-full bg-neutral-900 border border-orange-400 focus-within:border-yellow-400 focus-within:ring-2 focus-within:ring-orange-400/50 transition-colors overflow-hidden">
+												<span className="px-3 sm:px-4 py-2 text-gray-400 text-sm sm:text-base bg-neutral-800 border-r border-neutral-600 whitespace-nowrap">
+													{socialName === "instagram" &&
+														"https://instagram.com/"}
+													{socialName === "linkedin" &&
+														"https://linkedin.com/in/"}
+													{socialName === "github" && "https://github.com/"}
+													{socialName === "leetcode" &&
+														"https://leetcode.com/u/"}
+												</span>
+												<input
+													type="text"
+													className="px-3 sm:px-4 py-2 bg-transparent text-white focus:outline-none flex-1 text-sm sm:text-base"
+													placeholder="yourusername"
+													value={socialUsername}
+													onChange={(e) => {
+														const username = e.target.value;
+														setSocialUsername(username);
+
+														const platformUrls: Record<string, string> = {
+															instagram: "https://instagram.com/",
+															linkedin: "https://linkedin.com/in/",
+															github: "https://github.com/",
+															leetcode: "https://leetcode.com/u/",
+														};
+														setSocialUrl(platformUrls[socialName] + username);
+													}}
+													disabled={addingSocialLink}
+												/>
+											</div>
+										) : (
+											<input
+												type="url"
+												className="px-3 sm:px-4 py-2 rounded-lg sm:rounded-full bg-neutral-900 text-white border border-orange-400 focus:border-yellow-400 focus:outline-none flex-1 transition-colors focus:ring-2 focus:ring-orange-400/50 text-sm sm:text-base opacity-50"
+												placeholder="Select a platform first"
+												value=""
+												disabled={true}
+											/>
+										)}
 									</div>
 									<div className="flex justify-center">
 										<button
@@ -1312,6 +1357,14 @@ export default function Profile({ userId }: { userId?: number }) {
 											onClick={async () => {
 												if (!socialName || !socialUrl || !session?.user?.id)
 													return;
+
+												if (
+													socialName !== "portfolio" &&
+													!socialUsername.trim()
+												) {
+													toast.error("Please enter your username");
+													return;
+												}
 
 												if (
 													!socialUrl.startsWith("http://") &&
@@ -1363,6 +1416,7 @@ export default function Profile({ userId }: { userId?: number }) {
 													await update();
 													setSocialName("");
 													setSocialUrl("");
+													setSocialUsername("");
 													toast.success("Social link added successfully!");
 												} catch (err) {
 													toast.error(
@@ -1374,7 +1428,14 @@ export default function Profile({ userId }: { userId?: number }) {
 													setAddingSocialLink(false);
 												}
 											}}
-											disabled={!socialName || !socialUrl || addingSocialLink}
+											disabled={
+												!socialName ||
+												!socialUrl ||
+												addingSocialLink ||
+												(socialName !== "portfolio" &&
+													!!socialName &&
+													!socialUsername.trim())
+											}
 											title="Add Social Link"
 										>
 											{addingSocialLink ? (
