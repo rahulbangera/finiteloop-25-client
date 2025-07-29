@@ -2,6 +2,8 @@
 
 import { Share2 } from "lucide-react";
 import { toast } from "react-toastify";
+import { WhatsAppShare } from "../profile/WhatsAppShare";
+import { FaWhatsapp } from "react-icons/fa";
 
 interface Event {
 	id: number;
@@ -199,7 +201,7 @@ const EventWhatsAppShare = ({
 			onClick={handleWhatsAppShare}
 			className={`flex items-center gap-2 px-4 py-2 ${buttonStyle} text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200 ${className}`}
 		>
-			<Share2 className="h-4 w-4" />
+			<FaWhatsapp className="h-5 w-5" />
 			{buttonText}
 		</button>
 	);

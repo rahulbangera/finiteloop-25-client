@@ -10,6 +10,7 @@ const PaymentButton = forwardRef<
 	ButtonProps & {
 		onStart?: () => void;
 		description: string;
+		extraClassName?: string;
 		onSuccess: (paymentId: string) => void;
 		onFailure: (error?: string) => void;
 		onEnd?: () => void;
@@ -30,6 +31,7 @@ const PaymentButton = forwardRef<
 		{
 			onStart,
 			description,
+			extraClassName,
 			paymentType,
 			amountInINR,
 			teamId,
@@ -62,7 +64,7 @@ const PaymentButton = forwardRef<
 
 				<Button
 					ref={ref}
-					className="z-20"
+					className={`z-20 flex-1 font-bold text-md ${extraClassName}`}
 					onClick={async () => {
 						console.log("Payment button clicked");
 						if (onStart) {

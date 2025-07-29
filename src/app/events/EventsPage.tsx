@@ -101,6 +101,7 @@ const EventsPage = () => {
 		"2024-25": [],
 		"2025-26": [],
 	});
+	const [showDeleteTeam, setShowDeleteTeam] = useState(false);
 
 	const [loading, setLoading] = useState({
 		events: true,
@@ -180,11 +181,20 @@ const EventsPage = () => {
 		fetchEvents();
 	}, []);
 
+	const resetUrl = () => {
+		const params = new URLSearchParams(window.location.search);
+		params.delete("teamInvite");
+		const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+		window.history.replaceState({}, "", newUrl);
+	};
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <no need of exhaustive dependencies>
 	useEffect(() => {
 		if (isClosingDrawer) return;
 
 		const slug = searchParams.get("id");
 		const teamInvite = searchParams.get("teamInvite");
+		console.log("Search params:", searchParams.toString());
 
 		if (slug && !initialSlug) setInitialSlug(slug);
 
@@ -192,8 +202,9 @@ const EventsPage = () => {
 			setTeamInviteId(teamInvite);
 			setIsTeamInviteFlow(true);
 		}
-	}, [searchParams, initialSlug, teamInviteId, isClosingDrawer]);
+	}, [searchParams, initialSlug, isClosingDrawer]);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <no need of exhaustive dependencies>
 	useEffect(() => {
 		if (!initialSlug || loading.events || isClosingDrawer) return;
 		let found: { event: Event; year: EventYear } | null = null;
@@ -231,7 +242,11 @@ const EventsPage = () => {
 					return;
 				}
 
-				if (sessionStatus === "authenticated" && userId) {
+				if (
+					sessionStatus === "authenticated" &&
+					userId &&
+					!teamState.createdTeamId
+				) {
 					setDrawerOpen(true);
 					setTeamInviteProcessed(true);
 					toast.success(`Welcome! Ready to join team: ${teamInviteId}`, {
@@ -369,7 +384,7 @@ const EventsPage = () => {
 							}));
 							setRegistered(true);
 						} else {
-							if (!isTeamInviteFlow) {
+							if (!isTeamInviteFlow && teamState.action !== "JOIN") {
 								setTeamState((prev) => ({
 									...prev,
 									teamName: "",
@@ -427,8 +442,10 @@ const EventsPage = () => {
 		if (selectedEvent) {
 			const size =
 				selectedEvent.eventType === "SOLO"
-					? "SOLO"
-					: `${selectedEvent.minTeamSize} - ${selectedEvent.maxTeamSize}  `;
+					? "1"
+					: selectedEvent.minTeamSize === selectedEvent.maxTeamSize
+						? `${selectedEvent.minTeamSize}`
+						: `${selectedEvent.minTeamSize} - ${selectedEvent.maxTeamSize}  `;
 			setTeamSize(size);
 		}
 	}, [selectedEvent, userId, isTeamInviteFlow, teamState.action]);
@@ -688,7 +705,9 @@ const EventsPage = () => {
 					action: "NONE",
 				}));
 				toast.success("Team created successfully!");
-				setTimeout(() => refreshRegistrationData(), 500);
+
+				await refreshRegistrationData(); // have removed timeout from here, might be needed to test if anything breaks due to this
+				setShowTeamDialog(false);
 			} else {
 				toast.error(json.error || "Failed to create team");
 				setTeamState((prev) => ({
@@ -893,7 +912,7 @@ const EventsPage = () => {
 			);
 		}
 
-		if (teamState.createdTeamId) {
+		if (teamState.createdTeamId && teamState.teamName) {
 			return (
 				<div className="flex flex-col gap-3 mt-4">
 					<div className="flex flex-col sm:flex-row items-start gap-4 w-full bg-white/50 dark:bg-indigo-900/30 rounded-xl p-4 border border-purple-200 dark:border-indigo-700">
@@ -987,72 +1006,84 @@ const EventsPage = () => {
 					) : teamState.isLeader &&
 						selectedEvent?.deadline &&
 						new Date(selectedEvent.deadline) > new Date() ? (
-						<div className="flex gap-2">
-							{selectedEvent &&
-							(selectedEvent?.flcAmount > 0 ||
-								selectedEvent?.nonFlcAmount > 0) ? (
-								<PaymentButton
-									id="confirm-team-payment"
-									paymentType="EVENT"
-									amountInINR={400}
-									onStart={() => {
-										setLoading((prev) => ({ ...prev, confirmTeam: true }));
-									}}
-									onEnd={() => {
-										setLoading((prev) => ({ ...prev, confirmTeam: false }));
-									}}
-									description={selectedEvent.name}
-									teamId={teamState.createdTeamId}
-									disabled={
-										loading.confirmTeam ||
-										!userId ||
-										teamState.isConfirmed ||
-										(selectedEvent.deadline &&
-											new Date(selectedEvent.deadline) <= new Date()) ||
-										!selectedEvent ||
-										teamState.members.length < selectedEvent.minTeamSize ||
-										teamState.members.length > selectedEvent.maxTeamSize
-									}
-									onSuccess={async (_paymentId) => {
-										setLoading((prev) => ({
-											...prev,
-											confirmTeam: false,
-										}));
-										toast.success("Payment successful");
-										// Refresh the drawer data to show updated state
-										setTimeout(() => refreshRegistrationData(), 500);
-									}}
-									onFailure={(error) => {
-										setLoading((prev) => ({
-											...prev,
-											confirmTeam: false,
-										}));
-										toast.error(error || "Payment failed");
-									}}
-								>
-									{loading.confirmTeam
-										? "Confirming..."
-										: "Pay to confirm Team"}
-								</PaymentButton>
-							) : (
+						<>
+							<div className="flex gap-2">
+								{selectedEvent &&
+								(selectedEvent?.flcAmount > 0 ||
+									selectedEvent?.nonFlcAmount > 0) ? (
+									<PaymentButton
+										id="confirm-team-payment"
+										paymentType="EVENT"
+										extraClassName={BUTTON_CLASSES.primary}
+										amountInINR={400}
+										onStart={() => {
+											setLoading((prev) => ({ ...prev, confirmTeam: true }));
+										}}
+										onEnd={() => {
+											setLoading((prev) => ({ ...prev, confirmTeam: false }));
+										}}
+										description={selectedEvent.name}
+										teamId={teamState.createdTeamId}
+										disabled={
+											loading.confirmTeam ||
+											!userId ||
+											teamState.isConfirmed ||
+											(selectedEvent.deadline &&
+												new Date(selectedEvent.deadline) <= new Date()) ||
+											!selectedEvent ||
+											teamState.members.length < selectedEvent.minTeamSize ||
+											teamState.members.length > selectedEvent.maxTeamSize
+										}
+										onSuccess={async (_paymentId) => {
+											setLoading((prev) => ({
+												...prev,
+												confirmTeam: false,
+											}));
+											toast.success("Payment successful");
+											// Refresh the drawer data to show updated state
+											setTimeout(() => refreshRegistrationData(), 500);
+										}}
+										onFailure={(error) => {
+											setLoading((prev) => ({
+												...prev,
+												confirmTeam: false,
+											}));
+											toast.error(error || "Payment failed");
+										}}
+									>
+										{loading.confirmTeam
+											? "Confirming..."
+											: "Pay to confirm Team"}
+									</PaymentButton>
+								) : (
+									<button
+										type="button"
+										onClick={confirmTeam}
+										className={`${BUTTON_CLASSES.primary} flex-1`}
+										disabled={loading.confirmTeam || !userId}
+									>
+										{loading.confirmTeam ? "Confirming..." : "Confirm Team"}
+									</button>
+								)}
 								<button
 									type="button"
-									onClick={confirmTeam}
-									className={`${BUTTON_CLASSES.primary} flex-1`}
-									disabled={loading.confirmTeam || !userId}
+									onClick={() => setShowDeleteTeam(true)}
+									className={`${BUTTON_CLASSES.destructive}`}
+									disabled={loading.deleteTeam || !userId}
 								>
-									{loading.confirmTeam ? "Confirming..." : "Confirm Team"}
+									{loading.deleteTeam ? "Deleting..." : "Delete Team"}
 								</button>
-							)}
-							<button
-								type="button"
-								onClick={deleteTeam}
-								className={`${BUTTON_CLASSES.destructive} flex-1`}
-								disabled={loading.deleteTeam || !userId}
-							>
-								{loading.deleteTeam ? "Deleting..." : "Delete Team"}
-							</button>
-						</div>
+							</div>
+							{teamState.members.length < selectedEvent.minTeamSize ? (
+								<span className="text-red-800 text-center dark:text-red-400 font-semibold text-md md:text-xl">
+									Team Size not met! Please add more members.
+								</span>
+							) : teamState.members.length > selectedEvent.maxTeamSize ? (
+								<span className="text-red-800 text-center dark:text-red-400 font-semibold text-md md:text-xl">
+									Team Size exceeded! Please remove some members.
+								</span>
+							) : null}
+						</>
 					) : !teamState.isLeader &&
 						selectedEvent?.deadline &&
 						new Date(selectedEvent.deadline) > new Date() ? (
@@ -1073,7 +1104,7 @@ const EventsPage = () => {
 							</div>
 						)
 					)}
-					<div className="flex items-center gap-4 mt-2">
+					<div className="flex items-center gap-4 mt-1">
 						<div className="text-base md:text-lg text-purple-800 dark:text-purple-200 font-semibold">
 							Members:
 						</div>
@@ -1217,6 +1248,8 @@ const EventsPage = () => {
 									teamId: isTeamInviteFlow ? prev.teamId : "",
 								}));
 								if (isTeamInviteFlow) {
+									toast.info("Team invite declined");
+									resetUrl();
 									setIsTeamInviteFlow(false);
 									setTeamInviteId(null);
 									setTeamInviteProcessed(true);
@@ -1476,16 +1509,16 @@ const EventsPage = () => {
 												selectedEvent?.flcAmount === 0 ? (
 													"Free"
 												) : (
-													`Member: ${selectedEvent?.flcAmount}`
+													`Member: ${selectedEvent?.flcAmount}rs`
 												)
 											) : selectedEvent?.flcAmount === 0 &&
 												selectedEvent?.nonFlcAmount === 0 ? (
 												"Free"
 											) : (
 												<div className="flex flex-col text-center">
-													Member: {selectedEvent?.flcAmount}
+													Member: {selectedEvent?.flcAmount}rs
 													<br />
-													Non Member: {selectedEvent?.nonFlcAmount}
+													Non Member: {selectedEvent?.nonFlcAmount}rs
 												</div>
 											),
 										},
@@ -2073,6 +2106,40 @@ const EventsPage = () => {
 										</div>
 									</div>
 								)}
+								{showDeleteTeam && (
+									<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs">
+										<div className="bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-xl max-w-md w-[90%]">
+											<h2 className="text-lg font-bold text-zinc-800 dark:text-zinc-100 mb-4">
+												Delete Team
+											</h2>
+											<p className="text-sm text-zinc-600 dark:text-zinc-300	 mb-6">
+												Are you sure you want to delete the team? This action
+												cannot be undone.
+											</p>
+											<div className="flex justify-center gap-3">
+												<button
+													type="button"
+													className={BUTTON_CLASSES.destructive}
+													onClick={async () => {
+														setShowDeleteTeam(false);
+														await deleteTeam();
+													}}
+												>
+													{loading.leaveTeam
+														? "Leaving Team..."
+														: "Yes, Delete"}
+												</button>
+												<button
+													type="button"
+													onClick={() => setShowDeleteTeam(false)}
+													className={BUTTON_CLASSES.secondary}
+												>
+													Cancel
+												</button>
+											</div>
+										</div>
+									</div>
+								)}
 								{showTeamDialog && (
 									<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs">
 										<div className="bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-xl max-w-md w-[90%]">
@@ -2117,7 +2184,6 @@ const EventsPage = () => {
 															...prev,
 															action: "CREATE",
 														}));
-														setShowTeamDialog(false);
 													}}
 													className="mt-2 px-4 py-2 rounded-lg bg-purple-700 dark:bg-purple-400 text-white dark:text-black font-medium hover:scale-105 transition"
 												>
