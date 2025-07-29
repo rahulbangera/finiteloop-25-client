@@ -961,9 +961,14 @@ export default function Profile({ userId }: { userId?: number }) {
 							</div>
 
 							<div className="flex flex-col items-center sm:items-start flex-1 min-w-0 text-center sm:text-left">
-								<h1 className="text-2xl sm:text-3xl md:text-3xl font-bold mb-2 dark:text-white text-black/85">
+								<h1 className="text-2xl sm:text-3xl md:text-3xl font-bold mb-1 dark:text-white text-black/85">
 									{currentUser?.name}
 								</h1>
+								{currentUser?.id && (
+									<span className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-neutral-700/70 text-gray-200 text-xs font-mono font-semibold border border-neutral-600/50 mb-2">
+										ID: {currentUser.id}
+									</span>
+								)}
 								<span
 									className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 border backdrop-blur-sm
 										${

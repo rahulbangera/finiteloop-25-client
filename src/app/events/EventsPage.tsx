@@ -1506,7 +1506,7 @@ const EventsPage = () => {
 								{selectedEvent?.name}
 							</h2>
 							{selectedEvent?.imgSrc && (
-								<div className="flex justify-center">
+								<div className="flex justify-center relative">
 									{/** biome-ignore lint/performance/noImgElement: <testing> */}
 									<img
 										ref={imageRef}
