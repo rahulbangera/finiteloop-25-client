@@ -16,7 +16,13 @@ import "react-toastify/dist/ReactToastify.css";
 import { Drawer } from "vaul";
 import { HTMLContent } from "@/components/ui/custom/html-content";
 
-type EventYear = "2023-24" | "2024-25" | "2025-26";
+type EventYear =
+	| "2020-21"
+	| "2021-22"
+	| "2022-23"
+	| "2023-24"
+	| "2024-25"
+	| "2025-26";
 type Member = {
 	id: number;
 	name: string;
@@ -69,6 +75,9 @@ const getEventYear = (dateStr: string): EventYear => {
 
 	const academicYear = month < 5 ? year - 1 : year;
 
+	if (academicYear <= 2020) return "2020-21";
+	if (academicYear <= 2021) return "2021-22";
+	if (academicYear <= 2022) return "2022-23";
 	if (academicYear <= 2023) return "2023-24";
 	if (academicYear === 2024) return "2024-25";
 	return "2025-26";
@@ -91,7 +100,7 @@ const EventsPage = () => {
 	const [selectedYearData, setSelectedYearData] = useState<{
 		year: EventYear;
 		index: number;
-	}>({ year: "2025-26", index: 2 });
+	}>({ year: "2025-26", index: 5 });
 	const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 	const [showSoloConfirm, setSoloConfirm] = useState(false);
 	const [showTeamDialog, setShowTeamDialog] = useState(false);
@@ -102,6 +111,9 @@ const EventsPage = () => {
 	const [teamInviteProcessed, setTeamInviteProcessed] = useState(false);
 	const [isClosingDrawer, setIsClosingDrawer] = useState(false);
 	const [eventsByYear, setEventsByYear] = useState<EventsByYear>({
+		"2020-21": [],
+		"2021-22": [],
+		"2022-23": [],
 		"2023-24": [],
 		"2024-25": [],
 		"2025-26": [],
@@ -138,6 +150,7 @@ const EventsPage = () => {
 	const [showLeaveDialog, setShowLeaveDialog] = useState(false);
 	const [teamSize, setTeamSize] = useState("");
 	const imageRef = useRef<HTMLImageElement>(null);
+	const radioContainerRef = useRef<HTMLDivElement>(null);
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const { data: session, status: sessionStatus } = useSession();
@@ -165,6 +178,9 @@ const EventsPage = () => {
 				const json = await res.json();
 				if (json.success && Array.isArray(json.data)) {
 					const grouped: EventsByYear = {
+						"2020-21": [],
+						"2021-22": [],
+						"2022-23": [],
 						"2023-24": [],
 						"2024-25": [],
 						"2025-26": [],
@@ -230,7 +246,17 @@ const EventsPage = () => {
 		if (found) {
 			setSelectedEvent(found.event);
 			const yearIndex =
-				found.year === "2023-24" ? 0 : found.year === "2024-25" ? 1 : 2;
+				found.year === "2020-21"
+					? 0
+					: found.year === "2021-22"
+						? 1
+						: found.year === "2022-23"
+							? 2
+							: found.year === "2023-24"
+								? 3
+								: found.year === "2024-25"
+									? 4
+									: 5;
 			setSelectedYearData({ year: found.year, index: yearIndex });
 
 			if (
@@ -461,12 +487,18 @@ const EventsPage = () => {
 
 	const handleToggleChange = (e: React.ChangeEvent<HTMLDivElement>) => {
 		const id = (e.target as HTMLElement).id;
-		if (id === "glass-silver")
-			setSelectedYearData({ year: "2023-24", index: 0 });
+		if (id === "glass-bronze")
+			setSelectedYearData({ year: "2020-21", index: 0 });
+		else if (id === "glass-mad")
+			setSelectedYearData({ year: "2021-22", index: 1 });
+		else if (id === "glass-gd")
+			setSelectedYearData({ year: "2022-23", index: 2 });
+		else if (id === "glass-silver")
+			setSelectedYearData({ year: "2023-24", index: 3 });
 		else if (id === "glass-gold")
-			setSelectedYearData({ year: "2024-25", index: 1 });
+			setSelectedYearData({ year: "2024-25", index: 4 });
 		else if (id === "glass-platinum")
-			setSelectedYearData({ year: "2025-26", index: 2 });
+			setSelectedYearData({ year: "2025-26", index: 5 });
 	};
 
 	const handleDrawerClose = (open: boolean) => {
@@ -719,7 +751,39 @@ const EventsPage = () => {
 		}
 	}, [selectedEvent, userId, session?.user?.accessToken]);
 
-	useEffect(() => {}, []);
+	useEffect(() => {
+		const scrollToEnd = () => {
+			if (radioContainerRef.current && window.innerWidth <= 768) {
+				setTimeout(() => {
+					const container = radioContainerRef.current;
+					if (container) {
+						container.scrollLeft =
+							container.scrollWidth - container.clientWidth;
+					}
+				}, 100);
+			}
+		};
+
+		scrollToEnd();
+
+		const handleResize = () => {
+			if (window.innerWidth <= 768) {
+				if (radioContainerRef.current) {
+					const container = radioContainerRef.current;
+					const isAtEnd =
+						container.scrollLeft >=
+						container.scrollWidth - container.clientWidth - 10;
+					if (isAtEnd) {
+						scrollToEnd();
+					}
+				}
+			}
+		};
+
+		window.addEventListener("resize", handleResize);
+		return () => window.removeEventListener("resize", handleResize);
+	}, []);
+
 	const createTeam = useCallback(async () => {
 		if (!selectedEvent) return;
 		if (!userId) {
@@ -1402,11 +1466,19 @@ const EventsPage = () => {
 				Events
 			</div>
 			<div
-				className="m-4 md:m-8 select-none w-full flex justify-center"
+				ref={radioContainerRef}
+				className="m-4 md:m-8 select-none w-full flex justify-center overflow-x-auto scrollbar-hide rounded-2xl"
 				onChange={handleToggleChange}
+				style={{
+					scrollbarWidth: "none",
+					msOverflowStyle: "none",
+				}}
 			>
 				<Radio
 					plans={[
+						{ id: "glass-bronze", label: "2020-21" },
+						{ id: "glass-mad", label: "2021-22" },
+						{ id: "glass-gd", label: "2022-23" },
 						{ id: "glass-silver", label: "2023-24" },
 						{ id: "glass-gold", label: "2024-25" },
 						{ id: "glass-platinum", label: "2025-26" },
@@ -1414,7 +1486,17 @@ const EventsPage = () => {
 					selected={selectedYearData.index}
 					setSelected={(index) => {
 						const year =
-							index === 0 ? "2023-24" : index === 1 ? "2024-25" : "2025-26";
+							index === 0
+								? "2020-21"
+								: index === 1
+									? "2021-22"
+									: index === 2
+										? "2022-23"
+										: index === 3
+											? "2023-24"
+											: index === 4
+												? "2024-25"
+												: "2025-26";
 						setSelectedYearData({ year, index });
 					}}
 				/>
