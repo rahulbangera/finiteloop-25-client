@@ -151,6 +151,7 @@ const EventWhatsAppShare = ({
 		try {
 			const isTeamInvite = Boolean(
 				registered &&
+					event.deadline > new Date().toISOString() &&
 					teamState.createdTeamId &&
 					event.eventType === "TEAM" &&
 					teamState.isLeader,
@@ -185,6 +186,7 @@ const EventWhatsAppShare = ({
 
 	const isTeamInvite = Boolean(
 		registered &&
+			event.deadline > new Date().toISOString() &&
 			teamState.createdTeamId &&
 			event.eventType === "TEAM" &&
 			teamState.isLeader,

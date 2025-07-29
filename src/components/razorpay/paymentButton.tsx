@@ -9,6 +9,7 @@ const PaymentButton = forwardRef<
 	HTMLButtonElement,
 	ButtonProps & {
 		onStart?: () => void;
+		preTasks?: () => Promise<void>;
 		description: string;
 		extraClassName?: string;
 		onSuccess: (paymentId: string) => void;
@@ -31,6 +32,7 @@ const PaymentButton = forwardRef<
 		{
 			onStart,
 			description,
+			preTasks,
 			extraClassName,
 			paymentType,
 			amountInINR,
@@ -67,9 +69,14 @@ const PaymentButton = forwardRef<
 					className={`z-20 flex-1 font-bold text-md ${extraClassName}`}
 					onClick={async () => {
 						console.log("Payment button clicked");
+						if (preTasks) {
+							await preTasks();
+						}
+						console.log("Pre-tasks completed");
 						if (onStart) {
 							onStart();
 						}
+
 						const order = await fetch(`${API_URL}/api/razorpay/create-order`, {
 							method: "POST",
 							headers: {
