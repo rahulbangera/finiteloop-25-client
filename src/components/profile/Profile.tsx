@@ -1110,34 +1110,54 @@ export default function Profile({ userId }: { userId?: number }) {
 								)}
 							</div>
 						</div>
-
-						<div className="flex flex-col items-center lg:items-start justify-center flex-1 min-w-0 text-center lg:text-left max-w-full lg:max-w-[calc(100%-8rem)]">
-							<h1 className="text-2xl sm:text-3xl lg:text-2xl xl:text-3xl font-bold mb-3 dark:text-white text-black/85 leading-tight whitespace-nowrap w-full">
-								{currentUser?.name}
-							</h1>
-							<span
-								className={`inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 border backdrop-blur-sm
-									${
-										getRoleName(currentUser) === "ADMIN"
-											? "bg-red-500/20 border-red-400/50 text-red-700 dark:text-red-200 hover:bg-red-500/30 hover:border-red-400/70"
-											: getRoleName(currentUser) === "MODERATOR"
-												? "bg-orange-500/20 border-orange-400/50 text-orange-700 dark:text-orange-200 hover:bg-orange-500/30 hover:border-orange-400/70"
-												: getRoleName(currentUser) === "MEMBER"
-													? "bg-emerald-500/20 border-emerald-400/50 text-emerald-700 dark:text-emerald-200 hover:bg-emerald-500/30 hover:border-emerald-400/70"
-													: getRoleName(currentUser) === "DEVELOPER"
-														? "bg-purple-500/20 border-purple-400/50 text-purple-700 dark:text-purple-200 hover:bg-purple-500/30 hover:border-purple-400/70"
-														: getRoleName(currentUser) === "CP"
-															? "bg-yellow-500/20 border-yellow-400/50 text-yellow-700 dark:text-yellow-200 hover:bg-yellow-500/30 hover:border-yellow-400/70"
-															: getRoleName(currentUser) === "USER"
-																? "bg-blue-500/20 border-blue-400/50 text-blue-700 dark:text-blue-200 hover:bg-blue-500/30 hover:border-blue-400/70"
-																: "bg-slate-500/20 border-slate-400/50 text-slate-700 dark:text-slate-200 hover:bg-slate-500/30 hover:border-slate-400/70"
-									}`}
-								title={`Role: ${getRoleName(currentUser)}`}
-							>
-								<div
-									className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${
-										getRoleName(currentUser) === "ADMIN"
-											? "bg-red-400"
+							<div className="flex flex-col items-center sm:items-start flex-1 min-w-0 text-center sm:text-left">
+								<h1 className="text-2xl sm:text-3xl md:text-3xl font-bold mb-1 dark:text-white text-black/85">
+									{currentUser?.name}
+								</h1>
+								{currentUser?.id && (
+									<span className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-neutral-700/70 text-gray-200 text-xs font-mono font-semibold border border-neutral-600/50 mb-2">
+										ID: {currentUser.id}
+									</span>
+								)}
+								<span
+									className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 border backdrop-blur-sm
+										${
+											getRoleName(currentUser) === "ADMIN"
+												? "bg-red-500/20 border-red-400/50 text-red-700 dark:text-red-200 hover:bg-red-500/30 hover:border-red-400/70"
+												: getRoleName(currentUser) === "MODERATOR"
+													? "bg-orange-500/20 border-orange-400/50 text-orange-700 dark:text-orange-200 hover:bg-orange-500/30 hover:border-orange-400/70"
+													: getRoleName(currentUser) === "MEMBER"
+														? "bg-emerald-500/20 border-emerald-400/50 text-emerald-700 dark:text-emerald-200 hover:bg-emerald-500/30 hover:border-emerald-400/70"
+														: getRoleName(currentUser) === "DEVELOPER"
+															? "bg-purple-500/20 border-purple-400/50 text-purple-700 dark:text-purple-200 hover:bg-purple-500/30 hover:border-purple-400/70"
+															: getRoleName(currentUser) === "CP"
+																? "bg-yellow-500/20 border-yellow-400/50 text-yellow-700 dark:text-yellow-200 hover:bg-yellow-500/30 hover:border-yellow-400/70"
+																: getRoleName(currentUser) === "USER"
+																	? "bg-blue-500/20 border-blue-400/50 text-blue-700 dark:text-blue-200 hover:bg-blue-500/30 hover:border-blue-400/70"
+																	: "bg-slate-500/20 border-slate-400/50 text-slate-700 dark:text-slate-200 hover:bg-slate-500/30 hover:border-slate-400/70"
+										}`}
+									title={`Role: ${getRoleName(currentUser)}`}
+								>
+									<div
+										className={`w-2 h-2 rounded-full ${
+											getRoleName(currentUser) === "ADMIN"
+												? "bg-red-400"
+												: getRoleName(currentUser) === "MODERATOR"
+													? "bg-orange-400"
+													: getRoleName(currentUser) === "MEMBER"
+														? "bg-emerald-400"
+														: getRoleName(currentUser) === "DEVELOPER"
+															? "bg-purple-400"
+															: getRoleName(currentUser) === "CP"
+																? "bg-yellow-400"
+																: getRoleName(currentUser) === "USER"
+																	? "bg-blue-400"
+																	: "bg-slate-400"
+										}`}
+									></div>
+									<span className="font-semibold text-xs uppercase tracking-wider">
+										{getRoleName(currentUser) === "ADMIN"
+											? "Admin"
 											: getRoleName(currentUser) === "MODERATOR"
 												? "bg-orange-400"
 												: getRoleName(currentUser) === "MEMBER"

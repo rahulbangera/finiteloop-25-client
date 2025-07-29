@@ -1,7 +1,7 @@
 "use client";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import gsap from "gsap";
-import { X } from "lucide-react";
+import { Trash2Icon, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { QRCodeSVG } from "qrcode.react";
@@ -16,6 +16,10 @@ import "react-toastify/dist/ReactToastify.css";
 import { Drawer } from "vaul";
 
 type EventYear = "2023-24" | "2024-25" | "2025-26";
+type Member = {
+	id: number;
+	name: string;
+};
 type Event = {
 	id: number;
 	name: string;
@@ -101,6 +105,7 @@ const EventsPage = () => {
 		"2024-25": [],
 		"2025-26": [],
 	});
+	const [showDeleteTeam, setShowDeleteTeam] = useState(false);
 
 	const [loading, setLoading] = useState({
 		events: true,
@@ -111,6 +116,7 @@ const EventsPage = () => {
 		deleteTeam: false,
 		leaveTeam: false,
 		joinTeam: false,
+		removeMember: false,
 		checkAvailable: false,
 	});
 	const [teamState, setTeamState] = useState<TeamState>({
@@ -138,7 +144,10 @@ const EventsPage = () => {
 	const [drawerDirection, setDrawerDirection] = useState<"right" | "bottom">(
 		"right",
 	);
-
+	const [toBeDeletedMember, setToBeDeletedMember] = useState<Member | null>(
+		null,
+	);
+	const [showRemoveMemberDialog, setShowRemoveMemberDialog] = useState(false);
 	const [available, setAvailable] = useState<null | boolean>(null);
 
 	useEffect(() => {
@@ -180,11 +189,20 @@ const EventsPage = () => {
 		fetchEvents();
 	}, []);
 
+	const resetUrl = () => {
+		const params = new URLSearchParams(window.location.search);
+		params.delete("teamInvite");
+		const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+		window.history.replaceState({}, "", newUrl);
+	};
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <no need of exhaustive dependencies>
 	useEffect(() => {
 		if (isClosingDrawer) return;
 
 		const slug = searchParams.get("id");
 		const teamInvite = searchParams.get("teamInvite");
+		console.log("Search params:", searchParams.toString());
 
 		if (slug && !initialSlug) setInitialSlug(slug);
 
@@ -192,8 +210,9 @@ const EventsPage = () => {
 			setTeamInviteId(teamInvite);
 			setIsTeamInviteFlow(true);
 		}
-	}, [searchParams, initialSlug, teamInviteId, isClosingDrawer]);
+	}, [searchParams, initialSlug, isClosingDrawer]);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <no need of exhaustive dependencies>
 	useEffect(() => {
 		if (!initialSlug || loading.events || isClosingDrawer) return;
 		let found: { event: Event; year: EventYear } | null = null;
@@ -231,7 +250,11 @@ const EventsPage = () => {
 					return;
 				}
 
-				if (sessionStatus === "authenticated" && userId) {
+				if (
+					sessionStatus === "authenticated" &&
+					userId &&
+					!teamState.createdTeamId
+				) {
 					setDrawerOpen(true);
 					setTeamInviteProcessed(true);
 					toast.success(`Welcome! Ready to join team: ${teamInviteId}`, {
@@ -369,7 +392,7 @@ const EventsPage = () => {
 							}));
 							setRegistered(true);
 						} else {
-							if (!isTeamInviteFlow) {
+							if (!isTeamInviteFlow && teamState.action !== "JOIN") {
 								setTeamState((prev) => ({
 									...prev,
 									teamName: "",
@@ -427,8 +450,10 @@ const EventsPage = () => {
 		if (selectedEvent) {
 			const size =
 				selectedEvent.eventType === "SOLO"
-					? "SOLO"
-					: `${selectedEvent.minTeamSize} - ${selectedEvent.maxTeamSize}  `;
+					? "1"
+					: selectedEvent.minTeamSize === selectedEvent.maxTeamSize
+						? `${selectedEvent.minTeamSize}`
+						: `${selectedEvent.minTeamSize} - ${selectedEvent.maxTeamSize}  `;
 			setTeamSize(size);
 		}
 	}, [selectedEvent, userId, isTeamInviteFlow, teamState.action]);
@@ -487,6 +512,51 @@ const EventsPage = () => {
 		setSelectedEvent(event);
 		router.push(`?id=${event.id}`, { scroll: false });
 		setDrawerOpen(true);
+	};
+
+	const removeMemberFromTeam = async (memberId: number | null) => {
+		if (!selectedEvent || !userId || !memberId || !teamState.createdTeamId)
+			return;
+
+		try {
+			setLoading((prev) => ({ ...prev, removeMember: true }));
+			const res = await fetch(
+				`${process.env.NEXT_PUBLIC_SERVER_URL}/api/events/removeMember`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${session?.user?.accessToken}`,
+					},
+					body: JSON.stringify({
+						memberId,
+						teamId: teamState.createdTeamId,
+					}),
+				},
+			);
+			const json = await res.json();
+			if (json.success) {
+				toast.success("Member removed successfully!");
+				setTeamState((prev) => ({
+					...prev,
+					members: prev.members.filter((m) => m.id !== memberId.toString()),
+				}));
+				if (memberId.toString() === userId) {
+					setRegistered(false);
+					setTeamState((prev) => ({
+						...prev,
+						action: "NONE",
+						isLeader: false,
+						createdTeamId: "",
+						members: [],
+					}));
+				}
+			} else {
+				toast.error(json.error || "Failed to remove member");
+			}
+		} catch (error) {
+			toast.error("Error removing member");
+		}
 	};
 
 	const handleCopyLink = () => {
@@ -688,7 +758,9 @@ const EventsPage = () => {
 					action: "NONE",
 				}));
 				toast.success("Team created successfully!");
-				setTimeout(() => refreshRegistrationData(), 500);
+
+				await refreshRegistrationData(); // have removed timeout from here, might be needed to test if anything breaks due to this
+				setShowTeamDialog(false);
 			} else {
 				toast.error(json.error || "Failed to create team");
 				setTeamState((prev) => ({
@@ -892,8 +964,7 @@ const EventsPage = () => {
 				</div>
 			);
 		}
-
-		if (teamState.createdTeamId) {
+		if (teamState.createdTeamId && teamState.teamName) {
 			return (
 				<div className="flex flex-col gap-3 mt-4">
 					<div className="flex flex-col sm:flex-row items-start gap-4 w-full bg-white/50 dark:bg-indigo-900/30 rounded-xl p-4 border border-purple-200 dark:border-indigo-700">
@@ -987,74 +1058,87 @@ const EventsPage = () => {
 					) : teamState.isLeader &&
 						selectedEvent?.deadline &&
 						new Date(selectedEvent.deadline) > new Date() ? (
-						<div className="flex gap-2">
-							{selectedEvent &&
-							(selectedEvent?.flcAmount > 0 ||
-								selectedEvent?.nonFlcAmount > 0) ? (
-								<PaymentButton
-									id="confirm-team-payment"
-									paymentType="EVENT"
-									amountInINR={400}
-									onStart={() => {
-										setLoading((prev) => ({ ...prev, confirmTeam: true }));
-									}}
-									onEnd={() => {
-										setLoading((prev) => ({ ...prev, confirmTeam: false }));
-									}}
-									description={selectedEvent.name}
-									teamId={teamState.createdTeamId}
-									disabled={
-										loading.confirmTeam ||
-										!userId ||
-										teamState.isConfirmed ||
-										(selectedEvent.deadline &&
-											new Date(selectedEvent.deadline) <= new Date()) ||
-										!selectedEvent ||
-										teamState.members.length < selectedEvent.minTeamSize ||
-										teamState.members.length > selectedEvent.maxTeamSize
-									}
-									onSuccess={async (_paymentId) => {
-										setLoading((prev) => ({
-											...prev,
-											confirmTeam: false,
-										}));
-										toast.success("Payment successful");
-										// Refresh the drawer data to show updated state
-										setTimeout(() => refreshRegistrationData(), 500);
-									}}
-									onFailure={(error) => {
-										setLoading((prev) => ({
-											...prev,
-											confirmTeam: false,
-										}));
-										toast.error(error || "Payment failed");
-									}}
-								>
-									{loading.confirmTeam
-										? "Confirming..."
-										: "Pay to confirm Team"}
-								</PaymentButton>
-							) : (
+						<>
+							<div className="flex gap-2">
+								{selectedEvent &&
+								(selectedEvent?.flcAmount > 0 ||
+									selectedEvent?.nonFlcAmount > 0) ? (
+									<PaymentButton
+										id="confirm-team-payment"
+										paymentType="EVENT"
+										extraClassName={BUTTON_CLASSES.primary}
+										amountInINR={400}
+										onStart={() => {
+											setLoading((prev) => ({ ...prev, confirmTeam: true }));
+										}}
+										onEnd={() => {
+											setLoading((prev) => ({ ...prev, confirmTeam: false }));
+										}}
+										description={selectedEvent.name}
+										teamId={teamState.createdTeamId}
+										disabled={
+											loading.confirmTeam ||
+											!userId ||
+											teamState.isConfirmed ||
+											(selectedEvent.deadline &&
+												new Date(selectedEvent.deadline) <= new Date()) ||
+											!selectedEvent ||
+											teamState.members.length < selectedEvent.minTeamSize ||
+											teamState.members.length > selectedEvent.maxTeamSize
+										}
+										onSuccess={async (_paymentId) => {
+											setLoading((prev) => ({
+												...prev,
+												confirmTeam: false,
+											}));
+											toast.success("Payment successful");
+											// Refresh the drawer data to show updated state
+											setTimeout(() => refreshRegistrationData(), 500);
+										}}
+										onFailure={(error) => {
+											setLoading((prev) => ({
+												...prev,
+												confirmTeam: false,
+											}));
+											toast.error(error || "Payment failed");
+										}}
+									>
+										{loading.confirmTeam
+											? "Confirming..."
+											: "Pay to confirm Team"}
+									</PaymentButton>
+								) : (
+									<button
+										type="button"
+										onClick={confirmTeam}
+										className={`${BUTTON_CLASSES.primary} flex-1`}
+										disabled={loading.confirmTeam || !userId}
+									>
+										{loading.confirmTeam ? "Confirming..." : "Confirm Team"}
+									</button>
+								)}
 								<button
 									type="button"
-									onClick={confirmTeam}
-									className={`${BUTTON_CLASSES.primary} flex-1`}
-									disabled={loading.confirmTeam || !userId}
+									onClick={() => setShowDeleteTeam(true)}
+									className={`${BUTTON_CLASSES.destructive}`}
+									disabled={loading.deleteTeam || !userId}
 								>
-									{loading.confirmTeam ? "Confirming..." : "Confirm Team"}
+									{loading.deleteTeam ? "Deleting..." : "Delete Team"}
 								</button>
-							)}
-							<button
-								type="button"
-								onClick={deleteTeam}
-								className={`${BUTTON_CLASSES.destructive} flex-1`}
-								disabled={loading.deleteTeam || !userId}
-							>
-								{loading.deleteTeam ? "Deleting..." : "Delete Team"}
-							</button>
-						</div>
+							</div>
+							{teamState.members.length < selectedEvent.minTeamSize ? (
+								<span className="text-red-800 text-center dark:text-red-400 font-semibold text-md md:text-xl">
+									Team Size not met! Please add more members.
+								</span>
+							) : teamState.members.length > selectedEvent.maxTeamSize ? (
+								<span className="text-red-800 text-center dark:text-red-400 font-semibold text-md md:text-xl">
+									Team Size exceeded! Please remove some members.
+								</span>
+							) : null}
+						</>
 					) : !teamState.isLeader &&
 						selectedEvent?.deadline &&
+						!teamState.isConfirmed &&
 						new Date(selectedEvent.deadline) > new Date() ? (
 						<Button
 							disabled={loading.leaveTeam || !userId}
@@ -1073,12 +1157,12 @@ const EventsPage = () => {
 							</div>
 						)
 					)}
-					<div className="flex items-center gap-4 mt-2">
+					<div className="flex items-center gap-4 mt-1">
 						<div className="text-base md:text-lg text-purple-800 dark:text-purple-200 font-semibold">
 							Members:
 						</div>
 					</div>
-					<ul className="text-lg md:text-xl list-disc pl-4 text-purple-900 dark:text-purple-100">
+					<ul className="text-lg md:text-xl list-disc pl-2 text-purple-900 dark:text-purple-100">
 						{teamState.members.length === 0 ? (
 							<li>You</li>
 						) : (
@@ -1086,13 +1170,33 @@ const EventsPage = () => {
 								typeof m === "string" ? (
 									<li key={m}>{m}</li>
 								) : (
-									<li key={m.id ?? idx}>
-										{m.name}
-										{session?.user?.id === m.id
-											? " (You)"
-											: m.id === teamState.leaderId
-												? " (Leader)"
-												: ""}
+									<li key={m.id ?? idx} className="flex items-center gap-2">
+										<span>
+											<span className="mr-2">•</span>
+											{m.name}
+											{session?.user?.id === m.id
+												? " (You)"
+												: m.id === teamState.leaderId
+													? " (Leader)"
+													: ""}
+										</span>
+										{m.id !== teamState.leaderId &&
+											m.id !== session?.user?.id &&
+											teamState.isLeader && (
+												<span className="flex items-center">
+													<Trash2Icon
+														onClick={() => {
+															setToBeDeletedMember({
+																id: parseInt(m.id),
+																name: m.name,
+															});
+															setShowRemoveMemberDialog(true);
+														}}
+														className="inline"
+														size={18}
+													/>
+												</span>
+											)}
 									</li>
 								),
 							)
@@ -1129,6 +1233,8 @@ const EventsPage = () => {
 				}
 				setJoining(true);
 				await joinTeam();
+				resetUrl();
+				setIsTeamInviteFlow(false);
 				setJoining(false);
 			};
 
@@ -1217,6 +1323,8 @@ const EventsPage = () => {
 									teamId: isTeamInviteFlow ? prev.teamId : "",
 								}));
 								if (isTeamInviteFlow) {
+									toast.info("Team invite declined");
+									resetUrl();
 									setIsTeamInviteFlow(false);
 									setTeamInviteId(null);
 									setTeamInviteProcessed(true);
@@ -1242,7 +1350,7 @@ const EventsPage = () => {
 		if (
 			selectedEvent?.deadline &&
 			new Date(selectedEvent.deadline) > new Date() &&
-			selectedEvent.state === "PUBLISHED"
+			selectedEvent.state !== "COMPLETED"
 		) {
 			return (
 				<div className="flex flex-col gap-3 mt-4">
@@ -1398,7 +1506,7 @@ const EventsPage = () => {
 								{selectedEvent?.name}
 							</h2>
 							{selectedEvent?.imgSrc && (
-								<div className="flex justify-center">
+								<div className="flex justify-center relative">
 									{/** biome-ignore lint/performance/noImgElement: <testing> */}
 									<img
 										ref={imageRef}
@@ -1476,17 +1584,60 @@ const EventsPage = () => {
 												selectedEvent?.flcAmount === 0 ? (
 													"Free"
 												) : (
-													`Member: ${selectedEvent?.flcAmount}`
+													`Member: ${selectedEvent?.flcAmount}rs`
 												)
 											) : selectedEvent?.flcAmount === 0 &&
 												selectedEvent?.nonFlcAmount === 0 ? (
 												"Free"
 											) : (
 												<div className="flex flex-col text-center">
-													Member: {selectedEvent?.flcAmount}
+													Member: {selectedEvent?.flcAmount}rs
 													<br />
-													Non Member: {selectedEvent?.nonFlcAmount}
+													Non Member: {selectedEvent?.nonFlcAmount}rs
 												</div>
+											),
+										},
+										{
+											label: "From - To",
+											value: (
+												<>
+													{new Date(
+														selectedEvent?.fromDate ?? "",
+													).toLocaleDateString("en-US", {
+														year: "numeric",
+														month: "short",
+														day: "numeric",
+													})}{" "}
+													-{" "}
+													{new Date(
+														selectedEvent?.toDate ?? "",
+													).toLocaleDateString("en-US", {
+														year: "numeric",
+														month: "short",
+														day: "numeric",
+													})}
+												</>
+											),
+										},
+										{
+											label: "Registration Deadline",
+											value: (
+												<>
+													{new Date(
+														selectedEvent?.deadline ?? "",
+													).toLocaleDateString("en-US", {
+														year: "numeric",
+														month: "short",
+														day: "numeric",
+													})}{" "}
+													at{" "}
+													{new Date(
+														selectedEvent?.deadline ?? "",
+													).toLocaleTimeString("en-US", {
+														hour: "2-digit",
+														minute: "2-digit",
+													})}
+												</>
 											),
 										},
 									].map((item) => (
@@ -1522,8 +1673,8 @@ const EventsPage = () => {
 										</span>
 									</div>
 								) : selectedEvent &&
-									(selectedEvent?.state === "LIVE" ||
-										new Date(selectedEvent.deadline) < new Date()) ? (
+									selectedEvent?.state === "LIVE" &&
+									new Date(selectedEvent.deadline) < new Date() ? (
 									<>
 										<div className="w-full rounded-xl border border-green-500 bg-green-100 dark:bg-green-950 dark:border-green-400 p-4 text-center">
 											<span className="text-green-800 dark:text-green-300 font-semibold text-lg md:text-xl">
@@ -1618,24 +1769,6 @@ const EventsPage = () => {
 											)}
 										{selectedEvent?.eventType === "TEAM" &&
 											renderTeamRegistration()}
-										<div className="flex gap-2">
-											{selectedEvent && (
-												<EventWhatsAppShare
-													event={selectedEvent}
-													teamState={teamState}
-													registered={registered}
-													variant="button"
-													className="flex-1"
-												/>
-											)}
-											<button
-												type="button"
-												onClick={handleCopyLink}
-												className={`${BUTTON_CLASSES.secondary} ${selectedEvent ? "flex-1" : "w-full"}`}
-											>
-												Copy Link
-											</button>
-										</div>
 									</>
 								) : registered &&
 									selectedEvent?.deadline &&
@@ -1733,31 +1866,22 @@ const EventsPage = () => {
 											)}
 										{selectedEvent?.eventType === "TEAM" &&
 											renderTeamRegistration()}
-										<div className="flex gap-2">
-											{selectedEvent && (
-												<EventWhatsAppShare
-													event={selectedEvent}
-													teamState={teamState}
-													registered={registered}
-													variant="button"
-													className="flex-1"
-												/>
-											)}
-											<button
-												type="button"
-												onClick={handleCopyLink}
-												className={`${BUTTON_CLASSES.secondary} ${selectedEvent ? "flex-1" : "w-full"}`}
-											>
-												Copy Link
-											</button>
-										</div>
 									</>
 								) : available === false ? (
-									registered ? (
+									registered && teamState.isConfirmed ? (
 										<>
 											{selectedEvent?.eventType === "SOLO" &&
 												teamInitialized && (
 													<>
+														{teamState.isConfirmed &&
+															teamState.createdTeamId && (
+																<div className="w-full rounded-xl border border-green-500 bg-green-100 dark:bg-green-950 dark:border-green-400 p-4 text-center">
+																	<span className="text-green-800 dark:text-green-300 font-semibold text-lg md:text-xl">
+																		🎉 Registration confirmed! You're all set
+																		for the event.
+																	</span>
+																</div>
+															)}
 														{registered &&
 															teamState.isConfirmed &&
 															teamState.createdTeamId && (
@@ -1864,24 +1988,6 @@ const EventsPage = () => {
 												)}
 											{selectedEvent?.eventType === "TEAM" &&
 												renderTeamRegistration()}
-											<div className="flex gap-2">
-												{selectedEvent && (
-													<EventWhatsAppShare
-														event={selectedEvent}
-														teamState={teamState}
-														registered={registered}
-														variant="button"
-														className="flex-1"
-													/>
-												)}
-												<button
-													type="button"
-													onClick={handleCopyLink}
-													className={`${BUTTON_CLASSES.secondary} ${selectedEvent ? "flex-1" : "w-full"}`}
-												>
-													Copy Link
-												</button>
-											</div>
 										</>
 									) : (
 										<div className="w-full rounded-xl border border-yellow-400 bg-yellow-100 dark:bg-yellow-950 dark:border-yellow-500 p-4 text-center">
@@ -1902,146 +2008,164 @@ const EventsPage = () => {
 														</span>
 													</div>
 												)}
-												{registered && teamState.createdTeamId && (
-													<>
-														<div className="bg-white/50 dark:bg-indigo-900/30 rounded-xl p-4 border border-purple-200 dark:border-indigo-700">
-															<div className="flex flex-col sm:flex-row items-start gap-4 w-full">
-																<div className="flex flex-col gap-2 flex-1 min-w-0">
-																	<div className="flex flex-col sm:flex-row sm:items-center gap-2">
-																		<span className="font-semibold text-purple-800 dark:text-purple-200 text-base md:text-lg whitespace-nowrap">
-																			Team ID:
-																		</span>
-																		<div className="flex items-center gap-2 min-w-0 flex-1">
-																			<span
-																				className="px-3 py-1.5 rounded-lg bg-purple-100 dark:bg-indigo-800 text-purple-700 dark:text-purple-200 text-base md:text-lg font-mono shadow-sm truncate flex-1"
-																				title={teamState.createdTeamId}
-																			>
-																				{teamState.createdTeamId}
+												{registered &&
+													teamState.createdTeamId &&
+													teamState.isConfirmed && (
+														<>
+															<div className="bg-white/50 dark:bg-indigo-900/30 rounded-xl p-4 border border-purple-200 dark:border-indigo-700">
+																<div className="flex flex-col sm:flex-row items-start gap-4 w-full">
+																	<div className="flex flex-col gap-2 flex-1 min-w-0">
+																		<div className="flex flex-col sm:flex-row sm:items-center gap-2">
+																			<span className="font-semibold text-purple-800 dark:text-purple-200 text-base md:text-lg whitespace-nowrap">
+																				Team ID:
 																			</span>
-																			<button
-																				type="button"
-																				onClick={() => {
-																					navigator.clipboard.writeText(
-																						teamState.createdTeamId,
-																					);
-																					toast.success("Copied Team ID");
-																				}}
-																				className={`${BUTTON_CLASSES.secondary} px-3 py-1.5 text-xs whitespace-nowrap rounded-lg border border-purple-300 dark:border-indigo-700 hover:bg-purple-200 dark:hover:bg-indigo-800 transition flex-shrink-0`}
-																				title="Copy Team ID"
-																			>
-																				Copy
-																			</button>
+																			<div className="flex items-center gap-2 min-w-0 flex-1">
+																				<span
+																					className="px-3 py-1.5 rounded-lg bg-purple-100 dark:bg-indigo-800 text-purple-700 dark:text-purple-200 text-base md:text-lg font-mono shadow-sm truncate flex-1"
+																					title={teamState.createdTeamId}
+																				>
+																					{teamState.createdTeamId}
+																				</span>
+																				<button
+																					type="button"
+																					onClick={() => {
+																						navigator.clipboard.writeText(
+																							teamState.createdTeamId,
+																						);
+																						toast.success("Copied Team ID");
+																					}}
+																					className={`${BUTTON_CLASSES.secondary} px-3 py-1.5 text-xs whitespace-nowrap rounded-lg border border-purple-300 dark:border-indigo-700 hover:bg-purple-200 dark:hover:bg-indigo-800 transition flex-shrink-0`}
+																					title="Copy Team ID"
+																				>
+																					Copy
+																				</button>
+																			</div>
+																		</div>
+																	</div>
+																	<div className="flex-shrink-0 flex justify-center sm:justify-end">
+																		<button
+																			type="button"
+																			className="flex items-center justify-center w-20 h-20 md:w-24 md:h-24 bg-purple-100 dark:bg-zinc-400 rounded-xl border border-purple-300 dark:border-indigo-700 cursor-pointer shadow-sm hover:shadow-md transition-shadow"
+																			onClick={() => setShowQrModal(true)}
+																			onKeyDown={(e) => {
+																				if (
+																					e.key === "Enter" ||
+																					e.key === " "
+																				) {
+																					setShowQrModal(true);
+																				}
+																			}}
+																			aria-label="Show QR Code"
+																			tabIndex={0}
+																		>
+																			<QRCodeSVG
+																				value={teamState.createdTeamId}
+																				size={80}
+																				bgColor="#F3E8FF"
+																				fgColor="#59168b"
+																				className="w-16 h-16 md:w-20 md:h-20 object-contain"
+																			/>
+																		</button>
+																	</div>
+																</div>
+															</div>
+															{showQrModal && (
+																<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+																	<div className="relative bg-white p-6 rounded-xl shadow-xl flex flex-col items-center">
+																		<button
+																			type="button"
+																			onClick={() => setShowQrModal(false)}
+																			className="absolute top-2 right-2 text-black hover:text-gray-600"
+																			aria-label="Close"
+																		>
+																			<X className="h-6 w-6" />
+																		</button>
+																		<QRCodeSVG
+																			value={teamState.createdTeamId}
+																			size={256}
+																			bgColor="#FFFFFF"
+																			fgColor="#000000"
+																			className="w-64 h-64 object-contain p-3 mx-auto"
+																		/>
+																		<div className="mt-4 text-center text-black break-all font-mono">
+																			{teamState.createdTeamId}
 																		</div>
 																	</div>
 																</div>
-																<div className="flex-shrink-0 flex justify-center sm:justify-end">
-																	<button
-																		type="button"
-																		className="flex items-center justify-center w-20 h-20 md:w-24 md:h-24 bg-purple-100 dark:bg-zinc-400 rounded-xl border border-purple-300 dark:border-indigo-700 cursor-pointer shadow-sm hover:shadow-md transition-shadow"
-																		onClick={() => setShowQrModal(true)}
-																		onKeyDown={(e) => {
-																			if (e.key === "Enter" || e.key === " ") {
-																				setShowQrModal(true);
-																			}
-																		}}
-																		aria-label="Show QR Code"
-																		tabIndex={0}
-																	>
-																		<QRCodeSVG
-																			value={teamState.createdTeamId}
-																			size={80}
-																			bgColor="#F3E8FF"
-																			fgColor="#59168b"
-																			className="w-16 h-16 md:w-20 md:h-20 object-contain"
-																		/>
-																	</button>
-																</div>
-															</div>
-														</div>
-														{showQrModal && (
-															<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-																<div className="relative bg-white p-6 rounded-xl shadow-xl flex flex-col items-center">
-																	<button
-																		type="button"
-																		onClick={() => setShowQrModal(false)}
-																		className="absolute top-2 right-2 text-black hover:text-gray-600"
-																		aria-label="Close"
-																	>
-																		<X className="h-6 w-6" />
-																	</button>
-																	<QRCodeSVG
-																		value={teamState.createdTeamId}
-																		size={256}
-																		bgColor="#FFFFFF"
-																		fgColor="#000000"
-																		className="w-64 h-64 object-contain p-3 mx-auto"
-																	/>
-																	<div className="mt-4 text-center text-black break-all font-mono">
-																		{teamState.createdTeamId}
-																	</div>
-																</div>
-															</div>
-														)}
-													</>
-												)}
+															)}
+														</>
+													)}
 												{selectedEvent.deadline &&
 													new Date(selectedEvent.deadline) > new Date() && (
-														<button
-															type="button"
-															onClick={() => setSoloConfirm(true)}
-															disabled={
-																teamState.registering ||
-																loading.checkingRegistration ||
-																(selectedEvent.deadline &&
-																	new Date(selectedEvent.deadline) <
-																		new Date()) ||
-																(registered && teamState.isConfirmed) ||
-																loading.register
-															}
-															className={
-																registered && teamState.isConfirmed
-																	? BUTTON_CLASSES.disabled
-																	: BUTTON_CLASSES.primary
-															}
-														>
-															{loading.checkingRegistration
-																? "Checking..."
-																: teamState.registering || loading.register
-																	? "Processing..."
-																	: registered && teamState.isConfirmed
-																		? "Registered"
-																		: registered &&
-																				!teamState.isConfirmed &&
-																				(selectedEvent?.flcAmount > 0 ||
-																					selectedEvent?.nonFlcAmount > 0)
-																			? "Pay to Confirm"
-																			: "Register"}
-														</button>
+														<>
+															{(selectedEvent.flcAmount > 0 ||
+																selectedEvent.nonFlcAmount > 0) &&
+															registered &&
+															!teamState.isConfirmed ? (
+																<div className="w-full rounded-xl border border-yellow-400 bg-yellow-100 dark:bg-yellow-950 dark:border-yellow-500 p-4 text-center">
+																	<span className="text-yellow-900 dark:text-yellow-200 font-semibold text-lg md:text-xl">
+																		Registration successful! Please pay to
+																		confirm your spot.
+																	</span>
+																</div>
+															) : null}
+															<button
+																type="button"
+																onClick={() => setSoloConfirm(true)}
+																disabled={
+																	teamState.registering ||
+																	loading.checkingRegistration ||
+																	(selectedEvent.deadline &&
+																		new Date(selectedEvent.deadline) <
+																			new Date()) ||
+																	(registered && teamState.isConfirmed) ||
+																	loading.register
+																}
+																className={
+																	registered && teamState.isConfirmed
+																		? BUTTON_CLASSES.disabled
+																		: BUTTON_CLASSES.primary
+																}
+															>
+																{loading.checkingRegistration
+																	? "Checking..."
+																	: teamState.registering || loading.register
+																		? "Processing..."
+																		: registered && teamState.isConfirmed
+																			? "Registered"
+																			: registered &&
+																					!teamState.isConfirmed &&
+																					(selectedEvent?.flcAmount > 0 ||
+																						selectedEvent?.nonFlcAmount > 0)
+																				? "Pay to Confirm"
+																				: "Register"}
+															</button>
+														</>
 													)}
 											</>
 										)}
 										{selectedEvent?.eventType === "TEAM" &&
 											renderTeamRegistration()}
-										<div className="flex gap-2">
-											{selectedEvent && (
-												<EventWhatsAppShare
-													event={selectedEvent}
-													teamState={teamState}
-													registered={registered}
-													variant="button"
-													className="flex-1"
-												/>
-											)}
-											<button
-												type="button"
-												onClick={handleCopyLink}
-												className={`${BUTTON_CLASSES.secondary} ${selectedEvent ? "flex-1" : "w-full"}`}
-											>
-												Copy Link
-											</button>
-										</div>
 									</>
 								) : null}
+								<div className="flex gap-2">
+									{selectedEvent && (
+										<EventWhatsAppShare
+											event={selectedEvent}
+											teamState={teamState}
+											registered={registered}
+											variant="button"
+											className="flex-1"
+										/>
+									)}
+									<button
+										type="button"
+										onClick={handleCopyLink}
+										className={`${BUTTON_CLASSES.secondary} ${selectedEvent ? "flex-1" : "w-full"}`}
+									>
+										Copy Link
+									</button>
+								</div>
 								{showLeaveDialog && (
 									<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs">
 										<div className="bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-xl max-w-md w-[90%]">
@@ -2065,6 +2189,79 @@ const EventsPage = () => {
 												<button
 													type="button"
 													onClick={() => setShowLeaveDialog(false)}
+													className={BUTTON_CLASSES.secondary}
+												>
+													Cancel
+												</button>
+											</div>
+										</div>
+									</div>
+								)}
+								{showRemoveMemberDialog && toBeDeletedMember && (
+									<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs">
+										<div className="bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-xl max-w-md w-[90%]">
+											<h2 className="text-lg font-bold text-zinc-800 dark:text-zinc-100 mb-4">
+												Remove Member from Team
+											</h2>
+											{toBeDeletedMember && (
+												<p className="text-sm text-zinc-600 dark:text-zinc-300	 mb-6">
+													Are you sure you want to remove (
+													{toBeDeletedMember?.name}) from the team?
+												</p>
+											)}
+											<div className="flex justify-center gap-3">
+												<button
+													type="button"
+													className={BUTTON_CLASSES.primary}
+													onClick={async () => {
+														await removeMemberFromTeam(toBeDeletedMember?.id);
+														setShowRemoveMemberDialog(false);
+														setTimeout(() => {
+															refreshRegistrationData();
+														}, 500);
+													}}
+												>
+													{loading.removeMember
+														? "Removing Member..."
+														: "Yes, Remove"}
+												</button>
+												<button
+													type="button"
+													onClick={() => setShowRemoveMemberDialog(false)}
+													className={BUTTON_CLASSES.secondary}
+												>
+													Cancel
+												</button>
+											</div>
+										</div>
+									</div>
+								)}
+								{showDeleteTeam && (
+									<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs">
+										<div className="bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-xl max-w-md w-[90%]">
+											<h2 className="text-lg font-bold text-zinc-800 dark:text-zinc-100 mb-4">
+												Delete Team
+											</h2>
+											<p className="text-sm text-zinc-600 dark:text-zinc-300	 mb-6">
+												Are you sure you want to delete the team? This action
+												cannot be undone.
+											</p>
+											<div className="flex justify-center gap-3">
+												<button
+													type="button"
+													className={BUTTON_CLASSES.destructive}
+													onClick={async () => {
+														setShowDeleteTeam(false);
+														await deleteTeam();
+													}}
+												>
+													{loading.leaveTeam
+														? "Leaving Team..."
+														: "Yes, Delete"}
+												</button>
+												<button
+													type="button"
+													onClick={() => setShowDeleteTeam(false)}
 													className={BUTTON_CLASSES.secondary}
 												>
 													Cancel
@@ -2117,7 +2314,6 @@ const EventsPage = () => {
 															...prev,
 															action: "CREATE",
 														}));
-														setShowTeamDialog(false);
 													}}
 													className="mt-2 px-4 py-2 rounded-lg bg-purple-700 dark:bg-purple-400 text-white dark:text-black font-medium hover:scale-105 transition"
 												>
