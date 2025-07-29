@@ -1,7 +1,7 @@
 "use client";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import gsap from "gsap";
-import { Trash2Icon, X } from "lucide-react";
+import { MailIcon, PhoneIcon, Trash2Icon, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { QRCodeSVG } from "qrcode.react";
@@ -14,6 +14,7 @@ import PaymentButton from "@/components/razorpay/paymentButton";
 import { Button } from "@/components/ui/button";
 import "react-toastify/dist/ReactToastify.css";
 import { Drawer } from "vaul";
+import { HTMLContent } from "@/components/ui/custom/html-content";
 
 type EventYear = "2023-24" | "2024-25" | "2025-26";
 type Member = {
@@ -1516,18 +1517,17 @@ const EventsPage = () => {
 									/>
 								</div>
 							)}
-							<div
-								className="comic-font text-purple-900 dark:text-purple-100 text-md md:text-lg whitespace-pre-line break-words leading-relaxed"
-								// biome-ignore lint/security/noDangerouslySetInnerHtml: <rendering HTML content>
-								dangerouslySetInnerHTML={{
-									__html: selectedEvent?.description || "",
-								}}
-							/>
+							<div className="text-black dark:text-white">
+								<HTMLContent
+									content={selectedEvent?.description || ""}
+									className=""
+								/>
+							</div>
 
 							{/* Organisers Section */}
 							{selectedEvent?.Organiser &&
 								selectedEvent.Organiser.length > 0 && (
-									<div className="w-full mt-4">
+									<div className="w-full">
 										<h3 className="font-semibold text-base text-purple-900 dark:text-purple-100 mb-2">
 											Event Organisers
 										</h3>
@@ -1535,26 +1535,35 @@ const EventsPage = () => {
 											{selectedEvent.Organiser.map((organiser, index) => (
 												<div
 													key={organiser.email || `organiser-${index}`}
-													className="bg-white/50 dark:bg-indigo-950/50 rounded-lg p-3 border border-purple-200/50 dark:border-indigo-700/50"
+													className="bg-white/50 dark:bg-indigo-950/50 rounded-lg p-3 border border-purple-200/50 dark:border-indigo-700/50 min-w-0 flex flex-col"
+													style={{ minWidth: 0 }}
 												>
-													<div className="flex flex-col space-y-1">
+													<div className="flex flex-col space-y-1 min-w-0">
 														<h4 className="font-medium text-purple-900 dark:text-purple-100 text-sm truncate">
 															{organiser.name}
 														</h4>
-														<div className="flex flex-col space-y-0.5">
-															<a
-																href={`mailto:${organiser.email}`}
-																className="text-xs text-purple-600 dark:text-purple-300 hover:text-purple-800 dark:hover:text-purple-100 transition-colors truncate"
-																title={organiser.email}
-															>
-																✉ {organiser.email}
-															</a>
-															<a
-																href={`tel:${organiser.phone}`}
-																className="text-xs text-purple-600 dark:text-purple-300 hover:text-purple-800 dark:hover:text-purple-100 transition-colors"
-															>
-																📞 {organiser.phone}
-															</a>
+														<div className="flex flex-col space-y-0.5 min-w-0">
+															<div className="flex items-center gap-2 min-w-0">
+																<MailIcon className="w-4 h-4 text-purple-600 dark:text-purple-300" />
+																<a
+																	href={`mailto:${organiser.email}`}
+																	className="text-xs text-purple-600 dark:text-purple-300 hover:text-purple-800 dark:hover:text-purple-100 transition-colors "
+																	title={organiser.email}
+																	style={{ minWidth: 0, maxWidth: "100%" }}
+																>
+																	{organiser.email}
+																</a>
+															</div>
+															<div className="flex items-center gap-2 min-w-0">
+																<PhoneIcon className="w-4 h-4 text-purple-600 dark:text-purple-300" />
+																<a
+																	href={`tel:${organiser.phone}`}
+																	className="text-xs text-purple-600 dark:text-purple-300 hover:text-purple-800 dark:hover:text-purple-100 transition-colors "
+																	style={{ minWidth: 0, maxWidth: "100%" }}
+																>
+																	{organiser.phone}
+																</a>
+															</div>
 														</div>
 													</div>
 												</div>
