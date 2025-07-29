@@ -41,17 +41,17 @@ export default function NavBar() {
 	const getRoleColor = (role: string) => {
 		switch (role?.toLowerCase()) {
 			case "admin":
-				return "text-red-600";
+				return "text-red-700 dark:text-red-200";
 			case "moderator":
-				return "text-orange-600 dark:text-orange-400";
+				return "text-orange-700 dark:text-orange-200";
 			case "member":
-				return "text-green-600 dark:text-green-400";
+				return "text-green-700 dark:text-green-200";
 			case "developer":
-				return "text-purple-600 dark:text-purple-400";
+				return "text-purple-700 dark:text-purple-200";
 			case "cp":
-				return "text-cyan-600 dark:text-cyan-400";
+				return "text-cyan-700 dark:text-cyan-200";
 			case "user":
-				return "text-blue-600 dark:text-blue-400";
+				return "text-blue-700 dark:text-blue-200";
 			default:
 				return "text-gray-800 dark:text-white";
 		}
@@ -61,17 +61,17 @@ export default function NavBar() {
 		const baseClasses = "relative mr-3 drop-shadow-sm";
 		switch (role?.toLowerCase()) {
 			case "admin":
-				return `${baseClasses} text-red-600 dark:text-red-400`;
+				return `${baseClasses} text-red-700 dark:text-red-200`;
 			case "moderator":
-				return `${baseClasses} text-orange-600 dark:text-orange-400`;
+				return `${baseClasses} text-orange-700 dark:text-orange-200`;
 			case "member":
-				return `${baseClasses} text-green-600 dark:text-green-400`;
+				return `${baseClasses} text-green-700 dark:text-green-200`;
 			case "developer":
-				return `${baseClasses} text-purple-600 dark:text-purple-400`;
+				return `${baseClasses} text-purple-700 dark:text-purple-200`;
 			case "cp":
-				return `${baseClasses} text-cyan-600 dark:text-cyan-400`;
+				return `${baseClasses} text-cyan-700 dark:text-cyan-200`;
 			case "user":
-				return `${baseClasses} text-blue-600 dark:text-blue-400`;
+				return `${baseClasses} text-blue-700 dark:text-blue-200`;
 			default:
 				return `${baseClasses} text-gray-800 dark:text-white`;
 		}
