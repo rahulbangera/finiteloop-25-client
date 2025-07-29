@@ -392,6 +392,7 @@ export default function Profile({ userId }: { userId?: number }) {
 
 	const [socialName, setSocialName] = useState<string>("");
 	const [socialUrl, setSocialUrl] = useState<string>("");
+	const [socialUsername, setSocialUsername] = useState<string>("");
 	const [addingSocialLink, setAddingSocialLink] = useState(false);
 	const [removingLinkIndex, setRemovingLinkIndex] = useState<number | null>(
 		null,
@@ -1155,7 +1156,24 @@ export default function Profile({ userId }: { userId?: number }) {
 											<select
 												className="appearance-none px-3 sm:px-4 py-2 pr-8 rounded-lg sm:rounded-full bg-neutral-900 text-white border border-orange-400 focus:border-yellow-400 focus:outline-none transition-colors w-full focus:ring-2 focus:ring-orange-400/50 cursor-pointer text-sm sm:text-base"
 												value={socialName}
-												onChange={(e) => setSocialName(e.target.value)}
+												onChange={(e) => {
+													const platform = e.target.value;
+													setSocialName(platform);
+
+													setSocialUsername("");
+
+													if (platform && platform !== "portfolio") {
+														const platformUrls: Record<string, string> = {
+															instagram: "https://instagram.com/",
+															linkedin: "https://linkedin.com/in/",
+															github: "https://github.com/",
+															leetcode: "https://leetcode.com/u/",
+														};
+														setSocialUrl(platformUrls[platform] || "");
+													} else {
+														setSocialUrl("");
+													}
+												}}
 												disabled={addingSocialLink}
 											>
 												<option value="">Select Platform</option>
@@ -1180,14 +1198,56 @@ export default function Profile({ userId }: { userId?: number }) {
 												</svg>
 											</div>
 										</div>
-										<input
-											type="url"
-											className="px-3 sm:px-4 py-2 rounded-lg sm:rounded-full bg-neutral-900 text-white border border-orange-400 focus:border-yellow-400 focus:outline-none flex-1 transition-colors focus:ring-2 focus:ring-orange-400/50 text-sm sm:text-base"
-											placeholder="https://example.com/yourprofile"
-											value={socialUrl}
-											onChange={(e) => setSocialUrl(e.target.value)}
-											disabled={addingSocialLink}
-										/>
+
+										{socialName === "portfolio" ? (
+											<input
+												type="url"
+												className="px-3 sm:px-4 py-2 rounded-lg sm:rounded-full bg-neutral-900 text-white border border-orange-400 focus:border-yellow-400 focus:outline-none flex-1 transition-colors focus:ring-2 focus:ring-orange-400/50 text-sm sm:text-base"
+												placeholder="https://yourportfolio.com"
+												value={socialUrl}
+												onChange={(e) => setSocialUrl(e.target.value)}
+												disabled={addingSocialLink}
+											/>
+										) : socialName ? (
+											<div className="flex items-center rounded-lg sm:rounded-full bg-neutral-900 border border-orange-400 focus-within:border-yellow-400 focus-within:ring-2 focus-within:ring-orange-400/50 transition-colors overflow-hidden">
+												<span className="px-3 sm:px-4 py-2 text-gray-400 text-sm sm:text-base bg-neutral-800 border-r border-neutral-600 whitespace-nowrap">
+													{socialName === "instagram" &&
+														"https://instagram.com/"}
+													{socialName === "linkedin" &&
+														"https://linkedin.com/in/"}
+													{socialName === "github" && "https://github.com/"}
+													{socialName === "leetcode" &&
+														"https://leetcode.com/u/"}
+												</span>
+												<input
+													type="text"
+													className="px-3 sm:px-4 py-2 bg-transparent text-white focus:outline-none flex-1 text-sm sm:text-base"
+													placeholder="yourusername"
+													value={socialUsername}
+													onChange={(e) => {
+														const username = e.target.value;
+														setSocialUsername(username);
+
+														const platformUrls: Record<string, string> = {
+															instagram: "https://instagram.com/",
+															linkedin: "https://linkedin.com/in/",
+															github: "https://github.com/",
+															leetcode: "https://leetcode.com/u/",
+														};
+														setSocialUrl(platformUrls[socialName] + username);
+													}}
+													disabled={addingSocialLink}
+												/>
+											</div>
+										) : (
+											<input
+												type="url"
+												className="px-3 sm:px-4 py-2 rounded-lg sm:rounded-full bg-neutral-900 text-white border border-orange-400 focus:border-yellow-400 focus:outline-none flex-1 transition-colors focus:ring-2 focus:ring-orange-400/50 text-sm sm:text-base opacity-50"
+												placeholder="Select a platform first"
+												value=""
+												disabled={true}
+											/>
+										)}
 									</div>
 									<div className="flex justify-center">
 										<button
@@ -1196,6 +1256,14 @@ export default function Profile({ userId }: { userId?: number }) {
 											onClick={async () => {
 												if (!socialName || !socialUrl || !session?.user?.id)
 													return;
+
+												if (
+													socialName !== "portfolio" &&
+													!socialUsername.trim()
+												) {
+													toast.error("Please enter your username");
+													return;
+												}
 
 												if (
 													!socialUrl.startsWith("http://") &&
@@ -1247,6 +1315,7 @@ export default function Profile({ userId }: { userId?: number }) {
 													await update();
 													setSocialName("");
 													setSocialUrl("");
+													setSocialUsername("");
 													toast.success("Social link added successfully!");
 												} catch (err) {
 													toast.error(
@@ -1258,7 +1327,14 @@ export default function Profile({ userId }: { userId?: number }) {
 													setAddingSocialLink(false);
 												}
 											}}
-											disabled={!socialName || !socialUrl || addingSocialLink}
+											disabled={
+												!socialName ||
+												!socialUrl ||
+												addingSocialLink ||
+												(socialName !== "portfolio" &&
+													!!socialName &&
+													!socialUsername.trim())
+											}
 											title="Add Social Link"
 										>
 											{addingSocialLink ? (
