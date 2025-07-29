@@ -4,7 +4,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { FaGithub, FaGlobe, FaInstagram, FaLinkedin } from "react-icons/fa";
+import {
+	FaGithub,
+	FaGlobe,
+	FaInstagram,
+	FaLinkedin,
+	FaPencilAlt,
+} from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { SiLeetcode } from "react-icons/si";
 import { toast } from "react-toastify";
@@ -12,6 +18,8 @@ import { z } from "zod";
 import type { AppUser } from "@/lib/auth";
 import { Button } from "../ui/button";
 import { useWhatsAppShare, WHATSAPP_SHARE_CONFIG } from "./WhatsAppShare";
+import ImageSelector from "./ImageSelector";
+import ProfilePictureCropper from "./ProfilePictureCropper";
 
 function ProfileDetail({
 	label,
@@ -391,6 +399,10 @@ export default function Profile({ userId }: { userId?: number }) {
 	const [shareLoading, setShareLoading] = useState(false);
 	const [showShareOptions, setShowShareOptions] = useState(false);
 
+	const [showImageSelector, setShowImageSelector] = useState(false);
+	const [showImageCropper, setShowImageCropper] = useState(false);
+	const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
 	// Determine if we're viewing someone else's profile
 	const isViewingOtherProfile =
 		userId && userId !== parseInt(session?.user?.id || "0", 10);
@@ -610,6 +622,32 @@ export default function Profile({ userId }: { userId?: number }) {
 				branch: session.user.branch || "",
 			});
 		}
+	};
+
+	const handleProfilePictureEdit = () => {
+		setShowImageSelector(true);
+	};
+
+	const handleImageSelect = (imageSrc: string) => {
+		setSelectedImage(imageSrc);
+		setShowImageSelector(false);
+		setShowImageCropper(true);
+	};
+
+	const handleImageUpload = (_croppedImage: string) => {
+		alert("Image uploaded successfully!");
+		setShowImageCropper(false);
+		setSelectedImage(null);
+		// Actual Logic needs to be implemented here [Cloudinary Creds not present]
+	};
+
+	const handleCloseCropper = () => {
+		setShowImageCropper(false);
+		setSelectedImage(null);
+	};
+
+	const handleCloseImageSelector = () => {
+		setShowImageSelector(false);
 	};
 
 	const handleSave = async () => {
@@ -957,6 +995,17 @@ export default function Profile({ userId }: { userId?: number }) {
 										</div>
 									)}
 									<div className="absolute inset-0 rounded-full bg-gradient-to-tr from-orange-400/10 to-yellow-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+									{!isViewingOtherProfile && (
+										<button
+											type="button"
+											onClick={handleProfilePictureEdit}
+											className="absolute bottom-0 right-0 w-8 h-8 bg-gradient-to-r from-orange-500 to-yellow-400 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-200 border-2 border-white"
+											aria-label="Edit profile picture"
+										>
+											<FaPencilAlt className="w-3 h-3 text-white" />
+										</button>
+									)}
 								</div>
 							</div>
 
@@ -1403,6 +1452,19 @@ export default function Profile({ userId }: { userId?: number }) {
 				onSave={handleSave}
 				loading={loading}
 				branches={branches}
+			/>
+			<ImageSelector
+				isOpen={showImageSelector}
+				onClose={handleCloseImageSelector}
+				onImageSelect={handleImageSelect}
+				currentImage={currentUser?.image}
+			/>
+
+			<ProfilePictureCropper
+				isOpen={showImageCropper}
+				onClose={handleCloseCropper}
+				imageSrc={selectedImage}
+				onUpload={handleImageUpload}
 			/>
 		</section>
 	);
