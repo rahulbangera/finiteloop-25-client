@@ -47,7 +47,7 @@ export default function Team() {
 		{ id: "2025-26", label: "2025-26" },
 	];
 
-	const [selectedYear, setSelectedYear] = useState("2025");
+	const [selectedYear, setSelectedYear] = useState("2025-26");
 
 	useEffect(() => {
 		const fetchTeamMembers = async () => {
