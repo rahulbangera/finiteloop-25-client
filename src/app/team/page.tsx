@@ -29,20 +29,25 @@ interface APIResponse {
 }
 
 export default function Team() {
-	const [selectedYearIndex, setSelectedYearIndex] = useState(5);
 	const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
+	const [selectionType, setSelectionType] = useState<"year" | "faculty">(
+		"year",
+	);
+
 	const yearOptions = [
 		{ id: "2016-20", label: "2016-20" },
-		{ id: "2021", label: "2021" },
-		{ id: "2022", label: "2022" },
-		{ id: "2023", label: "2023" },
-		{ id: "2024", label: "2024" },
-		{ id: "2025", label: "2025" },
-		{ id: "faculty", label: "Faculty" },
+		{ id: "2020-21", label: "2020-21" },
+		{ id: "2021-22", label: "2021-22" },
+		{ id: "2022-23", label: "2022-23" },
+		{ id: "2023-24", label: "2023-24" },
+		{ id: "2024-25", label: "2024-25" },
+		{ id: "2025-26", label: "2025-26" },
 	];
+
+	const [selectedYear, setSelectedYear] = useState("2025-26");
 
 	useEffect(() => {
 		const fetchTeamMembers = async () => {
@@ -74,13 +79,17 @@ export default function Team() {
 		fetchTeamMembers();
 	}, []);
 
-	const selectedYear = yearOptions[selectedYearIndex].label;
-
 	const filteredMembers = teamMembers.filter((member) => {
-		if (selectedYear === "Faculty") {
+		if (selectionType === "faculty") {
 			return member.type === "FACULTY_COORDINATOR";
+		} else if (selectedYear === "2016-20") {
+			return (
+				member.year === "2017" ||
+				member.year === "2018" ||
+				member.year === "2019"
+			);
 		}
-		return member.year === selectedYear;
+		return member.year === selectedYear.slice(0, 4);
 	});
 
 	const getSocialLink = (
@@ -142,14 +151,17 @@ export default function Team() {
 					<div className="md:hidden mt-8 max-w-sm mx-auto space-y-3">
 						<div className="relative">
 							<select
-								value={selectedYearIndex}
-								onChange={(e) => setSelectedYearIndex(Number(e.target.value))}
-								className="w-full px-6 py-4 pr-12 rounded-2xl text-sm font-bold bg-gradient-to-br from-purple-500 via-indigo-600 to-blue-600 text-white border border-purple-400/50 shadow-[0_0_20px_rgba(139,92,246,0.4)] backdrop-blur-xl appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400 transition-all duration-300"
+								value={selectedYear}
+								onChange={(e) => {
+									setSelectionType("year");
+									setSelectedYear(e.target.value);
+								}}
+								className={`w-full px-6 py-4 pr-12 rounded-2xl text-sm font-bold text-white border border-purple-400/50 shadow-[0_0_20px_rgba(139,92,246,0.4)] backdrop-blur-xl appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400 transition-all duration-300 ${selectionType === "year" ? "bg-gradient-to-br from-purple-500 via-indigo-600 to-blue-600" : ""}`}
 							>
-								{yearOptions.slice(0, -1).map((year, index) => (
+								{yearOptions.map((year, index) => (
 									<option
 										key={year.id}
-										value={index}
+										value={year.label}
 										className="bg-slate-800 text-white"
 									>
 										{year.label}
@@ -176,9 +188,9 @@ export default function Team() {
 
 						<button
 							type="button"
-							onClick={() => setSelectedYearIndex(yearOptions.length - 1)}
+							onClick={() => setSelectionType("faculty")}
 							className={`w-full group relative px-6 py-4 rounded-2xl text-sm font-bold transition-all duration-500 backdrop-blur-xl border overflow-hidden ${
-								selectedYearIndex === yearOptions.length - 1
+								selectionType === "faculty"
 									? "bg-gradient-to-br from-amber-500 via-orange-600 to-red-600 text-white border-amber-400/50 shadow-[0_0_20px_rgba(245,158,11,0.4)] scale-105"
 									: "bg-white/20 dark:bg-white/5 text-gray-700 dark:text-gray-300 border-white/30 dark:border-white/10 hover:bg-white/30 dark:hover:bg-white/10 hover:border-amber-300/50 dark:hover:border-amber-400/30 hover:scale-105"
 							}`}
@@ -190,14 +202,17 @@ export default function Team() {
 					<div className="hidden md:flex justify-center gap-4 mt-8 max-w-4xl mx-auto">
 						<div className="relative">
 							<select
-								value={selectedYearIndex}
-								onChange={(e) => setSelectedYearIndex(Number(e.target.value))}
-								className="px-8 py-4 pr-12 rounded-2xl text-sm font-bold bg-gradient-to-br from-purple-500 via-indigo-600 to-blue-600 text-white border border-purple-400/50 shadow-[0_0_20px_rgba(139,92,246,0.4)] backdrop-blur-xl appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400 min-w-[200px] transition-all duration-300"
+								value={selectedYear}
+								onChange={(e) => {
+									setSelectionType("year");
+									setSelectedYear(e.target.value);
+								}}
+								className={`px-8 py-4 pr-12 rounded-2xl text-sm font-bold bg-gradient-to-br text-white border border-purple-400/50 shadow-[0_0_20px_rgba(139,92,246,0.4)] backdrop-blur-xl appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400 min-w-[200px] transition-all duration-300 ${selectionType === "year" ? "bg-gradient-to-br from-purple-500 via-indigo-600 to-blue-600" : ""}`}
 							>
-								{yearOptions.slice(0, -1).map((year, index) => (
+								{yearOptions.map((year, index) => (
 									<option
 										key={year.id}
-										value={index}
+										value={year.label}
 										className="bg-slate-800 text-white"
 									>
 										{year.label}
@@ -224,26 +239,28 @@ export default function Team() {
 
 						<button
 							type="button"
-							onClick={() => setSelectedYearIndex(yearOptions.length - 1)}
+							onClick={() => {
+								setSelectionType("faculty");
+							}}
 							className={`group relative px-8 py-4 rounded-2xl text-sm font-bold transition-all duration-500 backdrop-blur-xl border overflow-hidden ${
-								selectedYearIndex === yearOptions.length - 1
+								selectionType === "faculty"
 									? "bg-gradient-to-br from-amber-500 via-orange-600 to-red-600 text-white border-amber-400/50 shadow-[0_0_20px_rgba(245,158,11,0.4),0_0_40px_rgba(251,146,60,0.2)] scale-105"
 									: "bg-white/20 dark:bg-white/5 text-gray-700 dark:text-gray-300 border-white/30 dark:border-white/10 hover:bg-white/30 dark:hover:bg-white/10 hover:border-amber-300/50 dark:hover:border-amber-400/30 hover:scale-105 hover:shadow-[0_0_15px_rgba(245,158,11,0.2)]"
 							}`}
 						>
 							<div
 								className={`absolute inset-0 rounded-2xl transition-opacity duration-500 ${
-									selectedYearIndex === yearOptions.length - 1
+									selectionType === "faculty"
 										? "bg-gradient-to-br from-amber-400/20 via-orange-500/20 to-red-500/20 opacity-100"
 										: "bg-gradient-to-br from-amber-300/10 via-orange-300/10 to-red-300/10 opacity-0 group-hover:opacity-100"
 								}`}
 							></div>
 
-							{selectedYearIndex === yearOptions.length - 1 && (
+							{selectionType === "faculty" && (
 								<div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 opacity-30 animate-pulse"></div>
 							)}
 
-							{selectedYearIndex === yearOptions.length - 1 && (
+							{selectionType === "faculty" && (
 								<>
 									<div className="absolute top-2 right-2 w-1 h-1 bg-white/80 rounded-full animate-ping"></div>
 									<div className="absolute bottom-2 left-2 w-1.5 h-1.5 bg-white/60 rounded-full animate-pulse delay-300"></div>
