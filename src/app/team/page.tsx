@@ -39,12 +39,12 @@ export default function Team() {
 
 	const yearOptions = [
 		{ id: "2016-20", label: "2016-20" },
-		{ id: "2020", label: "2020" },
-		{ id: "2021", label: "2021" },
-		{ id: "2022", label: "2022" },
-		{ id: "2023", label: "2023" },
-		{ id: "2024", label: "2024" },
-		{ id: "2025", label: "2025" },
+		{ id: "2020-21", label: "2020-21" },
+		{ id: "2021-22", label: "2021-22" },
+		{ id: "2022-23", label: "2022-23" },
+		{ id: "2023-24", label: "2023-24" },
+		{ id: "2024-25", label: "2024-25" },
+		{ id: "2025-26", label: "2025-26" },
 	];
 
 	const [selectedYear, setSelectedYear] = useState("2025");
@@ -89,7 +89,7 @@ export default function Team() {
 				member.year === "2019"
 			);
 		}
-		return member.year === selectedYear;
+		return member.year === selectedYear.slice(0, 4);
 	});
 
 	const getSocialLink = (
