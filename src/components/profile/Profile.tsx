@@ -35,11 +35,11 @@ function ProfileDetail({
 	const hasValue = value && value.trim() !== "";
 
 	return (
-		<div className="interactive bg-gradient-to-tr from-neutral-800 to-neutral-900 border border-neutral-700 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 shadow-sm hover:border-orange-400 hover:shadow-md transition-all duration-200">
-			<div className="text-xs text-gray-400 uppercase font-semibold mb-1 tracking-wide">
+		<div className="interactive bg-gradient-to-tr from-neutral-800 to-neutral-900 border border-neutral-700 rounded-lg sm:rounded-xl px-4 py-4 shadow-sm hover:border-orange-400 hover:shadow-md transition-all duration-200">
+			<div className="text-xs text-gray-400 uppercase font-semibold mb-2 tracking-wide">
 				{label}
 			</div>
-			<div className="text-sm sm:text-base font-medium break-words">
+			<div className="text-sm sm:text-base font-medium break-words leading-relaxed">
 				{hasValue ? (
 					<span className="text-white">{value}</span>
 				) : (
@@ -907,7 +907,7 @@ export default function Profile({ userId }: { userId?: number }) {
 	return (
 		<section className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 px-3 sm:px-4 py-4 sm:py-6 md:py-10 max-w-full sm:max-w-4xl lg:max-w-6xl mx-auto mt-16 sm:mt-20 animate-fade-in">
 			<div className="card profile-card bg-gradient-to-tr from-white/20 via-white/10 to-white/5 dark:from-neutral-900/40 dark:to-neutral-800/20 border border-black dark:border-white rounded-xl sm:rounded-2xl overflow-hidden shadow transition backdrop-blur-sm relative">
-				<div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 flex gap-2">
+				<div className="absolute top-3 right-6 sm:top-4 sm:right-8 z-10 flex gap-2">
 					{!isViewingOtherProfile && (
 						<button
 							type="button"
@@ -1071,120 +1071,118 @@ export default function Profile({ userId }: { userId?: number }) {
 					</div>
 				</div>
 
-				<div className="p-4 sm:p-5 md:p-8 space-y-4 sm:space-y-6 text-black dark:text-white">
-					<div className="flex flex-col gap-4 sm:gap-6">
-						<div className="flex flex-col sm:flex-row items-center sm:items-center gap-6 pt-8 sm:pt-0">
-							<div className="relative flex-shrink-0">
-								<div className="relative group">
-									{currentUser?.image ? (
-										<Image
-											src={currentUser.image}
-											alt="Profile"
-											width={120}
-											height={120}
-											className="w-24 h-24 sm:w-28 sm:h-28 md:w-30 md:h-30 rounded-full border-4 border-orange-400 object-cover shadow-lg transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl"
-											priority
-										/>
-									) : (
-										<div className="w-24 h-24 sm:w-28 sm:h-28 md:w-30 md:h-30 rounded-full border-4 border-orange-400 bg-gradient-to-br from-orange-500 to-yellow-400 flex items-center justify-center shadow-lg transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl">
-											<span className="text-white text-2xl sm:text-3xl md:text-4xl font-bold">
-												{getInitialAvatar(currentUser?.name || "U")}
-											</span>
-										</div>
-									)}
-									<div className="absolute inset-0 rounded-full bg-gradient-to-tr from-orange-400/10 to-yellow-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+				<div className="p-4 sm:p-5 md:p-8 pt-16 sm:pt-20 lg:pt-24 text-black dark:text-white">
+					<div className="flex flex-col lg:flex-row items-center lg:items-center gap-6 mb-8 pr-0 lg:pr-32 xl:pr-40">
+						<div className="relative flex-shrink-0">
+							<div className="relative group">
+								{currentUser?.image ? (
+									<Image
+										src={currentUser.image}
+										alt="Profile"
+										width={120}
+										height={120}
+										className="w-28 h-28 sm:w-32 sm:h-32 lg:w-36 lg:h-36 xl:w-40 xl:h-40 rounded-full border-4 border-orange-400 object-cover shadow-lg transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl"
+										priority
+									/>
+								) : (
+									<div className="w-28 h-28 sm:w-32 sm:h-32 lg:w-36 lg:h-36 xl:w-40 xl:h-40 rounded-full border-4 border-orange-400 bg-gradient-to-br from-orange-500 to-yellow-400 flex items-center justify-center shadow-lg transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl">
+										<span className="text-white text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold">
+											{getInitialAvatar(currentUser?.name || "U")}
+										</span>
+									</div>
+								)}
+								<div className="absolute inset-0 rounded-full bg-gradient-to-tr from-orange-400/10 to-yellow-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
-									{!isViewingOtherProfile && (
-										<button
-											type="button"
-											onClick={handleProfilePictureEdit}
-											disabled={loading}
-											className="absolute bottom-0 right-0 w-8 h-8 bg-gradient-to-r from-orange-500 to-yellow-400 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-200 border-2 border-white disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-											aria-label="Edit profile picture"
-										>
-											{loading ? (
-												<div className="animate-spin rounded-full h-3 w-3 border border-white border-t-transparent"></div>
-											) : (
-												<FaPencilAlt className="w-3 h-3 text-white" />
-											)}
-										</button>
-									)}
-								</div>
-							</div>
-
-							<div className="flex flex-col items-center sm:items-start flex-1 min-w-0 text-center sm:text-left">
-								<h1 className="text-2xl sm:text-3xl md:text-3xl font-bold mb-2 dark:text-white text-black/85">
-									{currentUser?.name}
-								</h1>
-								<span
-									className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 border backdrop-blur-sm
-										${
-											getRoleName(currentUser) === "ADMIN"
-												? "bg-red-500/20 border-red-400/50 text-red-700 dark:text-red-200 hover:bg-red-500/30 hover:border-red-400/70"
-												: getRoleName(currentUser) === "MODERATOR"
-													? "bg-orange-500/20 border-orange-400/50 text-orange-700 dark:text-orange-200 hover:bg-orange-500/30 hover:border-orange-400/70"
-													: getRoleName(currentUser) === "MEMBER"
-														? "bg-emerald-500/20 border-emerald-400/50 text-emerald-700 dark:text-emerald-200 hover:bg-emerald-500/30 hover:border-emerald-400/70"
-														: getRoleName(currentUser) === "DEVELOPER"
-															? "bg-purple-500/20 border-purple-400/50 text-purple-700 dark:text-purple-200 hover:bg-purple-500/30 hover:border-purple-400/70"
-															: getRoleName(currentUser) === "CP"
-																? "bg-yellow-500/20 border-yellow-400/50 text-yellow-700 dark:text-yellow-200 hover:bg-yellow-500/30 hover:border-yellow-400/70"
-																: getRoleName(currentUser) === "USER"
-																	? "bg-blue-500/20 border-blue-400/50 text-blue-700 dark:text-blue-200 hover:bg-blue-500/30 hover:border-blue-400/70"
-																	: "bg-slate-500/20 border-slate-400/50 text-slate-700 dark:text-slate-200 hover:bg-slate-500/30 hover:border-slate-400/70"
-										}`}
-									title={`Role: ${getRoleName(currentUser)}`}
-								>
-									<div
-										className={`w-2 h-2 rounded-full ${
-											getRoleName(currentUser) === "ADMIN"
-												? "bg-red-400"
-												: getRoleName(currentUser) === "MODERATOR"
-													? "bg-orange-400"
-													: getRoleName(currentUser) === "MEMBER"
-														? "bg-emerald-400"
-														: getRoleName(currentUser) === "DEVELOPER"
-															? "bg-purple-400"
-															: getRoleName(currentUser) === "CP"
-																? "bg-yellow-400"
-																: getRoleName(currentUser) === "USER"
-																	? "bg-blue-400"
-																	: "bg-slate-400"
-										}`}
-									></div>
-									<span className="font-semibold text-xs uppercase tracking-wider">
-										{getRoleName(currentUser) === "ADMIN"
-											? "Admin"
-											: getRoleName(currentUser) === "MODERATOR"
-												? "Moderator"
-												: getRoleName(currentUser) === "MEMBER"
-													? "Member"
-													: getRoleName(currentUser) === "DEVELOPER"
-														? "Developer"
-														: getRoleName(currentUser) === "CP"
-															? "CP"
-															: getRoleName(currentUser) === "USER"
-																? "User"
-																: getRoleName(currentUser)}
-									</span>
-								</span>
+								{!isViewingOtherProfile && (
+									<button
+										type="button"
+										onClick={handleProfilePictureEdit}
+										disabled={loading}
+										className="absolute bottom-0 right-0 w-8 h-8 sm:w-9 sm:h-9 lg:w-10 lg:h-10 bg-gradient-to-r from-orange-500 to-yellow-400 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-200 border-2 border-white disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+										aria-label="Edit profile picture"
+									>
+										{loading ? (
+											<div className="animate-spin rounded-full h-3 w-3 lg:h-4 lg:w-4 border border-white border-t-transparent"></div>
+										) : (
+											<FaPencilAlt className="w-3 h-3 lg:w-4 lg:h-4 text-white" />
+										)}
+									</button>
+								)}
 							</div>
 						</div>
 
-						{!isViewingOtherProfile && getRoleName(currentUser) === "USER" && (
-							<div className="flex justify-center">
-								<Button
-									onClick={() => router.push("/auth/join-flc")}
-									className="w-full px-6 py-4 rounded-2xl text-sm font-bold bg-gradient-to-br from-purple-500 via-indigo-600 to-blue-600 hover:from-purple-600 hover:via-indigo-700 hover:to-blue-700 text-white border border-purple-400/50 shadow-[0_0_30px_rgba(139,92,246,0.5)] backdrop-blur-xl appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400"
-								>
-									Register Now
-								</Button>
-							</div>
-						)}
+						<div className="flex flex-col items-center lg:items-start justify-center flex-1 min-w-0 text-center lg:text-left max-w-full lg:max-w-[calc(100%-8rem)]">
+							<h1 className="text-2xl sm:text-3xl lg:text-2xl xl:text-3xl font-bold mb-3 dark:text-white text-black/85 leading-tight whitespace-nowrap w-full">
+								{currentUser?.name}
+							</h1>
+							<span
+								className={`inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 border backdrop-blur-sm
+									${
+										getRoleName(currentUser) === "ADMIN"
+											? "bg-red-500/20 border-red-400/50 text-red-700 dark:text-red-200 hover:bg-red-500/30 hover:border-red-400/70"
+											: getRoleName(currentUser) === "MODERATOR"
+												? "bg-orange-500/20 border-orange-400/50 text-orange-700 dark:text-orange-200 hover:bg-orange-500/30 hover:border-orange-400/70"
+												: getRoleName(currentUser) === "MEMBER"
+													? "bg-emerald-500/20 border-emerald-400/50 text-emerald-700 dark:text-emerald-200 hover:bg-emerald-500/30 hover:border-emerald-400/70"
+													: getRoleName(currentUser) === "DEVELOPER"
+														? "bg-purple-500/20 border-purple-400/50 text-purple-700 dark:text-purple-200 hover:bg-purple-500/30 hover:border-purple-400/70"
+														: getRoleName(currentUser) === "CP"
+															? "bg-yellow-500/20 border-yellow-400/50 text-yellow-700 dark:text-yellow-200 hover:bg-yellow-500/30 hover:border-yellow-400/70"
+															: getRoleName(currentUser) === "USER"
+																? "bg-blue-500/20 border-blue-400/50 text-blue-700 dark:text-blue-200 hover:bg-blue-500/30 hover:border-blue-400/70"
+																: "bg-slate-500/20 border-slate-400/50 text-slate-700 dark:text-slate-200 hover:bg-slate-500/30 hover:border-slate-400/70"
+									}`}
+								title={`Role: ${getRoleName(currentUser)}`}
+							>
+								<div
+									className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${
+										getRoleName(currentUser) === "ADMIN"
+											? "bg-red-400"
+											: getRoleName(currentUser) === "MODERATOR"
+												? "bg-orange-400"
+												: getRoleName(currentUser) === "MEMBER"
+													? "bg-emerald-400"
+													: getRoleName(currentUser) === "DEVELOPER"
+														? "bg-purple-400"
+														: getRoleName(currentUser) === "CP"
+															? "bg-yellow-400"
+															: getRoleName(currentUser) === "USER"
+																? "bg-blue-400"
+																: "bg-slate-400"
+									}`}
+								></div>
+								<span className="font-semibold text-xs uppercase tracking-wider">
+									{getRoleName(currentUser) === "ADMIN"
+										? "Admin"
+										: getRoleName(currentUser) === "MODERATOR"
+											? "Moderator"
+											: getRoleName(currentUser) === "MEMBER"
+												? "Member"
+												: getRoleName(currentUser) === "DEVELOPER"
+													? "Developer"
+													: getRoleName(currentUser) === "CP"
+														? "CP"
+														: getRoleName(currentUser) === "USER"
+															? "User"
+															: getRoleName(currentUser)}
+								</span>
+							</span>
+						</div>
 					</div>
 
-					<div className="space-y-3 sm:space-y-4">
-						<div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+					{!isViewingOtherProfile && getRoleName(currentUser) === "USER" && (
+						<div className="mb-8">
+							<Button
+								onClick={() => router.push("/auth/join-flc")}
+								className="w-full px-6 py-4 rounded-2xl text-sm font-bold bg-gradient-to-br from-purple-500 via-indigo-600 to-blue-600 hover:from-purple-600 hover:via-indigo-700 hover:to-blue-700 text-white border border-purple-400/50 shadow-[0_0_30px_rgba(139,92,246,0.5)] backdrop-blur-xl appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400"
+							>
+								Register Now
+							</Button>
+						</div>
+					)}
+
+					<div className="space-y-5">
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 							<ProfileDetail
 								label="USN"
 								value={`${currentUser?.usn || ""}`}
@@ -1206,11 +1204,11 @@ export default function Profile({ userId }: { userId?: number }) {
 							userName={currentUser?.name || "This user"}
 						/>
 
-						<div className="interactive bg-gradient-to-tr from-neutral-800 to-neutral-900 border border-neutral-700 rounded-lg sm:rounded-xl px-3 sm:px-4 py-4 sm:py-6 shadow-sm hover:border-orange-400 hover:shadow-md transition-all duration-200">
-							<div className="text-xs text-gray-400 uppercase font-semibold mb-2 sm:mb-3 tracking-wide">
+						<div className="interactive bg-gradient-to-tr from-neutral-800 to-neutral-900 border border-neutral-700 rounded-lg sm:rounded-xl px-4 py-5 shadow-sm hover:border-orange-400 hover:shadow-md transition-all duration-200">
+							<div className="text-xs text-gray-400 uppercase font-semibold mb-3 tracking-wide">
 								Bio
 							</div>
-							<div className="text-sm sm:text-base font-medium break-words leading-relaxed min-h-[60px] sm:min-h-[80px]">
+							<div className="text-sm sm:text-base font-medium break-words leading-relaxed min-h-[80px]">
 								{currentUser?.bio?.trim() ? (
 									<p className="whitespace-pre-wrap text-white">
 										{currentUser.bio}
@@ -1398,33 +1396,33 @@ export default function Profile({ userId }: { userId?: number }) {
 							</h5>
 
 							{getUserLinks(currentUser).length > 0 ? (
-								<div className="grid grid-cols-1 gap-2 sm:gap-3">
+								<div className="grid grid-cols-2 gap-2 sm:gap-3">
 									{getUserLinks(currentUser).map(
 										(link: { linkName: string; url: string }, idx: number) => {
 											const icons: Record<string, React.JSX.Element> = {
 												instagram: (
-													<div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-tr from-pink-500 via-red-500 to-yellow-500 flex items-center justify-center shadow-lg">
-														<FaInstagram className="text-white text-sm sm:text-lg" />
+													<div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-gradient-to-tr from-pink-500 via-red-500 to-yellow-500 flex items-center justify-center shadow-lg">
+														<FaInstagram className="text-white text-xs sm:text-sm" />
 													</div>
 												),
 												linkedin: (
-													<div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-tr from-blue-600 to-blue-700 flex items-center justify-center shadow-lg">
-														<FaLinkedin className="text-white text-sm sm:text-lg" />
+													<div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-gradient-to-tr from-blue-600 to-blue-700 flex items-center justify-center shadow-lg">
+														<FaLinkedin className="text-white text-xs sm:text-sm" />
 													</div>
 												),
 												github: (
-													<div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-tr from-gray-800 to-gray-900 flex items-center justify-center shadow-lg">
-														<FaGithub className="text-white text-sm sm:text-lg" />
+													<div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-gradient-to-tr from-gray-800 to-gray-900 flex items-center justify-center shadow-lg">
+														<FaGithub className="text-white text-xs sm:text-sm" />
 													</div>
 												),
 												portfolio: (
-													<div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-tr from-orange-500 to-yellow-500 flex items-center justify-center shadow-lg">
-														<FaGlobe className="text-white text-sm sm:text-lg" />
+													<div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-gradient-to-tr from-orange-500 to-yellow-500 flex items-center justify-center shadow-lg">
+														<FaGlobe className="text-white text-xs sm:text-sm" />
 													</div>
 												),
 												leetcode: (
-													<div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-tr from-yellow-500 to-orange-500 flex items-center justify-center shadow-lg">
-														<SiLeetcode className="text-white text-sm sm:text-lg" />
+													<div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-gradient-to-tr from-yellow-500 to-orange-500 flex items-center justify-center shadow-lg">
+														<SiLeetcode className="text-white text-xs sm:text-sm" />
 													</div>
 												),
 											};
@@ -1440,18 +1438,18 @@ export default function Profile({ userId }: { userId?: number }) {
 											return (
 												<div
 													key={`${link.linkName}-${link.url}`}
-													className="flex items-center bg-gradient-to-r from-neutral-800/80 to-neutral-900/80 backdrop-blur-sm border border-neutral-700/50 hover:border-orange-400/50 rounded-xl sm:rounded-2xl p-3 sm:p-4 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] group"
+													className="flex items-center bg-gradient-to-r from-neutral-800/80 to-neutral-900/80 backdrop-blur-sm border border-neutral-700/50 hover:border-orange-400/50 rounded-xl sm:rounded-2xl p-2 sm:p-3 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] group"
 												>
 													<a
 														href={link.url}
 														target="_blank"
 														rel="noopener noreferrer"
-														className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0 transition-all duration-200"
+														className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0 transition-all duration-200"
 														title={`Visit ${platformNames[link.linkName.toLowerCase()] || link.linkName} profile`}
 													>
 														{icons[link.linkName.toLowerCase()] || (
-															<div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-tr from-gray-600 to-gray-700 flex items-center justify-center shadow-lg flex-shrink-0">
-																<FaGlobe className="text-white text-sm sm:text-lg" />
+															<div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-gradient-to-tr from-gray-600 to-gray-700 flex items-center justify-center shadow-lg flex-shrink-0">
+																<FaGlobe className="text-white text-xs sm:text-sm" />
 															</div>
 														)}
 														<div className="flex flex-col min-w-0 flex-1">
@@ -1459,7 +1457,7 @@ export default function Profile({ userId }: { userId?: number }) {
 																{platformNames[link.linkName.toLowerCase()] ||
 																	link.linkName}
 															</span>
-															<span className="text-xs text-gray-400 truncate max-w-[100px] sm:max-w-[120px]">
+															<span className="text-xs text-gray-400 truncate max-w-[80px] sm:max-w-[100px]">
 																{
 																	link.url
 																		.replace(/^https?:\/\//, "")
@@ -1469,13 +1467,13 @@ export default function Profile({ userId }: { userId?: number }) {
 														</div>
 														<div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex-shrink-0 hidden sm:block">
 															<svg
-																width="14"
-																height="14"
+																width="12"
+																height="12"
 																viewBox="0 0 24 24"
 																fill="none"
 																stroke="currentColor"
 																strokeWidth="2"
-																className="text-orange-400 sm:w-4 sm:h-4"
+																className="text-orange-400"
 															>
 																<title>External Link</title>
 																<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
@@ -1485,18 +1483,18 @@ export default function Profile({ userId }: { userId?: number }) {
 														</div>
 													</a>
 													{!isViewingOtherProfile && (
-														<div className="flex items-center ml-1 sm:ml-2">
+														<div className="flex items-center ml-1">
 															<button
 																type="button"
 																onClick={() => handleRemoveSocial(idx)}
-																className="w-7 h-7 sm:w-9 sm:h-9 flex items-center justify-center rounded-lg sm:rounded-xl transition-all duration-200 hover:bg-red-500/20 disabled:opacity-50 group-hover:scale-110 border border-transparent hover:border-red-500/30"
+																className="w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg sm:rounded-xl transition-all duration-200 hover:bg-red-500/20 disabled:opacity-50 group-hover:scale-110 border border-transparent hover:border-red-500/30"
 																title="Remove link"
 																disabled={removingLinkIndex === idx}
 															>
 																{removingLinkIndex === idx ? (
 																	<div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-red-400 border-t-transparent"></div>
 																) : (
-																	<MdDelete className="text-red-400 hover:text-red-300 text-base sm:text-lg transition-colors" />
+																	<MdDelete className="text-red-400 hover:text-red-300 text-sm sm:text-base transition-colors" />
 																)}
 															</button>
 														</div>
