@@ -634,11 +634,109 @@ export default function Profile({ userId }: { userId?: number }) {
 		setShowImageCropper(true);
 	};
 
-	const handleImageUpload = (_croppedImage: string) => {
-		alert("Image uploaded successfully!");
-		setShowImageCropper(false);
-		setSelectedImage(null);
-		// Actual Logic needs to be implemented here [Cloudinary Creds not present]
+	const handleImageUpload = async (croppedImage: string) => {
+		if (!session?.user?.id) {
+			toast.error("User not authenticated");
+			return;
+		}
+
+		try {
+			setLoading(true);
+
+			const signatureResponse = await fetch("/api/cloudinary/signature", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					userId: session.user.id,
+				}),
+			});
+
+			const signatureData = await signatureResponse.json();
+
+			if (!signatureData.success) {
+				throw new Error(
+					signatureData.message || "Failed to get upload signature",
+				);
+			}
+
+			const response = await fetch(croppedImage);
+			const blob = await response.blob();
+
+			const formData = new FormData();
+			formData.append("file", blob);
+			formData.append("api_key", signatureData.apiKey);
+			formData.append("timestamp", signatureData.timestamp);
+			formData.append("signature", signatureData.signature);
+			formData.append("public_id", signatureData.publicId);
+			formData.append("folder", signatureData.folder);
+			formData.append("transformation", "w_400,h_400,c_fill,q_auto");
+			formData.append("overwrite", "true");
+
+			const uploadResponse = await fetch(
+				`https://api.cloudinary.com/v1_1/${signatureData.cloudName}/image/upload`,
+				{
+					method: "POST",
+					body: formData,
+				},
+			);
+
+			const uploadData = await uploadResponse.json();
+
+			if (!uploadResponse.ok) {
+				throw new Error(uploadData.error?.message || "Failed to upload image");
+			}
+
+			const updateResponse = await fetch(
+				`${process.env.NEXT_PUBLIC_SERVER_URL}/api/user/updatepfp`,
+				{
+					method: "PATCH",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${session.user.accessToken}`,
+					},
+					body: JSON.stringify({
+						imageUrl: uploadData.secure_url,
+					}),
+				},
+			);
+
+			const updateData = await updateResponse.json();
+
+			if (updateData.success) {
+				toast.success("Profile picture updated successfully!");
+
+				await update();
+
+				if (session?.user) {
+					const userRes = await fetch(
+						`${process.env.NEXT_PUBLIC_SERVER_URL}/api/user/searchbyId`,
+						{
+							method: "POST",
+							headers: { "Content-Type": "application/json" },
+							body: JSON.stringify({ userId: session.user.id }),
+						},
+					);
+					if (userRes.ok) {
+						await userRes.json();
+					}
+				}
+			} else {
+				throw new Error(updateData.error || "Failed to update profile picture");
+			}
+		} catch (error) {
+			console.error("Error uploading image:", error);
+			toast.error(
+				error instanceof Error
+					? error.message
+					: "Failed to upload image. Please try again.",
+			);
+		} finally {
+			setLoading(false);
+			setShowImageCropper(false);
+			setSelectedImage(null);
+		}
 	};
 
 	const handleCloseCropper = () => {
@@ -1000,10 +1098,15 @@ export default function Profile({ userId }: { userId?: number }) {
 										<button
 											type="button"
 											onClick={handleProfilePictureEdit}
-											className="absolute bottom-0 right-0 w-8 h-8 bg-gradient-to-r from-orange-500 to-yellow-400 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-200 border-2 border-white"
+											disabled={loading}
+											className="absolute bottom-0 right-0 w-8 h-8 bg-gradient-to-r from-orange-500 to-yellow-400 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-200 border-2 border-white disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
 											aria-label="Edit profile picture"
 										>
-											<FaPencilAlt className="w-3 h-3 text-white" />
+											{loading ? (
+												<div className="animate-spin rounded-full h-3 w-3 border border-white border-t-transparent"></div>
+											) : (
+												<FaPencilAlt className="w-3 h-3 text-white" />
+											)}
 										</button>
 									)}
 								</div>
