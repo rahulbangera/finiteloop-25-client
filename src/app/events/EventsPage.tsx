@@ -588,7 +588,11 @@ const EventsPage = () => {
 				toast.error(json.error || "Failed to remove member");
 			}
 		} catch (error) {
-			toast.error("Error removing member");
+			const errorMessage =
+				typeof error === "object" && error !== null && "message" in error
+					? (error as { message?: string }).message
+					: String(error);
+			toast.error(`Error removing member: ${errorMessage}`);
 		}
 	};
 
