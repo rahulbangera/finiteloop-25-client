@@ -140,8 +140,8 @@ export default function Team() {
 	return (
 		<main className="min-h-screen px-4 relative mb-20">
 			<div className="max-w-7xl mx-auto relative z-10">
-				<div className="text-center mb-16 mt-32 md:mt-20">
-					<h1 className="lilita-font text-6xl md:text-7xl lg:text-8xl font-bold text-flc-yellow relative select-none">
+				<div className="text-center">
+					<h1 className="lilita-font text-6xl md:text-7xl lg:text-8xl font-bold text-flc-yellow relative mt-32 md:mt-20 select-none">
 						MEET THE TEAM
 					</h1>
 					<p className="comic-font text-lg md:text-xl lg:text-2xl text-gray-700 dark:text-gray-300 mt-6 max-w-2xl mx-auto font-medium">
