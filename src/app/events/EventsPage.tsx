@@ -1466,7 +1466,7 @@ const EventsPage = () => {
 
 	return (
 		<div className="p-4 md:p-8 h-full w-full bg-transparent flex flex-col items-center justify-center overflow-x-hidden overflow-y-auto mb-20">
-			<div className="lilita-font text-6xl md:text-7xl lg:text-8xl font-bold text-flc-yellow relative mt-28 select-none text-center w-full">
+			<div className="lilita-font text-6xl md:text-7xl lg:text-8xl font-bold text-flc-yellow relative mt-28 select-none text-center w-full mb-5">
 				Events
 			</div>
 			<div
@@ -1507,7 +1507,7 @@ const EventsPage = () => {
 			</div>
 			<div
 				key={selectedYearData.year}
-				className="w-[90%] grid justify-center items-stretch grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mt-2 md:mt-5 md:px-0"
+				className="w-full md:w-[90%] grid justify-center items-stretch grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mt-2 md:mt-5 md:px-0"
 				style={{
 					gridAutoRows: "minmax(400px, 1fr)",
 					display: "grid",

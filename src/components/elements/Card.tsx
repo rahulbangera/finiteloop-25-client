@@ -11,7 +11,7 @@ export default function Card({ image, children, className }: CardProps) {
 	return (
 		<div
 			className={cn(
-				"h-full min-w-[20rem] md:min-w-[22rem] mx-auto rounded-3xl p-1.5 shadow-[0_15px_30px_-5px_rgba(151,65,252,0.2)] bg-[linear-gradient(144deg,#FBCFF4,#E4CCF8,#C4E2F7,#FEF9FF)] dark:bg-[linear-gradient(144deg,#7F439D,#33107C,#060329)] transition-transform hover:-translate-y-1 duration-200",
+				"h-full min-w-[100%] md:min-w-[22rem] mx-auto rounded-3xl p-1.5 shadow-[0_15px_30px_-5px_rgba(151,65,252,0.2)] bg-[linear-gradient(144deg,#FBCFF4,#E4CCF8,#C4E2F7,#FEF9FF)] dark:bg-[linear-gradient(144deg,#7F439D,#33107C,#060329)] transition-transform hover:-translate-y-1 duration-200",
 				className,
 			)}
 		>
