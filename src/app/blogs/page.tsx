@@ -48,9 +48,9 @@ export default function BlogsPage() {
 	}, []);
 
 	return (
-		<main className="min-h-screen mt-16 md:mt-32 mb-16 p-4 md:p-6">
-			<h1 className="lilith-font text-5xl md:text-7xl font-extrabold text-flc-yellow mb-2 text-center lilita-font">
-				Blogs
+		<main className="min-h-screen mb-16 p-4 md:p-6">
+			<h1 className="lilith-font text-6xl md:text-7xl lg:text-8xl font-extrabold text-flc-yellow mb-2 mt-32 md:mt-20 text-center lilita-font">
+				BLOGS
 			</h1>
 			<p className="text-base sm:text-lg text-purple-900 dark:text-purple-100 mb-8 md:mb-12 text-center">
 				Welcome to the blogs page. Explore our latest articles!

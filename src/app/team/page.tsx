@@ -141,7 +141,7 @@ export default function Team() {
 		<main className="min-h-screen py-20 px-4 relative">
 			<div className="max-w-7xl mx-auto relative z-10">
 				<div className="text-center mb-16">
-					<h1 className="lilita-font text-6xl md:text-7xl lg:text-8xl font-bold text-flc-yellow relative mt-8 select-none">
+					<h1 className="lilita-font text-6xl md:text-7xl lg:text-8xl font-bold text-flc-yellow relative mt-32 md:mt-20 select-none">
 						MEET THE TEAM
 					</h1>
 					<p className="comic-font text-lg md:text-xl lg:text-2xl text-gray-700 dark:text-gray-300 mt-6 max-w-2xl mx-auto font-medium">
@@ -158,7 +158,7 @@ export default function Team() {
 								}}
 								className={`w-full px-6 py-4 pr-12 rounded-2xl text-sm font-bold text-white border border-purple-400/50 shadow-[0_0_20px_rgba(139,92,246,0.4)] backdrop-blur-xl appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400 transition-all duration-300 ${selectionType === "year" ? "bg-gradient-to-br from-purple-500 via-indigo-600 to-blue-600" : ""}`}
 							>
-								{yearOptions.map((year, index) => (
+								{yearOptions.map((year) => (
 									<option
 										key={year.id}
 										value={year.label}
@@ -209,7 +209,7 @@ export default function Team() {
 								}}
 								className={`px-8 py-4 pr-12 rounded-2xl text-sm font-bold bg-gradient-to-br text-white border border-purple-400/50 shadow-[0_0_20px_rgba(139,92,246,0.4)] backdrop-blur-xl appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400 min-w-[200px] transition-all duration-300 ${selectionType === "year" ? "bg-gradient-to-br from-purple-500 via-indigo-600 to-blue-600" : ""}`}
 							>
-								{yearOptions.map((year, index) => (
+								{yearOptions.map((year) => (
 									<option
 										key={year.id}
 										value={year.label}

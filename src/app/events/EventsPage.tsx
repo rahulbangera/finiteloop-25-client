@@ -1466,8 +1466,8 @@ const EventsPage = () => {
 
 	return (
 		<div className="p-4 md:p-8 h-full w-full bg-transparent flex flex-col items-center justify-center overflow-x-hidden overflow-y-auto mb-20">
-			<div className="lilita-font text-6xl md:text-7xl lg:text-8xl font-bold text-flc-yellow relative mt-28 select-none text-center w-full mb-5">
-				Events
+			<div className="lilita-font text-6xl md:text-7xl lg:text-8xl font-bold text-flc-yellow relative mt-32 md:mt-20 select-none text-center w-full mb-5">
+				EVENTS
 			</div>
 			<div
 				ref={radioContainerRef}

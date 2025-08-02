@@ -120,10 +120,10 @@ export default function Leaderboard() {
 
 	return (
 		<main>
-			<div className="flex md:hidden mt-20 p-2 flex-col items-center justify-center overflow-x-hidden overflow-y-hidden">
+			<div className="flex md:hidden p-2 flex-col items-center justify-center overflow-x-hidden overflow-y-hidden">
 				<div className="text-center mb-16">
-					<h1 className="lilita-font text-6xl md:text-7xl lg:text-8xl font-bold text-flc-yellow relative mt-8 select-none">
-						LeaderBoard
+					<h1 className="lilita-font text-5xl font-bold text-flc-yellow relative mt-32 select-none">
+						LEADERBOARD
 					</h1>
 				</div>
 
@@ -335,7 +335,7 @@ export default function Leaderboard() {
 			<div className="hidden md:flex pt-20 m-8 mb-15 flex-col items-center justify-center overflow-x-hidden">
 				<div className="text-center mb-16">
 					<h1 className="lilita-font text-6xl md:text-7xl lg:text-8xl font-bold text-flc-yellow relative mt-8 select-none">
-						LeaderBoard
+						LEADERBOARD
 					</h1>
 				</div>
 
