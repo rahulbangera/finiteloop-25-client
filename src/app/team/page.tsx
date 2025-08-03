@@ -148,7 +148,7 @@ export default function Team() {
 						Dynamic and Agile
 					</p>
 
-					<div className="md:hidden mt-8 max-w-sm mx-auto space-y-3">
+					<div className="md:hidden mt-8 max-w-sm mx-auto space-y-3 mb-10">
 						<div className="relative">
 							<select
 								value={selectedYear}
@@ -199,7 +199,7 @@ export default function Team() {
 						</button>
 					</div>
 
-					<div className="hidden md:flex justify-center gap-4 mt-8 max-w-4xl mx-auto">
+					<div className="hidden md:flex justify-center gap-4 mt-8 max-w-4xl mx-auto mb-10">
 						<div className="relative">
 							<select
 								value={selectedYear}
