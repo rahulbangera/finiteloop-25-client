@@ -66,18 +66,20 @@ export default function SignUpForm() {
 				return;
 			}
 
-			const verifyRes = await fetch(
-				`${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/send-verify-email`,
-				{
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ email: data.email }),
-				},
-			);
+			// const verifyRes = await fetch(
+			// 	`${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/send-verify-email`,
+			// 	{
+			// 		method: "POST",
+			// 		headers: { "Content-Type": "application/json" },
+			// 		body: JSON.stringify({ email: data.email }),
+			// 	},
+			// );
 
-			if (!verifyRes.ok) {
-				const errorVerify = await verifyRes.json();
-				console.error("Verification email error", errorVerify);
+			const response = await res.json();
+
+			console.log("Signup response:", response);
+			if (res.ok && !response.emailSent) {
+				console.error("Verification email error");
 				toast.warn("Account created but verification email failed.");
 			} else {
 				toast.success(

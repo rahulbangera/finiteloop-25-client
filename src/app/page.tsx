@@ -1,10 +1,29 @@
+"use client";
 import Benefits from "@/components/sections/Benefits";
 import JsonLd, {
 	organizationSchema,
 	websiteSchema,
 } from "@/components/seo/JsonLd";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const page = () => {
+	const router = useRouter();
+	const session = useSession();
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <no need of exhaustive deps here>
+	useEffect(() => {
+		if (typeof window !== "undefined" && session.status === "authenticated") {
+			if (session.data.user.role === "USER") {
+				const redirectToJoinFLC = localStorage.getItem("redirectToJoinFLC");
+				if (!redirectToJoinFLC) {
+					localStorage.setItem("redirectToJoinFLC", "true");
+					router.push("auth/join-flc");
+				}
+			}
+		}
+	}, [session]);
+
 	return (
 		<div className="min-h-screen relative">
 			<div
