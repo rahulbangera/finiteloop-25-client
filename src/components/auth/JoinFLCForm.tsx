@@ -65,9 +65,7 @@ export default function JoinFLCForm() {
 					method: "POST",
 				},
 			);
-			if (!res.ok) {
-				throw new Error("Failed to check join status");
-			}
+
 			const data = await res.json();
 			if (
 				data.joinStatus.paymentStatus === true &&
