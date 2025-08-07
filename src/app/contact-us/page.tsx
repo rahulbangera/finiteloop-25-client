@@ -48,8 +48,8 @@ export default function ContactUs() {
 						<span>
 							<span className="inline font-extrabold">Email ID:</span>
 							<span className="ml-5 text-blue-400">
-								<a href="mailto:inspirantech@gmail.com">
-									inspirantech@gmail.com
+								<a href="mailto:finiteloopclub@nmamit.in">
+									finiteloopclub@nmamit.in
 								</a>
 							</span>
 						</span>
