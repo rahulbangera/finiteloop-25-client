@@ -127,7 +127,7 @@ export default function Privacy() {
 								If you have previously agreed to us using your personal
 								information for direct marketing purposes, you may change your
 								mind at any time by writing to or emailing us at
-								inspirantech@gmail.com
+								finiteloopclub@nmamit.in
 							</li>
 						</ul>
 					</div> */}

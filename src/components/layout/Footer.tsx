@@ -36,7 +36,7 @@ export const social = [
 		name: "E-mail",
 	},
 	{
-		link: "tel:8197903771",
+		link: "tel:8861337830",
 		icon: <AiOutlinePhone className="h-7 w-7 hover:-translate-y-1" />,
 		name: "Call Us",
 	},
