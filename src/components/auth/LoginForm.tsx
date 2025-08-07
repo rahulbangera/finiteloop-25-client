@@ -37,7 +37,7 @@ const LoginForm = () => {
 				router.push(redirectUrl);
 			}, 1600);
 		} else {
-			if (res?.status === 401) {
+			if (res?.error === "Email not verified") {
 				const verifyRes = await fetch(
 					`${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/send-verify-email`,
 					{

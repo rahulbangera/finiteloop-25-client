@@ -61,8 +61,21 @@ export default function SignUpForm() {
 
 			if (!res.ok) {
 				const errorData = await res.json();
-				console.error("Signup failed", errorData);
-				toast.error(`Signup failed: ${errorData.message || "Unknown error"}`);
+				if (errorData.message === "Please verify your email and Login") {
+					const verifyRes = await fetch(
+						`${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/send-verify-email`,
+						{
+							method: "POST",
+							headers: { "Content-Type": "application/json" },
+							body: JSON.stringify({ email: data.email }),
+						},
+					);
+					if (verifyRes.ok) {
+						toast.error(`Resent verification email. Please check your inbox.`);
+					}
+				} else {
+					toast.error(`Signup failed: ${errorData.message}`);
+				}
 				return;
 			}
 
