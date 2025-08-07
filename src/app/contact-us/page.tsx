@@ -43,7 +43,7 @@ export default function ContactUs() {
 						</span>
 						<span>
 							<span className="inline font-extrabold">Telephone No:</span>
-							<span className="select-all ml-5">+91 8197903771</span>
+							<span className="select-all ml-5">+91 8861337830</span>
 						</span>
 						<span>
 							<span className="inline font-extrabold">Email ID:</span>
