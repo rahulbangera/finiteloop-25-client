@@ -37,7 +37,23 @@ const LoginForm = () => {
 				router.push(redirectUrl);
 			}, 1600);
 		} else {
-			toast.error(res?.error || "Login failed. Please try again.");
+			if (res?.status === 401) {
+				const verifyRes = await fetch(
+					`${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/send-verify-email`,
+					{
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({ email: data.email }),
+					},
+				);
+				if (verifyRes.ok) {
+					toast.error("Email not verified. Verification email sent!");
+				} else {
+					toast.error("Email not verified. Failed to send verification email.");
+				}
+			} else {
+				toast.error(res?.error || "Login failed. Please try again.");
+			}
 		}
 	};
 
