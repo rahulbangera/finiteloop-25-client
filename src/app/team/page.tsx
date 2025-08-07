@@ -385,11 +385,6 @@ export default function Team() {
 					)}
 				</div>
 			</div>
-
-			<div className="absolute top-1/3 left-0 w-px h-20 bg-gradient-to-b from-transparent via-purple-400/50 dark:via-blue-400/50 to-transparent"></div>
-			<div className="absolute bottom-1/4 right-0 w-px h-16 bg-gradient-to-b from-transparent via-pink-400/50 dark:via-purple-400/50 to-transparent"></div>
-
-			<div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-radial from-purple-300/10 via-pink-300/5 to-transparent dark:from-blue-600/5 dark:via-purple-600/3 dark:to-transparent rounded-full blur-3xl -z-10"></div>
 		</main>
 	);
 }
