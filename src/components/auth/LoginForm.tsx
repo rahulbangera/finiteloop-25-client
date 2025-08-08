@@ -37,23 +37,7 @@ const LoginForm = () => {
 				router.push(redirectUrl);
 			}, 1600);
 		} else {
-			if (res?.error === "Email not verified") {
-				const verifyRes = await fetch(
-					`${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/send-verify-email`,
-					{
-						method: "POST",
-						headers: { "Content-Type": "application/json" },
-						body: JSON.stringify({ email: data.email }),
-					},
-				);
-				if (verifyRes.ok) {
-					toast.error("Email not verified. Verification email sent!");
-				} else {
-					toast.error("Email not verified. Failed to send verification email.");
-				}
-			} else {
-				toast.error(res?.error || "Login failed. Please try again.");
-			}
+			toast.error(res?.error || "Login failed. Please try again.");
 		}
 	};
 
