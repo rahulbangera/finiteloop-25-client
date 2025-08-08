@@ -32,12 +32,11 @@ const page = () => {
 					backgroundPosition: "right top",
 				}}
 			/>
-
 			<div
-				className="md:hidden absolute top-[7%] right-0 w-[40rem] h-[40rem] pointer-events-none z-0 transform -translate-y-1/2 bg-contain bg-no-repeat"
+				className="md:hidden absolute top-[7%] right-0 w-[36rem] h-[36rem] pointer-events-none z-0 transform -translate-y-1/2 bg-contain bg-no-repeat"
 				style={{
 					backgroundImage: "url('/mobile_rocket1.png')",
-					backgroundPosition: "center right",
+					backgroundPosition: "right center",
 				}}
 			/>
 
