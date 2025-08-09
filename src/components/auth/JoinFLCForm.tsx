@@ -11,6 +11,7 @@ import "react-toastify/dist/ReactToastify.css";
 import type { z } from "zod";
 import PaymentButton from "../razorpay/paymentButton";
 import { Button } from "../ui/button";
+import { FaInstagram } from "react-icons/fa";
 
 export default function JoinFLCForm() {
 	const _router = useRouter();
@@ -354,9 +355,25 @@ export default function JoinFLCForm() {
 							) : (
 								<div className="flex flex-col items-center justify-center h-full">
 									<p className="text-2xl text-slate-800 dark:text-white mb-2 text-center">
-										{session?.user?.role === "USER"
-											? "Registration is closed."
-											: "You are a FLC member!"}
+										{session?.user?.role === "USER" ? (
+											<div className="flex flex-col items-center gap-2">
+												<p>Registrations are temporarily closed.</p>
+												<p className="flex items-center gap-1 text-sm text-slate-600 dark:text-white/80">
+													For updates, follow us on{" "}
+													<a
+														href="https://www.instagram.com/finiteloop_club_nmamit"
+														target="_blank"
+														rel="noopener noreferrer"
+														className="inline-flex items-center underline hover:text-orange-500 transition-colors"
+													>
+														<FaInstagram className="mr-1" />
+														Instagram
+													</a>
+												</p>
+											</div>
+										) : (
+											"You are a FLC member!"
+										)}
 									</p>
 								</div>
 							)}

@@ -5,6 +5,7 @@ import Footer from "@/components/layout/Footer";
 import Navbar from "@/components/layout/Navbar";
 import { Providers } from "@/components/layout/Providers";
 import Toaster from "@/components/ui/Toaster";
+import { BannerProvider } from "@/contexts/BannerContext";
 
 export const metadata: Metadata = {
 	title: {
@@ -76,13 +77,15 @@ export default function RootLayout({
 		<html lang="en" suppressHydrationWarning>
 			<body className="min-h-screen flex flex-col">
 				<Providers>
-					<Toaster />
-					<Navbar />
-					<div className="fixed inset-0 -z-10 pointer-events-none">
-						<Background />
-					</div>
-					<main className="flex-1">{children}</main>
-					<Footer />
+					<BannerProvider>
+						<Toaster />
+						<Navbar />
+						<div className="fixed inset-0 -z-10 pointer-events-none">
+							<Background />
+						</div>
+						<main className="flex-1">{children}</main>
+						<Footer />
+					</BannerProvider>
 				</Providers>
 			</body>
 		</html>

@@ -1,4 +1,5 @@
 "use client";
+import { useBannerContext } from "@/contexts/BannerContext";
 import { LogIn, LogOut, Moon, Sun, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -10,6 +11,7 @@ import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
 import { toast } from "react-toastify";
 
 export default function NavBar() {
+	const { isBannerVisible, bannerHeight } = useBannerContext();
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [mounted, setMounted] = useState(false);
 	const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
@@ -124,7 +126,13 @@ export default function NavBar() {
 
 	return (
 		<>
-			<div className="hidden md:flex fixed top-0 left-0 right-0 w-full h-20 flex-row items-center px-8 justify-between z-50 text-gray-800 dark:text-white">
+			<div
+				className="hidden md:flex fixed left-0 right-0 w-full h-20 flex-row items-center px-8 justify-between z-50 text-gray-800 dark:text-white"
+				style={{
+					top: isBannerVisible ? `${bannerHeight}px` : "0px",
+					transition: "top 0.3s ease-in-out",
+				}}
+			>
 				<div className="flex flex-row gap-4 items-center">
 					<Link href="/">
 						<div className="relative w-12 h-12 bg-white/40 dark:bg-white/25 backdrop-blur-2xl rounded-2xl overflow-hidden shadow-xl hover:bg-white/50 dark:hover:bg-white/35 transition-all duration-300 hover:scale-105 hover:shadow-2xl">
@@ -309,7 +317,13 @@ export default function NavBar() {
 				</div>
 			</div>
 
-			<div className="md:hidden fixed top-0 left-0 right-0 w-full h-20 flex flex-row items-center px-4 justify-between z-50 text-gray-800 dark:text-white">
+			<div
+				className="md:hidden fixed left-0 right-0 w-full h-20 flex flex-row items-center px-4 justify-between z-50 text-gray-800 dark:text-white"
+				style={{
+					top: isBannerVisible ? `${bannerHeight}px` : "0px",
+					transition: "top 0.3s ease-in-out",
+				}}
+			>
 				<div className="flex flex-row gap-3 items-center">
 					<Link href="/">
 						<div className="relative w-12 h-12 bg-white/35 dark:bg-white/25 backdrop-blur-2xl rounded-2xl overflow-hidden shadow-xl hover:bg-white/45 dark:hover:bg-white/35 transition-all duration-300 hover:scale-105 hover:shadow-2xl">

@@ -1078,7 +1078,7 @@ export default function Profile({ userId }: { userId?: number }) {
 							<div className="relative group">
 								{currentUser?.image ? (
 									<Image
-										src={currentUser.image}
+										src={currentUser.image.trimStart()}
 										alt="Profile"
 										width={120}
 										height={120}
