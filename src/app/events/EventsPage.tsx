@@ -1604,6 +1604,7 @@ const EventsPage = () => {
 								</div>
 							)}
 							<div className="text-black dark:text-white">
+								<p>{selectedEvent?.description || ""}</p>
 								<HTMLContent
 									content={selectedEvent?.description || ""}
 									className=""

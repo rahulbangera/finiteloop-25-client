@@ -44,6 +44,12 @@ interface EventWhatsAppShareProps {
 	className?: string;
 	variant?: "button" | "icon";
 }
+function normalize(html: string): string {
+	if (!html) return "";
+	const tmp = document.createElement("div");
+	tmp.innerHTML = html;
+	return tmp.textContent || tmp.innerText || "";
+}
 
 const EventWhatsAppShare = ({
 	event,
@@ -103,10 +109,9 @@ const EventWhatsAppShare = ({
 			message += `🏆 *${event.name}*\n\n`;
 
 			if (event.description) {
+				const remHtml = normalize(event.description);
 				const shortDescription =
-					event.description.length > 100
-						? `${event.description.substring(0, 97)}...`
-						: event.description;
+					remHtml.length > 100 ? `${remHtml.substring(0, 97)}...` : remHtml;
 				message += `📝 *About:*\n${shortDescription}\n\n`;
 			}
 
@@ -117,7 +122,11 @@ const EventWhatsAppShare = ({
 			message += `• *Format:* ${event.eventType}\n`;
 
 			if (event.eventType === "TEAM") {
-				message += `• *Team Size:* ${event.minTeamSize}-${event.maxTeamSize} members\n`;
+				if (event.minTeamSize === event.maxTeamSize) {
+					message += `• *Team Size:* ${event.minTeamSize} members\n`;
+				} else {
+					message += `• *Team Size:* ${event.minTeamSize}-${event.maxTeamSize} members\n`;
+				}
 			}
 
 			if (event.flcAmount === 0 && event.nonFlcAmount === 0) {
