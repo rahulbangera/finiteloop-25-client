@@ -1693,24 +1693,54 @@ const EventsPage = () => {
 											),
 										},
 										{
-											label: "From - To",
+											label:
+												selectedEvent?.fromDate &&
+												selectedEvent?.toDate &&
+												new Date(selectedEvent.fromDate).toDateString() ===
+													new Date(selectedEvent.toDate).toDateString()
+													? "Date"
+													: "From - To",
 											value: (
 												<>
-													{new Date(
-														selectedEvent?.fromDate ?? "",
-													).toLocaleDateString("en-US", {
-														year: "numeric",
-														month: "short",
-														day: "numeric",
-													})}{" "}
-													-{" "}
-													{new Date(
-														selectedEvent?.toDate ?? "",
-													).toLocaleDateString("en-US", {
-														year: "numeric",
-														month: "short",
-														day: "numeric",
-													})}
+													{selectedEvent?.fromDate &&
+													selectedEvent?.toDate &&
+													new Date(selectedEvent.fromDate).toDateString() ===
+														new Date(selectedEvent.toDate).toDateString() ? (
+														<>
+															{new Date(
+																selectedEvent.fromDate,
+															).toLocaleDateString("en-US", {
+																year: "numeric",
+																month: "short",
+																day: "numeric",
+															})}
+															{" at "}
+															{new Date(
+																selectedEvent.fromDate,
+															).toLocaleTimeString("en-US", {
+																hour: "2-digit",
+																minute: "2-digit",
+															})}
+														</>
+													) : (
+														<>
+															{new Date(
+																selectedEvent?.fromDate ?? "",
+															).toLocaleDateString("en-US", {
+																year: "numeric",
+																month: "short",
+																day: "numeric",
+															})}
+															{" - "}
+															{new Date(
+																selectedEvent?.toDate ?? "",
+															).toLocaleDateString("en-US", {
+																year: "numeric",
+																month: "short",
+																day: "numeric",
+															})}
+														</>
+													)}
 												</>
 											),
 										},
