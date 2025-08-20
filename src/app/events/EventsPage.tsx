@@ -1722,6 +1722,16 @@ const EventsPage = () => {
 																minute: "2-digit",
 															})}
 														</>
+													) : selectedEvent?.fromDate &&
+														!selectedEvent?.toDate ? (
+														new Date(selectedEvent.fromDate).toLocaleDateString(
+															"en-US",
+															{
+																year: "numeric",
+																month: "short",
+																day: "numeric",
+															},
+														)
 													) : (
 														<>
 															{new Date(
