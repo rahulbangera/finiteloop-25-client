@@ -1,8 +1,8 @@
 "use client";
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import type { AppUser } from "@/lib/auth";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
 	FaGithub,
@@ -15,11 +15,11 @@ import { MdDelete } from "react-icons/md";
 import { SiLeetcode } from "react-icons/si";
 import { toast } from "react-toastify";
 import { z } from "zod";
-import type { AppUser } from "@/lib/auth";
 import { Button } from "../ui/button";
-import { useWhatsAppShare, WHATSAPP_SHARE_CONFIG } from "./WhatsAppShare";
+import EventCarousel from "./EventCarousel";
 import ImageSelector from "./ImageSelector";
 import ProfilePictureCropper from "./ProfilePictureCropper";
+import { useWhatsAppShare, WHATSAPP_SHARE_CONFIG } from "./WhatsAppShare";
 
 function ProfileDetail({
 	label,
@@ -400,6 +400,9 @@ export default function Profile({ userId }: { userId?: number }) {
 	const [shareLoading, setShareLoading] = useState(false);
 	const [showShareOptions, setShowShareOptions] = useState(false);
 
+	// biome-ignore lint/suspicious/noExplicitAny: <testing>
+	type UserEvents = { data: any[] } | null;
+	const [userEvents, setUserEvents] = useState<UserEvents>(null);
 	const [showImageSelector, setShowImageSelector] = useState(false);
 	const [showImageCropper, setShowImageCropper] = useState(false);
 	const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -556,9 +559,33 @@ export default function Profile({ userId }: { userId?: number }) {
 	}, [session, branches]);
 
 	useEffect(() => {
+		if (isViewingOtherProfile) return;
+		const fetchEventData = async () => {
+			try {
+				const getMyEvents = await fetch(
+					`${process.env.NEXT_PUBLIC_SERVER_URL}/api/user/getEvents`,
+					{
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({
+							userId: session?.user.id,
+						}),
+					},
+				);
+				const userEvents = await getMyEvents.json();
+				setUserEvents(userEvents.events || []);
+			} catch (error) {
+				console.error("Error fetching user events:", error);
+			}
+		};
+		fetchEventData();
+	}, [session, isViewingOtherProfile]);
+
+	useEffect(() => {
 		const fetchUserData = async () => {
 			if (!isViewingOtherProfile || !userId) return;
-
 			setFetchingUser(true);
 			try {
 				const res = await fetch(
@@ -571,10 +598,27 @@ export default function Profile({ userId }: { userId?: number }) {
 						}),
 					},
 				);
-
-				if (!res.ok) throw new Error("User not found");
+				const getEvents = await fetch(
+					`${process.env.NEXT_PUBLIC_SERVER_URL}/api/user/getEvents`,
+					{
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({
+							userId: userId,
+						}),
+					},
+				);
+				if (!res.ok || !getEvents.ok) {
+					const errorData = await res.json();
+					throw new Error(errorData.message || "Failed to remove link");
+				}
 
 				const data = await res.json();
+				const userEvents = await getEvents.json();
+				setUserEvents(userEvents.events || []);
+
 				if (data.success && data.id) {
 					// Transform the server response to match expected user structure
 					setViewedUser({
@@ -1609,21 +1653,30 @@ export default function Profile({ userId }: { userId?: number }) {
 				<h2 className="text-xl sm:text-2xl md:text-4xl font-extrabold bg-gradient-to-tr from-orange-400 to-yellow-400 bg-clip-text text-transparent mb-2 sm:mb-3">
 					My Events
 				</h2>
-				<p className="text-sm sm:text-base md:text-lg font-medium mb-1 sm:mb-2">
-					You're missing out!
-				</p>
-				<p className="text-xs sm:text-sm text-gray-500 dark:text-gray-300 mb-3 sm:mb-4 px-2">
-					Register for events to get started and make the most of your
-					experience!
-				</p>
-				<Link href="/events" className="inline-block">
-					<button
-						type="button"
-						className="px-5 sm:px-6 md:px-8 py-2 sm:py-3 font-semibold bg-gradient-to-tr from-orange-500 to-yellow-400 rounded-full shadow transition hover:scale-105 hover:shadow-lg text-white text-sm sm:text-base md:text-lg whitespace-nowrap"
-					>
-						Browse Events
-					</button>
-				</Link>
+				{userEvents === null ? (
+					<div className="flex flex-col items-center justify-center py-8">
+						<div className="animate-spin rounded-full h-10 w-10 border-4 border-orange-400 border-t-transparent mb-4"></div>
+						<p className="text-sm sm:text-base md:text-lg font-medium mb-1 sm:mb-2">
+							Loading your events...
+						</p>
+					</div>
+				) : userEvents?.data && userEvents.data.length > 0 ? (
+					<EventCarousel
+						events={userEvents.data}
+						isViewingOtherProfile={!!isViewingOtherProfile}
+					/>
+				) : (
+					<div className="flex flex-col items-center justify-center py-8">
+						<p className="text-sm sm:text-base md:text-lg font-medium mb-1 sm:mb-2">
+							No events found.
+						</p>
+						<p className="text-xs dark:text-gray-500 text-white">
+							{isViewingOtherProfile
+								? "Check back later to see their events"
+								: "Add your events above to connect with others"}
+						</p>
+					</div>
+				)}
 			</div>
 
 			<EditProfileDialog
