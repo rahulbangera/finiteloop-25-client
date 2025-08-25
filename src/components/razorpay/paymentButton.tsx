@@ -152,6 +152,7 @@ const PaymentButton = forwardRef<
 													? {
 															paymentType: paymentType,
 															paymentName: description,
+															amount: orderData.orderAmount,
 															razorpayOrderId: response.razorpay_order_id,
 															razorpayPaymentId: response.razorpay_payment_id,
 															razorpaySignature: response.razorpay_signature,
