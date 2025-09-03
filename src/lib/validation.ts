@@ -28,8 +28,8 @@ export const sendPasswordResetZ = z.object({
 });
 
 export const registerZ = z.object({
-	reasonToJoin: z.string().optional(),
-	expectations: z.string().optional(),
-	contribution: z.string().optional(),
-	githubLink: z.string().url("Invalid GitHub URL").optional(),
+	reasonToJoin: z.string(),
+	expectations: z.string(),
+	contribution: z.string(),
+	githubLink: z.string().url("Invalid GitHub URL"),
 });

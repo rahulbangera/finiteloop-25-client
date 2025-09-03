@@ -1,7 +1,6 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -14,7 +13,6 @@ import { Button } from "../ui/button";
 import { FaInstagram } from "react-icons/fa";
 
 export default function JoinFLCForm() {
-	const _router = useRouter();
 	const [isPaymentLoading, setIsPaymentLoading] = useState(false);
 	const [statusLoading, setStatusLoading] = useState(true);
 	const { data: session, update } = useSession();
@@ -48,10 +46,10 @@ export default function JoinFLCForm() {
 	const {
 		register,
 		handleSubmit,
-		formState: { errors, isSubmitting },
+		formState: { errors, isSubmitting, isValid },
 	} = useForm<z.infer<typeof registerZ>>({
 		resolver: zodResolver(registerZ),
-		mode: "onChange",
+		mode: "onChange", // enables live validation
 	});
 
 	const checkJoinStatus = async () => {
@@ -173,10 +171,7 @@ export default function JoinFLCForm() {
 										</p>
 									</div>
 								) : !joined.joined ? (
-									<form
-										className="space-y-5"
-										onSubmit={(e) => e.preventDefault()}
-									>
+									<form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
 										<div className="text-center mb-4 md:mb-6">
 											<h2 className="text-slate-800 dark:text-white text-xl md:text-2xl font-medium">
 												Register
@@ -303,16 +298,21 @@ export default function JoinFLCForm() {
 												{errors.githubLink?.message}
 											</div>
 										</div>
-										{/* <button
-										type="submit"
-										disabled={isSubmitting}
-										className="w-full mt-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-medium py-2 rounded-lg h-10 text-sm disabled:opacity-50"
-									>
-										{isSubmitting ? "Submitting..." : "Register"}
-									</button> */}
 										<div className="flex justify-between items-center mt-4">
-											<Button onClick={handleSubmit(onSubmit)}>
-												Register Now
+											<Button
+												type="submit"
+												disabled={isSubmitting || !isValid}
+												className={`w-auto px-5 ${
+													isSubmitting || !isValid
+														? "bg-gray-900 text-white cursor-not-allowed"
+														: "bg-black text-white shadow-lg"
+												}`}
+											>
+												{isSubmitting
+													? "Submitting..."
+													: !isValid
+														? "Please complete all fields"
+														: "Register"}
 											</Button>
 										</div>
 									</form>
