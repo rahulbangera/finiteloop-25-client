@@ -20,6 +20,7 @@ import EventCarousel from "./EventCarousel";
 import ImageSelector from "./ImageSelector";
 import ProfilePictureCropper from "./ProfilePictureCropper";
 import { useWhatsAppShare, WHATSAPP_SHARE_CONFIG } from "./WhatsAppShare";
+import Link from "next/link";
 
 function ProfileDetail({
 	label,
@@ -1665,17 +1666,43 @@ export default function Profile({ userId }: { userId?: number }) {
 						events={userEvents.data}
 						isViewingOtherProfile={!!isViewingOtherProfile}
 					/>
-				) : (
-					<div className="flex flex-col items-center justify-center py-8">
+				) : userEvents?.data &&
+					userEvents.data.length === 0 &&
+					isViewingOtherProfile ? (
+					<>
 						<p className="text-sm sm:text-base md:text-lg font-medium mb-1 sm:mb-2">
-							No events found.
+							They haven't registered for any events yet!
 						</p>
-						<p className="text-xs dark:text-gray-500 text-white">
-							{isViewingOtherProfile
-								? "Check back later to see their events"
-								: "Add your events above to connect with others"}
+						<p className="text-xs sm:text-sm text-gray-500 dark:text-gray-300 mb-3 sm:mb-4 px-2">
+							Browse our events and encourage them to join in on the fun!
 						</p>
-					</div>
+						<Link href="/events" className="inline-block">
+							<button
+								type="button"
+								className="px-5 sm:px-6 md:px-8 py-2 sm:py-3 font-semibold bg-gradient-to-tr from-orange-500 to-yellow-400 rounded-full shadow transition hover:scale-105 hover:shadow-lg text-white text-sm sm:text-base md:text-lg whitespace-nowrap"
+							>
+								Browse Events
+							</button>
+						</Link>
+					</>
+				) : (
+					<>
+						<p className="text-sm sm:text-base md:text-lg font-medium mb-1 sm:mb-2">
+							You're missing out!
+						</p>
+						<p className="text-xs sm:text-sm text-gray-500 dark:text-gray-300 mb-3 sm:mb-4 px-2">
+							Register for events to get started and make the most of your
+							experience!
+						</p>
+						<Link href="/events" className="inline-block">
+							<button
+								type="button"
+								className="px-5 sm:px-6 md:px-8 py-2 sm:py-3 font-semibold bg-gradient-to-tr from-orange-500 to-yellow-400 rounded-full shadow transition hover:scale-105 hover:shadow-lg text-white text-sm sm:text-base md:text-lg whitespace-nowrap"
+							>
+								Browse Events
+							</button>
+						</Link>
+					</>
 				)}
 			</div>
 

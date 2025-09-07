@@ -84,6 +84,22 @@ export default function EventCarousel({
 		setDrawerOpen(open);
 		if (!open) setSelectedEvent(null);
 	};
+	const handleDownload = async (link: string) => {
+		const response = await fetch(link, {
+			mode: "cors",
+		});
+		const urlParts = link.split("/");
+		const filename = urlParts[urlParts.length - 1] || "certificate.jpg";
+		const blob = await response.blob();
+		const url = window.URL.createObjectURL(blob);
+		const a = document.createElement("a");
+		a.href = url;
+		a.download = filename;
+		document.body.appendChild(a);
+		a.click();
+		a.remove();
+		window.URL.revokeObjectURL(url);
+	};
 
 	return (
 		<div className="relative w-full flex flex-col items-center">
@@ -251,36 +267,6 @@ export default function EventCarousel({
 				)}
 			</div>
 
-			{safeEvents.length === 0 &&
-				(isViewingOtherProfile ? (
-					<>
-						<p className="text-sm sm:text-base md:text-lg font-medium mb-1 sm:mb-2">
-							No events to show!
-						</p>
-						<p className="text-xs sm:text-sm text-gray-500 dark:text-gray-300 mb-3 sm:mb-4 px-2">
-							This user hasn't participated in any events yet.
-						</p>
-					</>
-				) : (
-					<>
-						<p className="text-sm sm:text-base md:text-lg font-medium mb-1 sm:mb-2">
-							You're missing out!
-						</p>
-						<p className="text-xs sm:text-sm text-gray-500 dark:text-gray-300 mb-3 sm:mb-4 px-2">
-							Register for events to get started and make the most of your
-							experience!
-						</p>
-						<Link href="/events" className="inline-block">
-							<button
-								type="button"
-								className="px-5 sm:px-6 md:px-8 py-2 sm:py-3 font-semibold bg-gradient-to-tr from-orange-500 to-yellow-400 rounded-full shadow transition hover:scale-105 hover:shadow-lg text-white text-sm sm:text-base md:text-lg whitespace-nowrap"
-							>
-								Browse Events
-							</button>
-						</Link>
-					</>
-				))}
-
 			{/* Drawer for certificate */}
 			<Drawer.Root
 				open={drawerOpen}
@@ -348,11 +334,13 @@ export default function EventCarousel({
 												</div>
 											)}
 											<div className="flex gap-3 mt-2">
-												<a
-													href={selectedEvent.certificates?.link}
-													download
-													target="_blank"
-													rel="noopener noreferrer"
+												<button
+													type="button"
+													onClick={() =>
+														handleDownload(
+															`${selectedEvent.certificates?.link}`,
+														)
+													}
 													className="flex items-center gap-2 px-10 py-4 rounded-full bg-gradient-to-tr from-green-400 to-green-600 font-semibold text-white shadow-md hover:scale-105 hover:shadow-lg border-green-400/60 hover:border-green-500 transition-all duration-200 text-xl"
 												>
 													<svg
@@ -373,7 +361,7 @@ export default function EventCarousel({
 														/>
 													</svg>
 													Download
-												</a>
+												</button>
 												{/* <button
                                                     type="button"
                                                     className="px-5 py-2 rounded-full bg-gradient-to-tr from-red-500 to-pink-500 font-semibold text-white shadow-md hover:scale-105 hover:shadow-lg transition-all duration-200 text-base"
