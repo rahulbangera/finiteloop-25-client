@@ -12,7 +12,6 @@ import Radio from "@/components/elements/Radio";
 import EventWhatsAppShare from "@/components/events/EventWhatsAppShare";
 import PaymentButton from "@/components/razorpay/paymentButton";
 import { Button } from "@/components/ui/button";
-import "react-toastify/dist/ReactToastify.css";
 import { Drawer } from "vaul";
 import { HTMLContent } from "@/components/ui/custom/html-content";
 
@@ -48,6 +47,10 @@ type Event = {
 	isLegacy: boolean;
 	createdAt: string;
 	updatedAt: string;
+	statusOfBatchRestriction: boolean;
+	batchRestriction?: {
+		year: number;
+	}[];
 	Organiser?: {
 		name: string;
 		email: string;
@@ -63,6 +66,7 @@ type TeamState = {
 	isLeader: boolean;
 	action: "NONE" | "CREATE" | "JOIN";
 	teamName: string;
+	yearOfStudy?: number;
 	teamId: string;
 	createdTeamId: string;
 	members: { id: string; name: string }[];
@@ -139,6 +143,7 @@ const EventsPage = () => {
 		isLeader: false,
 		teamId: "",
 		leaderId: "",
+		yearOfStudy: 1,
 		isConfirmed: false,
 		createdTeamId: "",
 		members: [],
@@ -808,6 +813,7 @@ const EventsPage = () => {
 					body: JSON.stringify({
 						eventId: selectedEvent.id,
 						teamName: teamState.teamName,
+						yearOfStudy: teamState.yearOfStudy,
 					}),
 				},
 			);
@@ -818,6 +824,7 @@ const EventsPage = () => {
 					createdTeamId: json.data.teamId,
 					isLeader: true,
 					leaderId: userId,
+					yearOfStudy: prev.yearOfStudy,
 					members: Array.isArray(json.data?.members)
 						? json.data.members.map((m: { id: string; name: string }) => ({
 								id: m.id,
@@ -849,6 +856,7 @@ const EventsPage = () => {
 		session,
 		teamState.teamName,
 		refreshRegistrationData,
+		teamState.yearOfStudy,
 	]);
 
 	const joinTeam = useCallback(async () => {
@@ -2437,7 +2445,28 @@ const EventsPage = () => {
 														placeholder="Enter your team name"
 													/>
 												</label>
-
+												{selectedEvent?.statusOfBatchRestriction === true && (
+													<label className="text-sm text-zinc-700 dark:text-zinc-300">
+														Year of Study
+														<select
+															value={teamState.yearOfStudy}
+															onChange={(e) =>
+																setTeamState((prev) => ({
+																	...prev,
+																	yearOfStudy: Number(e.target.value),
+																}))
+															}
+															className="mt-1 w-full p-2 rounded-md bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 text-black dark:text-white"
+														>
+															<option value="">Select Year of Study</option>
+															{selectedEvent.batchRestriction?.map((item) => (
+																<option key={item.year} value={item.year}>
+																	{item.year}
+																</option>
+															))}
+														</select>
+													</label>
+												)}
 												<button
 													type="button"
 													onClick={() => {
