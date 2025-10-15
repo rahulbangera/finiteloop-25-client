@@ -361,7 +361,7 @@ export default function JoinFLCForm() {
 												<p className="flex items-center gap-1 text-sm text-slate-600 dark:text-white/80">
 													For updates, follow us on{" "}
 													<a
-														href="https://www.instagram.com/finiteloop_club_nmamit"
+														href="https://www.instagram.com/finiteloop.club/"
 														target="_blank"
 														rel="noopener noreferrer"
 														className="inline-flex items-center underline hover:text-orange-500 transition-colors"

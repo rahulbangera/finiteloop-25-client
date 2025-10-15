@@ -11,7 +11,7 @@ import {
 
 export const social = [
 	{
-		link: "https://www.instagram.com/finiteloop_club_nmamit/",
+		link: "https://www.instagram.com/finiteloop.club/",
 		icon: <AiOutlineInstagram className="h-7 w-7 hover:-translate-y-1" />,
 		name: "Instagram",
 	},

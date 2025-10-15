@@ -26,7 +26,7 @@ export const organizationSchema = {
 	description:
 		"Finite loop club encourages students of NMAMIT to realize their idea through competitive programming participation, hands-on experience on real-time projects and by conducting many more coding events that will inspire the next generation of innovators.",
 	sameAs: [
-		"https://www.instagram.com/finiteloop_club_nmamit/",
+		"https://www.instagram.com/finiteloop.club/",
 		"https://www.facebook.com/FiniteLoopClub.Nmamit/",
 		"https://www.linkedin.com/showcase/finite-loop-club",
 		"https://github.com/finiteloopclub?tab=repositories",
