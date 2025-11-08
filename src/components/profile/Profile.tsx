@@ -11,7 +11,7 @@ import {
 	FaLinkedin,
 	FaPencilAlt,
 } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
+import { MdDelete, MdWarning } from "react-icons/md";
 import { SiLeetcode } from "react-icons/si";
 import { toast } from "react-toastify";
 import { z } from "zod";
@@ -407,6 +407,11 @@ export default function Profile({ userId }: { userId?: number }) {
 	const [showImageSelector, setShowImageSelector] = useState(false);
 	const [showImageCropper, setShowImageCropper] = useState(false);
 	const [selectedImage, setSelectedImage] = useState<string | null>(null);
+	const [showStrikes, setShowStrikes] = useState(false);
+
+	const [strikes, setStrikes] = useState<
+		{ reason: string; createdAt: string }[]
+	>([]);
 
 	// Determine if we're viewing someone else's profile
 	const isViewingOtherProfile =
@@ -523,7 +528,34 @@ export default function Profile({ userId }: { userId?: number }) {
 		};
 	}, []);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <its fine>
 	useEffect(() => {
+		const fetchStrikes = async () => {
+			if (session?.user) {
+				try {
+					const res = await fetch(
+						`${process.env.NEXT_PUBLIC_SERVER_URL}/api/user/getStrikes`,
+						{
+							method: "POST",
+							headers: {
+								"Content-Type": "application/json",
+								Authorization: `Bearer ${session.user.accessToken}`,
+							},
+							body: JSON.stringify({}),
+						},
+					);
+					const json = await res.json();
+					if (json.success) {
+						setStrikes(json.data || []);
+					} else {
+						toast.error("Failed to load strikes");
+					}
+				} catch {
+					toast.error("Failed to load strikes");
+				}
+			}
+		};
+
 		const fetchBranches = async () => {
 			try {
 				const res = await fetch(
@@ -536,6 +568,7 @@ export default function Profile({ userId }: { userId?: number }) {
 			}
 		};
 		fetchBranches();
+		fetchStrikes();
 	}, []);
 
 	useEffect(() => {
@@ -1232,6 +1265,52 @@ export default function Profile({ userId }: { userId?: number }) {
 						</div>
 					)}
 
+					<div className="mb-4">
+						<div className="interactive bg-gradient-to-tr from-neutral-800 to-neutral-900 border border-neutral-700 rounded-lg px-4 py-3 shadow-sm hover:border-red-400 hover:shadow-md transition-all duration-200">
+							<div className="flex items-center justify-between">
+								<div className="flex items-center gap-3">
+									<div className="p-2 rounded-lg bg-gradient-to-tr from-red-500 to-orange-500 text-white">
+										<MdWarning className="h-5 w-5" />
+									</div>
+									<div>
+										<div className="text-sm text-gray-300 font-semibold">
+											Strikes{" "}
+											<span className="text-xs text-gray-400">
+												(Exceeding 3 may lead to revocation of membership)
+											</span>
+										</div>
+										<div className="text-xl font-bold text-white">
+											{strikes.length}
+										</div>
+									</div>
+								</div>
+								<button
+									type="button"
+									className="text-sm text-blue-400 hover:underline"
+									onClick={() => setShowStrikes(!showStrikes)}
+								>
+									{showStrikes ? "Hide" : "View"}
+								</button>
+							</div>
+							{showStrikes && (
+								<ul className="mt-3 space-y-2">
+									{strikes.map((s) => (
+										<li
+											key={s.createdAt}
+											className="bg-neutral-900/30 border border-neutral-700 rounded-lg p-3 text-sm text-gray-200"
+										>
+											<div className="flex items-center justify-between">
+												<div className="font-medium">{s.reason}</div>
+												<div className="text-xs text-gray-400">
+													{new Date(s.createdAt).toLocaleDateString()}
+												</div>
+											</div>
+										</li>
+									))}
+								</ul>
+							)}
+						</div>
+					</div>
 					<div className="space-y-5">
 						<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 							<ProfileDetail
