@@ -20,7 +20,7 @@ const MagazineViewer = dynamic(
 
 export default function MagazinePage() {
 	const yearlyMagazine = {
-		"2024-25": "/inFiniteInsider.pdf",
+		// "2024-25": "/inFiniteInsider.pdf",
 		"2025-26": "/infinite.pdf",
 	};
 
@@ -48,7 +48,7 @@ export default function MagazinePage() {
 				Explore the 2025 edition of inFinite Insider!
 			</p>
 
-			<div
+			{/* <div
 				ref={radioContainerRef}
 				className="m-4 md:m-8 select-none w-full flex justify-center overflow-x-auto scrollbar-hide rounded-2xl"
 				onChange={handleToggleChange}
@@ -68,11 +68,11 @@ export default function MagazinePage() {
 						setSelectedYearData({ year, index });
 					}}
 				/>
-			</div>
+			</div> */}
 
 			<div className="w-full max-w-7xl mx-auto min-h-[400px] md:min-h-[800px] flex justify-center">
 				<MagazineViewer
-					pdfUrl={yearlyMagazine[selectedYearData.year]}
+					pdfUrl={"./infinite.pdf"}
 					year={selectedYearData.year}
 				/>
 			</div>
