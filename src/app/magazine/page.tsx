@@ -70,8 +70,11 @@ export default function MagazinePage() {
 				/>
 			</div>
 
-			<div className="w-full max-w-7xl mx-auto min-h-[800px] flex justify-center">
-				<MagazineViewer pdfUrl={yearlyMagazine[selectedYearData.year]} />
+			<div className="w-full max-w-7xl mx-auto min-h-[400px] md:min-h-[800px] flex justify-center">
+				<MagazineViewer
+					pdfUrl={yearlyMagazine[selectedYearData.year]}
+					year={selectedYearData.year}
+				/>
 			</div>
 		</main>
 	);

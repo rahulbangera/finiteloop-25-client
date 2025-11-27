@@ -22,9 +22,9 @@ const Radio: React.FC<RadioProps> = ({ plans, selected, setSelected }) => {
 					backgroundStyles[selected] || backgroundStyles[0]
 				}`}
 				style={{
-					width: "50%", // 3 items per row
-					height: "50%", // 2 rows total
-					transform: `translateX(${(selected % 3) * 100}%) translateY(${Math.floor(selected / 3) * 100}%)`,
+					width: `${itemWidth}%`,
+					height: "100%",
+					transform: `translateX(${selected * 100}%)`,
 				}}
 			/>
 

@@ -10,6 +10,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/b
 
 interface MagazineViewerProps {
 	pdfUrl: string;
+	year: string;
 }
 
 // ForwardRef component for pages to work with react-pageflip
@@ -41,10 +42,11 @@ const PageContent = forwardRef<HTMLDivElement, any>((props, ref) => {
 
 PageContent.displayName = "PageContent";
 
-export default function MagazineViewer({ pdfUrl }: MagazineViewerProps) {
+export default function MagazineViewer({ pdfUrl, year }: MagazineViewerProps) {
 	const [numPages, setNumPages] = useState<number>(0);
 	const [containerWidth, setContainerWidth] = useState<number>(1200); // Start with default value
 	const containerRef = useRef<HTMLDivElement>(null);
+	const [isMobile, setIsMobile] = useState(false);
 
 	function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
 		console.log("PDF loaded successfully with", numPages, "pages");
@@ -54,7 +56,14 @@ export default function MagazineViewer({ pdfUrl }: MagazineViewerProps) {
 	useEffect(() => {
 		const updateWidth = () => {
 			if (containerRef.current) {
-				setContainerWidth(containerRef.current.clientWidth);
+				const width = containerRef.current.clientWidth;
+				setContainerWidth((prev) => {
+					if (Math.abs(prev - width) > 10) {
+						return width;
+					}
+					return prev;
+				});
+				setIsMobile(width < 768);
 			}
 		};
 
@@ -64,13 +73,16 @@ export default function MagazineViewer({ pdfUrl }: MagazineViewerProps) {
 		return () => window.removeEventListener("resize", updateWidth);
 	}, []);
 
-	const maxBookWidth = Math.min(containerWidth * 0.9, 1400);
-	const pageWidth = maxBookWidth / 2;
-	const pageHeight = pageWidth * 1.19;
+	const maxBookWidth = isMobile
+		? Math.min(containerWidth * 0.95, 600)
+		: Math.min(containerWidth * 0.9, 1400);
+
+	const pageWidth = isMobile ? maxBookWidth : maxBookWidth / 2;
+	const pageHeight = pageWidth * (year === "2024-25" ? 1.414 : 1.19);
 
 	return (
 		<div
-			className="w-full flex justify-center items-center py-10"
+			className="w-full flex justify-center items-center py-10 touch-none"
 			ref={containerRef}
 		>
 			<Document
@@ -99,17 +111,17 @@ export default function MagazineViewer({ pdfUrl }: MagazineViewerProps) {
 							width={pageWidth}
 							height={pageHeight}
 							size="fixed"
-							minWidth={250}
-							maxWidth={700}
-							minHeight={350}
-							maxHeight={1000}
+							minWidth={isMobile ? 200 : 250}
+							maxWidth={isMobile ? 600 : 700}
+							minHeight={isMobile ? 300 : 350}
+							maxHeight={isMobile ? 850 : 1000}
 							maxShadowOpacity={0.5}
 							showCover={true}
 							mobileScrollSupport={true}
 							className="shadow-2xl"
 							drawShadow={true}
 							flippingTime={800}
-							usePortrait={false}
+							usePortrait={isMobile}
 							startPage={0}
 							clickEventForward={true}
 							useMouseEvents={true}
