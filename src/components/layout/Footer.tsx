@@ -7,6 +7,7 @@ import {
 	AiOutlineLinkedin,
 	AiOutlineMail,
 	AiOutlinePhone,
+	AiOutlineTwitter,
 } from "react-icons/ai";
 
 export const social = [
@@ -29,6 +30,11 @@ export const social = [
 		link: "https://www.linkedin.com/company/finite-loop-club/",
 		icon: <AiOutlineLinkedin className="h-7 w-7 hover:-translate-y-1" />,
 		name: "LinkedIn",
+	},
+	{
+		link: "https://twitter.com/finiteloopclub",
+		icon: <AiOutlineTwitter className="h-7 w-7 hover:-translate-y-1" />,
+		name: "Twitter",
 	},
 	{
 		link: "mailto:finiteloopclub@nmamit.in",
