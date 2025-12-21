@@ -20,7 +20,7 @@ const MagazineViewer = dynamic(
 
 export default function MagazinePage() {
 	const yearlyMagazine = {
-		// "2024-25": "/inFiniteInsider.pdf",
+		"2024-25": "/inFiniteInsider.pdf",
 		"2025-26": "/infinite.pdf",
 	};
 
@@ -33,22 +33,22 @@ export default function MagazinePage() {
 
 	const handleToggleChange = (e: React.ChangeEvent<HTMLDivElement>) => {
 		const id = (e.target as HTMLElement).id;
-		if (id === "glass-bronze")
-			setSelectedYearData({ year: "2024-25", index: 0 });
-		else if (id === "glass-mad")
+		if (id === "glass-gold") setSelectedYearData({ year: "2024-25", index: 0 });
+		else if (id === "glass-platinum")
 			setSelectedYearData({ year: "2025-26", index: 1 });
 	};
 
 	return (
-		<main className="min-h-screen mb-16 p-4 md:p-6 bg-[radial-gradient(at_top_right,_#FBCFF4,_#E4CCF8,_#C4E2F7,_#FEF9FF)] dark:bg-[radial-gradient(at_top_right,_#7F439D,_#33107C,_#060329)]">
+		<main className="min-h-screen mb-16 p-4 md:p-6 bg-[radial-gradient(at_top_right,#FBCFF4,#E4CCF8,#C4E2F7,#FEF9FF)] dark:bg-[radial-gradient(at_top_right,#7F439D,#33107C,#060329)]">
 			<h1 className="lilita-font text-6xl md:text-7xl lg:text-8xl font-extrabold text-flc-yellow mb-2 mt-32 md:mt-20 text-center">
 				MAGAZINE
 			</h1>
 			<p className="text-base sm:text-lg text-purple-900 dark:text-purple-100 mb-8 md:mb-12 text-center">
-				Explore the 2025 edition of inFinite Insider!
+				Explore the {selectedYearData.year.split("-")[0]} edition of inFinite
+				Insider!
 			</p>
 
-			{/* <div
+			<div
 				ref={radioContainerRef}
 				className="m-4 md:m-8 select-none w-full flex justify-center overflow-x-auto scrollbar-hide rounded-2xl"
 				onChange={handleToggleChange}
@@ -68,11 +68,11 @@ export default function MagazinePage() {
 						setSelectedYearData({ year, index });
 					}}
 				/>
-			</div> */}
+			</div>
 
 			<div className="w-full max-w-7xl mx-auto min-h-[400px] md:min-h-[800px] flex justify-center">
 				<MagazineViewer
-					pdfUrl={"./infinite.pdf"}
+					pdfUrl={yearlyMagazine[selectedYearData.year]}
 					year={selectedYearData.year}
 				/>
 			</div>
