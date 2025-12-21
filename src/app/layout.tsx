@@ -6,6 +6,7 @@ import Navbar from "@/components/layout/Navbar";
 import { Providers } from "@/components/layout/Providers";
 import Toaster from "@/components/ui/Toaster";
 import { BannerProvider } from "@/contexts/BannerContext";
+import SnowfallEffect from "@/components/layout/SnowfallEffect";
 
 export const metadata: Metadata = {
 	title: {
@@ -76,6 +77,7 @@ export default function RootLayout({
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body className="min-h-screen flex flex-col">
+				<SnowfallEffect />
 				<Providers>
 					<BannerProvider>
 						<Toaster />
