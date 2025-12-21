@@ -54,7 +54,7 @@ export default function MagazineViewer({ pdfUrl, year }: MagazineViewerProps) {
 	const [metadata, setMetadata] = useState<MagazineMetadata | null>(null);
 	const [containerWidth, setContainerWidth] = useState<number>(1200);
 	const containerRef = useRef<HTMLDivElement>(null);
-	const [isMobile, setIsMobile] = useState(false);
+	const [isMobile, setIsMobile] = useState(true);
 	const [loadedPages, setLoadedPages] = useState<Set<number>>(
 		new Set([1, 2, 3, 4]),
 	);
@@ -114,7 +114,7 @@ export default function MagazineViewer({ pdfUrl, year }: MagazineViewerProps) {
 					}
 					return prev;
 				});
-				setIsMobile(width < 768);
+				setIsMobile(width < 800);
 			}
 		};
 
@@ -124,7 +124,7 @@ export default function MagazineViewer({ pdfUrl, year }: MagazineViewerProps) {
 	}, []);
 
 	const maxBookWidth = isMobile
-		? Math.min(containerWidth * 0.95, 600)
+		? Math.min(containerWidth - 32, 380)
 		: Math.min(containerWidth * 0.9, 1400);
 
 	const pageWidth = isMobile ? maxBookWidth : maxBookWidth / 2;
@@ -144,21 +144,21 @@ export default function MagazineViewer({ pdfUrl, year }: MagazineViewerProps) {
 
 	return (
 		<div
-			className="w-full flex justify-center items-start py-10 touch-none"
+			className="w-full flex justify-center items-center py-4 sm:py-8 md:py-10 touch-none overflow-hidden"
 			ref={containerRef}
 		>
 			{metadata && metadata.totalPages > 0 && (
-				<div className="flex flex-col items-center gap-6">
+				<div className="flex flex-col items-center gap-6 w-full">
 					{/* @ts-ignore */}
 					<HTMLFlipBook
-						key={year}
+						key={`${year}-${isMobile ? "mobile" : "desktop"}`}
 						width={pageWidth}
 						height={pageHeight}
 						size="fixed"
-						minWidth={isMobile ? 200 : 250}
-						maxWidth={isMobile ? 600 : 700}
-						minHeight={isMobile ? 300 : 350}
-						maxHeight={isMobile ? 850 : 1000}
+						minWidth={isMobile ? 250 : 250}
+						maxWidth={isMobile ? 400 : 700}
+						minHeight={isMobile ? 350 : 350}
+						maxHeight={isMobile ? 650 : 1000}
 						maxShadowOpacity={0.5}
 						showCover={true}
 						mobileScrollSupport={true}

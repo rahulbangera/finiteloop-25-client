@@ -39,18 +39,18 @@ export default function MagazinePage() {
 	};
 
 	return (
-		<main className="min-h-screen mb-16 p-4 md:p-6 bg-[radial-gradient(at_top_right,#FBCFF4,#E4CCF8,#C4E2F7,#FEF9FF)] dark:bg-[radial-gradient(at_top_right,#7F439D,#33107C,#060329)]">
-			<h1 className="lilita-font text-6xl md:text-7xl lg:text-8xl font-extrabold text-flc-yellow mb-2 mt-32 md:mt-20 text-center">
+		<main className="min-h-screen mb-8 md:mb-16 p-2 sm:p-4 md:p-6 bg-[radial-gradient(at_top_right,#FBCFF4,#E4CCF8,#C4E2F7,#FEF9FF)] dark:bg-[radial-gradient(at_top_right,#7F439D,#33107C,#060329)]">
+			<h1 className="lilita-font text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-extrabold text-flc-yellow mb-2 mt-20 sm:mt-24 md:mt-20 text-center">
 				MAGAZINE
 			</h1>
-			<p className="text-base sm:text-lg text-purple-900 dark:text-purple-100 mb-8 md:mb-12 text-center">
+			<p className="text-sm sm:text-base md:text-lg text-purple-900 dark:text-purple-100 mb-4 sm:mb-6 md:mb-12 text-center px-4">
 				Explore the {selectedYearData.year.split("-")[0]} edition of inFinite
 				Insider!
 			</p>
 
 			<div
 				ref={radioContainerRef}
-				className="m-4 md:m-8 select-none w-full flex justify-center overflow-x-auto scrollbar-hide rounded-2xl"
+				className="mb-4 sm:mb-6 md:mb-8 px-2 select-none w-full flex justify-center overflow-x-auto scrollbar-hide rounded-2xl"
 				onChange={handleToggleChange}
 				style={{
 					scrollbarWidth: "none",
@@ -70,7 +70,7 @@ export default function MagazinePage() {
 				/>
 			</div>
 
-			<div className="w-full max-w-7xl mx-auto min-h-[400px] md:min-h-[800px] flex justify-center">
+			<div className="w-full max-w-7xl mx-auto px-1 sm:px-2 md:px-4 flex justify-center">
 				<MagazineViewer
 					pdfUrl={yearlyMagazine[selectedYearData.year]}
 					year={selectedYearData.year}
