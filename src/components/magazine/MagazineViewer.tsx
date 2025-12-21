@@ -200,8 +200,8 @@ export default function MagazineViewer({ pdfUrl, year }: MagazineViewerProps) {
 												height={metadata.height}
 												className="w-full h-full object-contain"
 												quality={90}
-												priority={isNearCurrentPage}
-												loading={isNearCurrentPage ? "eager" : "lazy"}
+												priority={true}
+												loading="eager"
 											/>
 										</div>
 									) : (
