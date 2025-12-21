@@ -86,22 +86,31 @@ export default function MagazineViewer({ pdfUrl, year }: MagazineViewerProps) {
 		fetchMetadata();
 	}, [year]);
 
+	useEffect(() => {
+		if (!metadata) return;
+
+		const preloadNearby = () => {
+			const pagesToLoad = new Set<number>();
+			const BUFFER = 5;
+
+			for (
+				let i = Math.max(0, currentPage - BUFFER);
+				i <= Math.min(metadata.totalPages - 1, currentPage + BUFFER);
+				i++
+			) {
+				pagesToLoad.add(i + 1);
+			}
+
+			setLoadedPages((prev) => new Set([...prev, ...pagesToLoad]));
+		};
+
+		const timer = setTimeout(preloadNearby, 500);
+		return () => clearTimeout(timer);
+	}, [currentPage, metadata]);
+
 	const onFlip = (e: any) => {
 		const newPage = e.data;
 		setCurrentPage(newPage);
-
-		const pagesToLoad = new Set<number>();
-		const BUFFER = 3;
-
-		for (
-			let i = Math.max(0, newPage - BUFFER);
-			i <= Math.min((metadata?.totalPages || 0) - 1, newPage + BUFFER);
-			i++
-		) {
-			pagesToLoad.add(i + 1);
-		}
-
-		setLoadedPages((prev) => new Set([...prev, ...pagesToLoad]));
 	};
 
 	useEffect(() => {
@@ -177,7 +186,9 @@ export default function MagazineViewer({ pdfUrl, year }: MagazineViewerProps) {
 						{metadata.pages.map((page) => {
 							const Component = page.number === 1 ? PageCover : PageContent;
 							const shouldLoad = loadedPages.has(page.number);
-
+							const isNearCurrentPage =
+								Math.abs(page.number - 1 - currentPage) <= 2;
+							console.log(isNearCurrentPage);
 							return (
 								<Component key={`page_${page.number}`}>
 									{shouldLoad ? (
@@ -189,8 +200,8 @@ export default function MagazineViewer({ pdfUrl, year }: MagazineViewerProps) {
 												height={metadata.height}
 												className="w-full h-full object-contain"
 												quality={90}
-												priority={page.number <= 3}
-												loading={page.number <= 3 ? "eager" : "lazy"}
+												priority={isNearCurrentPage}
+												loading={isNearCurrentPage ? "eager" : "lazy"}
 											/>
 										</div>
 									) : (
