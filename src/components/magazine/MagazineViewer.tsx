@@ -42,6 +42,8 @@ interface MagazineMetadata {
 	year: string;
 	totalPages: number;
 	format: string;
+	width: number;
+	height: number;
 	pages: Array<{
 		number: number;
 		filename: string;
@@ -53,11 +55,19 @@ export default function MagazineViewer({ pdfUrl, year }: MagazineViewerProps) {
 	const [containerWidth, setContainerWidth] = useState<number>(1200);
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [isMobile, setIsMobile] = useState(false);
-	const [loadedPages, setLoadedPages] = useState<Set<number>>(new Set([1]));
+	const [loadedPages, setLoadedPages] = useState<Set<number>>(
+		new Set([1, 2, 3, 4]),
+	);
 	const [currentPage, setCurrentPage] = useState(0);
+	const [isLoadingYear, setIsLoadingYear] = useState(false);
 
 	useEffect(() => {
 		const fetchMetadata = async () => {
+			setIsLoadingYear(true);
+			setMetadata(null);
+			setLoadedPages(new Set([1, 2, 3, 4]));
+			setCurrentPage(0);
+
 			try {
 				const res = await fetch(`/magazines/${year}/metadata.json`);
 				if (res.ok) {
@@ -68,6 +78,8 @@ export default function MagazineViewer({ pdfUrl, year }: MagazineViewerProps) {
 				}
 			} catch (error) {
 				console.error("Error loading metadata:", error);
+			} finally {
+				setIsLoadingYear(false);
 			}
 		};
 
@@ -116,9 +128,11 @@ export default function MagazineViewer({ pdfUrl, year }: MagazineViewerProps) {
 		: Math.min(containerWidth * 0.9, 1400);
 
 	const pageWidth = isMobile ? maxBookWidth : maxBookWidth / 2;
-	const pageHeight = pageWidth * (year === "2024-25" ? 1.414 : 1.19);
+	const pageHeight = metadata
+		? pageWidth * (metadata.height / metadata.width)
+		: pageWidth * 1.4;
 
-	if (!metadata) {
+	if (!metadata || isLoadingYear) {
 		return (
 			<div className="w-full flex justify-center items-center py-10">
 				<div className="text-purple-900 dark:text-purple-100 text-xl animate-pulse bg-white/20 p-8 rounded-lg">
@@ -130,13 +144,14 @@ export default function MagazineViewer({ pdfUrl, year }: MagazineViewerProps) {
 
 	return (
 		<div
-			className="w-full flex justify-center items-center py-10 touch-none"
+			className="w-full flex justify-center items-start py-10 touch-none"
 			ref={containerRef}
 		>
 			{metadata && metadata.totalPages > 0 && (
 				<div className="flex flex-col items-center gap-6">
 					{/* @ts-ignore */}
 					<HTMLFlipBook
+						key={year}
 						width={pageWidth}
 						height={pageHeight}
 						size="fixed"
@@ -166,12 +181,13 @@ export default function MagazineViewer({ pdfUrl, year }: MagazineViewerProps) {
 							return (
 								<Component key={`page_${page.number}`}>
 									{shouldLoad ? (
-										<div className="relative w-full h-full bg-white">
+										<div className="relative w-full h-full bg-white flex items-center justify-center">
 											<Image
 												src={`/magazines/${year}/${page.filename}`}
 												alt={`Page ${page.number}`}
-												fill
-												className="object-contain"
+												width={metadata.width}
+												height={metadata.height}
+												className="w-full h-full object-contain"
 												quality={90}
 												priority={page.number <= 3}
 												loading={page.number <= 3 ? "eager" : "lazy"}
