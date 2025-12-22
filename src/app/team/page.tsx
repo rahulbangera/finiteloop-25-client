@@ -240,7 +240,9 @@ export default function Team() {
 						<button
 							type="button"
 							onClick={() => {
-								setSelectionType("faculty");
+								setSelectionType((prev) =>
+									prev === "year" ? "faculty" : "year",
+								);
 							}}
 							className={`group relative px-8 py-4 rounded-2xl text-sm font-bold transition-all duration-500 backdrop-blur-xl border overflow-hidden ${
 								selectionType === "faculty"
