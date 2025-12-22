@@ -12,11 +12,11 @@ export default function SnowfallEffect() {
 					left: 0,
 					width: "100vw",
 					height: "100vh",
-					zIndex: 1,
+					zIndex: -1,
 					pointerEvents: "none",
 				}}
 			>
-				<Snowfall snowflakeCount={20} />
+				<Snowfall snowflakeCount={40} />
 			</div>
 
 			<div
@@ -30,7 +30,25 @@ export default function SnowfallEffect() {
 					pointerEvents: "none",
 				}}
 			>
-				<Snowfall snowflakeCount={20} />
+				<Snowfall snowflakeCount={30} />
+			</div>
+			<div className="snowflakes" aria-hidden="true">
+				{Array.from({ length: 10 }, (_, i) => i).map((id) => (
+					<div key={`snowflake-background-${id}`} className="snowflake">
+						<div className="inner">❅</div>
+					</div>
+				))}
+			</div>
+			<div className="snowflakes" aria-hidden="true">
+				{Array.from({ length: 20 }, (_, i) => i).map((id) => (
+					<div
+						key={`snowflake-foreground-${id}`}
+						className="snowflake"
+						style={{ zIndex: -1 }}
+					>
+						<div className="inner">❅</div>
+					</div>
+				))}
 			</div>
 		</>
 	);
