@@ -86,6 +86,7 @@ export default function RootLayout({
 							<Background />
 						</div>
 						<main className="flex-1">{children}</main>
+
 						<Footer />
 					</BannerProvider>
 				</Providers>

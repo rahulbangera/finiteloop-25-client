@@ -211,6 +211,78 @@
 			opacity: 0;
 		}
 	}
+
+	--animate-snowman-wobble: snowman-wobble 0.5s ease-in-out infinite;
+
+	@keyframes snowman-wobble {
+
+		0%,
+		100% {
+			transform: rotate(0deg);
+		}
+
+		25% {
+			transform: rotate(-10deg);
+		}
+
+		75% {
+			transform: rotate(10deg);
+		}
+	}
+
+	--animate-coin-spin: coin-spin 3s linear infinite;
+
+	@keyframes coin-spin {
+		0% {
+			transform: rotateY(0deg);
+		}
+
+		100% {
+			transform: rotateY(360deg);
+		}
+	}
+
+	--animate-float-slow: float-slow 3s ease-in-out infinite;
+
+	@keyframes float-slow {
+
+		0%,
+		100% {
+			transform: translateY(0px);
+		}
+
+		50% {
+			transform: translateY(-8px);
+		}
+	}
+
+	--animate-float-medium: float-medium 2.5s ease-in-out infinite;
+
+	@keyframes float-medium {
+
+		0%,
+		100% {
+			transform: translateY(0px);
+		}
+
+		50% {
+			transform: translateY(-6px);
+		}
+	}
+
+	--animate-float-fast: float-fast 2s ease-in-out infinite;
+
+	@keyframes float-fast {
+
+		0%,
+		100% {
+			transform: translateY(0px);
+		}
+
+		50% {
+			transform: translateY(-4px);
+		}
+	}
 }
 
 .ProseMirror {

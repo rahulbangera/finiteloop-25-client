@@ -123,11 +123,11 @@ export const WhatsAppShare = ({
 
 				if (WHATSAPP_SHARE_CONFIG.content.includeEmojis) {
 					message += `📊 *Performance Stats:*\n`;
-					message += `• *Activity Points:* ⚡ *${activityPoints}*\n`;
+					message += `• *FLC Points:* ⚡ *${activityPoints}*\n`;
 					message += `• *Attendance:* 📈 *${attendance}%*\n\n`;
 				} else {
 					message += `*Performance Stats:*\n`;
-					message += `• *Activity Points:* *${activityPoints}*\n`;
+					message += `• *FLC Points:* *${activityPoints}*\n`;
 					message += `• *Attendance:* *${attendance}%*\n\n`;
 				}
 			}
