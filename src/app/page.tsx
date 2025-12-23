@@ -4,6 +4,8 @@ import JsonLd, {
 	organizationSchema,
 	websiteSchema,
 } from "@/components/seo/JsonLd";
+import Snowman from "@/components/ui/custom/Snowman";
+import Snowman2 from "@/components/ui/custom/Snowman2";
 import MovingBannerWrapper from "@/components/ui/MovingBannerWrapper";
 import { useBannerContext } from "@/contexts/BannerContext";
 import { useSession } from "next-auth/react";
@@ -85,7 +87,14 @@ const page = () => {
 			</div>
 
 			<Benefits />
-
+			<div className="flex relative justify-end mr-32">
+				<div className="flex -translate-y-1/2 justify-center mt-8">
+					<Snowman />
+				</div>
+				<div className="flex -translate-y-3/4 translate-x-1/2 justify-center mt-8">
+					<Snowman2 />
+				</div>
+			</div>
 			{/* Structured Data */}
 			<JsonLd data={organizationSchema} />
 			<JsonLd data={websiteSchema} />
