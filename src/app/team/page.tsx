@@ -156,6 +156,9 @@ export default function Team() {
 									setSelectionType("year");
 									setSelectedYear(e.target.value);
 								}}
+								onClick={() => {
+									setSelectionType("year");
+								}}
 								className={`w-full px-6 py-4 pr-12 rounded-2xl text-sm font-bold text-white border border-purple-400/50 shadow-[0_0_20px_rgba(139,92,246,0.4)] backdrop-blur-xl appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400 transition-all duration-300 ${selectionType === "year" ? "bg-gradient-to-br from-purple-500 via-indigo-600 to-blue-600" : ""}`}
 							>
 								{yearOptions.map((year) => (
@@ -188,7 +191,11 @@ export default function Team() {
 
 						<button
 							type="button"
-							onClick={() => setSelectionType("faculty")}
+							onClick={() => {
+								setSelectionType((prev) =>
+									prev === "year" ? "faculty" : "year",
+								);
+							}}
 							className={`w-full group relative px-6 py-4 rounded-2xl text-sm font-bold transition-all duration-500 backdrop-blur-xl border overflow-hidden ${
 								selectionType === "faculty"
 									? "bg-gradient-to-br from-amber-500 via-orange-600 to-red-600 text-white border-amber-400/50 shadow-[0_0_20px_rgba(245,158,11,0.4)] scale-105"
@@ -206,6 +213,9 @@ export default function Team() {
 								onChange={(e) => {
 									setSelectionType("year");
 									setSelectedYear(e.target.value);
+								}}
+								onClick={() => {
+									setSelectionType("year");
 								}}
 								className={`px-8 py-4 pr-12 rounded-2xl text-sm font-bold bg-gradient-to-br text-white border border-purple-400/50 shadow-[0_0_20px_rgba(139,92,246,0.4)] backdrop-blur-xl appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400 min-w-[200px] transition-all duration-300 ${selectionType === "year" ? "bg-gradient-to-br from-purple-500 via-indigo-600 to-blue-600" : ""}`}
 							>
@@ -301,7 +311,7 @@ export default function Team() {
 
 										{member.image ? (
 											<Image
-												src={member.image}
+												src={member.image.trim()}
 												alt={member.name}
 												width={320}
 												height={320}
