@@ -386,22 +386,22 @@ const Benefits = () => {
 								<div className="text-center max-w-sm space-y-6">
 									<div className="space-y-4">
 										<h4 className="lilita-font text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
-											Get Your Free Guide
+											Get Your Own Copy
 										</h4>
 										<div className="w-12 h-1 bg-flc-yellow rounded-full mx-auto"></div>
 									</div>
 
 									<p className="comic-font text-gray-600 dark:text-gray-400 text-base leading-relaxed">
-										Download our exclusive{" "}
+										Dive into our{" "}
 										<span className="text-flc-yellow font-semibold">
-											tech guide
+											official club magazine
 										</span>{" "}
-										and stay ahead of the curve with cutting-edge insights
+										featuring interesting tech insights and much more!
 									</p>
 
 									<div className="pt-2">
 										<a
-											href="/inFiniteInsider.pdf"
+											href="/infinite.pdf"
 											target="_blank"
 											rel="noopener noreferrer"
 											className="comic-font inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white bg-gradient-to-r from-flc-yellow to-flc-yellow/90 hover:from-flc-yellow/90 hover:to-flc-yellow rounded-2xl transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-flc-yellow/30 hover:scale-105 group min-w-[180px]"

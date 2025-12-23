@@ -7,6 +7,7 @@ import { Providers } from "@/components/layout/Providers";
 import Toaster from "@/components/ui/Toaster";
 import { BannerProvider } from "@/contexts/BannerContext";
 import SnowfallEffect from "@/components/layout/SnowfallEffect";
+import SnowballThrow from "@/components/SnowballThrow";
 
 export const metadata: Metadata = {
 	title: {
@@ -78,6 +79,7 @@ export default function RootLayout({
 		<html lang="en" suppressHydrationWarning>
 			<body className="min-h-screen flex flex-col">
 				<SnowfallEffect />
+				<SnowballThrow />
 				<Providers>
 					<BannerProvider>
 						<Toaster />
