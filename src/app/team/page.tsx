@@ -1,8 +1,13 @@
 "use client";
 
 import Image from "next/image";
+import React from "react";
 import { useEffect, useState } from "react";
 import { FaGithub, FaInstagram, FaLinkedinIn } from "react-icons/fa";
+import { useSession } from "next-auth/react";
+import EasterEggModal from "../../components/ui/custom/EasterEggModal";
+
+const SNOWMAN_EASTER_EGG_ID = 2; // Assuming the ID for the snowman easter egg in the database
 
 interface UserLink {
 	id: string;
@@ -32,10 +37,13 @@ export default function Team() {
 	const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
-
 	const [selectionType, setSelectionType] = useState<"year" | "faculty">(
 		"year",
 	);
+	const [alreadyClaimed, setAlreadyClaimed] = React.useState(false);
+	const [flcPoints, setFlcPoints] = React.useState(0);
+	const [showModal, setShowModal] = React.useState(false);
+	const [errorMessage, setErrorMessage] = React.useState("");
 
 	const yearOptions = [
 		{ id: "2016-20", label: "2016-20" },
@@ -48,6 +56,63 @@ export default function Team() {
 	];
 
 	const [selectedYear, setSelectedYear] = useState("2025-26");
+	const { data: session } = useSession(); // Get session data
+
+	const handleClaim = async () => {
+		try {
+			const res = await fetch(
+				`${process.env.NEXT_PUBLIC_SERVER_URL}/api/easteregg/giveflceasterpoints`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${session?.accessToken}`,
+					},
+					body: JSON.stringify({ easterEggId: SNOWMAN_EASTER_EGG_ID }),
+				},
+			);
+
+			const data = await res.json();
+
+			// RESET modal state first
+			setErrorMessage("");
+			setAlreadyClaimed(false);
+			setFlcPoints(0);
+
+			if (res.status === 200) {
+				setFlcPoints(data.totalFLCPoints);
+				setAlreadyClaimed(false);
+				setShowModal(true);
+				return;
+			}
+
+			if (res.status === 209) {
+				setAlreadyClaimed(true);
+				setShowModal(true);
+				return;
+			}
+
+			if (res.status === 401) {
+				setErrorMessage("You need to be logged in to claim the reward.");
+				setShowModal(true);
+			}
+		} catch {
+			setErrorMessage("Something went wrong. Please try again.");
+			setShowModal(true);
+		}
+	};
+
+	const handleCloseModal = () => {
+		setShowModal(false);
+	};
+
+	const handleSnowmanClick = () => {
+		if (alreadyClaimed) {
+			setShowModal(true);
+			return;
+		}
+		handleClaim();
+	};
 
 	useEffect(() => {
 		const fetchTeamMembers = async () => {
@@ -64,7 +129,28 @@ export default function Team() {
 				const result: APIResponse = await response.json();
 
 				if (result.success) {
-					setTeamMembers(result.data || []);
+					setTeamMembers(result.data);
+					const SNOWMAN: TeamMember = {
+						id: 99999, // Unique ID for the snowman
+						name: "Snowman",
+						image:
+							"https://res.cloudinary.com/dyrzaaln4/image/upload/v1766510372/snowman_yzeb6m.png", // Path to snowman image
+						userLink: [],
+						year: "2025",
+						position: "Christmas Team",
+						type: "EASTER_EGG",
+						priority: 10, // High priority to appear last or in a specific spot
+					};
+					const merged: TeamMember[] = [...result.data, SNOWMAN];
+
+					merged.sort((a, b) => {
+						if (a.priority !== b.priority) {
+							return a.priority - b.priority; // ascending
+						}
+						return a.id - b.id;
+					});
+
+					setTeamMembers(merged);
 				} else {
 					throw new Error(result.error || "Failed to fetch team members");
 				}
@@ -286,7 +372,6 @@ export default function Team() {
 						</button>
 					</div>
 				</div>
-
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
 					{filteredMembers.length === 0 ? (
 						<div className="col-span-full text-center text-gray-600 dark:text-gray-400 text-xl mt-10">
@@ -302,7 +387,17 @@ export default function Team() {
 						</div>
 					) : (
 						filteredMembers.map((member) => (
-							<div key={member.id} className="group relative">
+							<button
+								key={member.id}
+								type="button"
+								className="group relative"
+								onClick={() => {
+									if (member.id === 99999) {
+										handleSnowmanClick();
+									}
+								}}
+							>
+								{/* Wrapping card in button to handle snowman click */}
 								<div className="relative w-80 h-full flex flex-col bg-white/20 dark:bg-gradient-to-br dark:from-slate-900/50 dark:via-blue-900/30 dark:to-purple-900/40 backdrop-blur-xl border border-white/30 dark:border-slate-700/50 rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 hover:bg-white/30 dark:hover:bg-gradient-to-br dark:hover:from-slate-800/60 dark:hover:via-blue-800/40 dark:hover:to-purple-800/50">
 									<div className="relative w-full h-80 overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
 										<div className="absolute top-4 right-4 w-3 h-3 bg-gradient-to-r from-purple-400 to-pink-400 dark:from-blue-400 dark:to-cyan-400 rounded-full opacity-70 animate-pulse"></div>
@@ -392,11 +487,18 @@ export default function Team() {
 										</div>
 									</div>
 								</div>
-							</div>
+							</button>
 						))
 					)}
 				</div>
 			</div>
+			<EasterEggModal
+				isOpen={showModal}
+				onClose={handleCloseModal}
+				alreadyClaimed={alreadyClaimed}
+				flcPoints={flcPoints}
+				errorMessage={errorMessage}
+			/>
 		</main>
 	);
 }
