@@ -1396,7 +1396,7 @@ export default function Profile({ userId }: { userId?: number }) {
 				<div className="p-4 sm:p-5 md:p-8 space-y-4 sm:space-y-6 text-black dark:text-white">
 					<div className="grid grid-cols-2 gap-3 sm:gap-4">
 						<StatItem
-							label="Activity Points"
+							label="FLC Points"
 							value={`${(currentUser as unknown as { totalActivityPoints: number })?.totalActivityPoints || currentUser?.activityPoints || "0"}`}
 						/>
 						<StatItem
