@@ -16,13 +16,6 @@ const Snowman = () => {
 	const [flcPoints, setFlcPoints] = React.useState(0);
 	const [errorMessage, setErrorMessage] = React.useState("");
 
-	React.useEffect(() => {
-		const claimed = localStorage.getItem("flc_snowman_claimed");
-		if (claimed === "true") {
-			setAlreadyClaimed(true);
-		}
-	}, []);
-
 	const handleClaim = async () => {
 		const res = await fetch(
 			`${process.env.NEXT_PUBLIC_SERVER_URL}/api/easteregg/giveflceasterpoints`,
@@ -37,12 +30,10 @@ const Snowman = () => {
 		);
 		const data = await res.json();
 		if (res.status === 200) {
-			localStorage.setItem("flc_snowman_claimed", "true");
 			setFlcPoints(data.totalFLCPoints);
 			setShowModal(true);
 		}
 		if (res.status === 209) {
-			localStorage.setItem("flc_snowman_claimed", "true");
 			setFlcPoints(data.totalFLCPoints);
 			setAlreadyClaimed(true);
 			setShowModal(true);
@@ -73,9 +64,7 @@ const Snowman = () => {
 			setTimeout(() => {
 				setExploded(true);
 				setTimeout(() => {
-					if (!alreadyClaimed) {
-						handleClaim();
-					}
+					handleClaim();
 				}, 400);
 			}, 200);
 		}
