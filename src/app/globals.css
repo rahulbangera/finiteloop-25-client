@@ -553,3 +553,129 @@ body {
 .animate-marquee2 {
 	animation: marquee2 30s linear infinite;
 }
+
+
+
+@keyframes twinkle {
+	0%, 100% {
+		opacity: 0.2;
+		transform: scale(0.7) rotate(0deg);
+		filter: brightness(0.5);
+	}
+	25% {
+		opacity: 0.8;
+		transform: scale(1.0) rotate(90deg);
+		filter: brightness(1.5);
+	}
+	50% {
+		opacity: 1;
+		transform: scale(1.2) rotate(180deg);
+		filter: brightness(2);
+	}
+	75% {
+		opacity: 0.8;
+		transform: scale(1.0) rotate(270deg);
+		filter: brightness(1.5);
+	}
+}
+
+@keyframes twinkle-slow {
+	0%, 100% {
+		opacity: 0.25;
+		transform: scale(0.9) rotate(0deg);
+	}
+	50% {
+		opacity: 0.7;
+		transform: scale(1.05) rotate(15deg);
+	}
+}
+
+
+.animate-twinkle {
+	animation: twinkle 3s ease-in-out infinite;
+}
+
+.animate-twinkle-slow {
+	animation: twinkle-slow 5s ease-in-out infinite;
+}
+
+
+.frost-border {
+	position: relative;
+	backdrop-filter: blur(8px);
+	box-shadow:
+		inset 0 0 10px rgba(255, 255, 255, 0.2),
+		0 0 8px rgba(200, 230, 255, 0.1);
+}
+
+.frost-border::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	padding: 2px;
+	background: linear-gradient(
+		135deg,
+		rgba(250, 250, 255, 0.5) 0%,
+		rgba(220, 235, 255, 0.4) 20%,
+		rgba(230, 240, 255, 0.3) 40%,
+		rgba(210, 225, 245, 0.4) 60%,
+		rgba(240, 245, 255, 0.5) 80%,
+		rgba(230, 240, 255, 0.5) 100%
+	);
+	-webkit-mask:
+		linear-gradient(#fff 0 0) content-box,
+		linear-gradient(#fff 0 0);
+	mask:
+		linear-gradient(#fff 0 0) content-box,
+		linear-gradient(#fff 0 0);
+	-webkit-mask-composite: xor;
+	mask-composite: exclude;
+	pointer-events: none;
+	z-index: 1;
+}
+
+@keyframes frost-shimmer {
+	0%, 100% {
+		opacity: 0.5;
+		transform: translateX(-10%);
+	}
+	50% {
+		opacity: 0.8;
+		transform: translateX(10%);
+	}
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+
+.ice-border {
+    position: relative;
+    border: 2px solid rgba(200, 225, 255, 0.5); 
+    box-shadow:
+        inset 0 0 25px rgba(180, 200, 255, 0.7), 
+          inset 0 0 50px rgba(160, 190, 255, 0.5), 
+          0 0 30px rgba(140, 180, 240, 0.4),       
+                    0 0 60px rgba(110, 160, 230, 0.3),       
+               0 0 80px rgba(80, 130, 210, 0.2),      
+         0 0 100px rgba(30, 80, 150, 0.1);      
+}
+
+
+.ice-border-subtle {
+    position: relative;
+                  border: 1px solid rgba(200, 225, 255, 0.3); 
+             box-shadow:
+        inset 0 0 15px rgba(180, 200, 255, 0.5), 
+                inset 0 0 30px rgba(160, 190, 255, 0.3), 
+        0 0 15px rgba(140, 180, 240, 0.2),       
+        0 0 20px rgba(30, 80, 150, 0.05);     
+}
+

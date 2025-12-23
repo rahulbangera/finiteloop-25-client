@@ -32,6 +32,7 @@ export default function SnowfallEffect() {
 			>
 				<Snowfall snowflakeCount={30} />
 			</div>
+
 			<div className="snowflakes" aria-hidden="true">
 				{Array.from({ length: 10 }, (_, i) => i).map((id) => (
 					<div key={`snowflake-background-${id}`} className="snowflake">
