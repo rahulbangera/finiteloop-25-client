@@ -1,5 +1,6 @@
 "use client";
 import Benefits from "@/components/sections/Benefits";
+import WordlePromo from "@/components/sections/WordlePromo";
 import JsonLd, {
 	organizationSchema,
 	websiteSchema,
@@ -86,6 +87,7 @@ const page = () => {
 				</div>
 			</div>
 
+			<WordlePromo />
 			<Benefits />
 			<div className="flex relative justify-end mr-32">
 				<div className="flex -translate-y-1/2 justify-center mt-8">
