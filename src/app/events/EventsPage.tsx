@@ -7,13 +7,14 @@ import { useSession } from "next-auth/react";
 import { QRCodeSVG } from "qrcode.react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
+import { Drawer } from "vaul";
 import Card from "@/components/elements/Card";
 import Radio from "@/components/elements/Radio";
 import EventWhatsAppShare from "@/components/events/EventWhatsAppShare";
 import PaymentButton from "@/components/razorpay/paymentButton";
 import { Button } from "@/components/ui/button";
-import { Drawer } from "vaul";
 import { HTMLContent } from "@/components/ui/custom/html-content";
+import SantaClaus from "@/components/ui/custom/SantaClaus";
 
 type EventYear =
 	| "2020-21"
@@ -1562,6 +1563,7 @@ const EventsPage = () => {
 						</button>
 					))
 				)}
+				{selectedYearData.year === "2021-22" && <SantaClaus />}
 			</div>
 			<Drawer.Root
 				open={drawerOpen && !!selectedEvent}
