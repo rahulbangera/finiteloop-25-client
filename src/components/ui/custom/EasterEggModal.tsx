@@ -9,6 +9,10 @@ interface EasterEggModalProps {
 	onToggleClaimed?: () => void;
 	flcPoints?: number;
 	errorMessage?: string;
+
+	// NEW (optional)
+	title?: React.ReactNode;
+	subtitle?: React.ReactNode;
 }
 
 const EasterEggModal: React.FC<EasterEggModalProps> = ({
@@ -17,6 +21,8 @@ const EasterEggModal: React.FC<EasterEggModalProps> = ({
 	alreadyClaimed = false,
 	errorMessage = "",
 	flcPoints = 5,
+	title,
+	subtitle,
 }) => {
 	const [show, setShow] = useState(isOpen);
 	const [mounted, setMounted] = useState(false);
@@ -52,20 +58,24 @@ const EasterEggModal: React.FC<EasterEggModalProps> = ({
 				<div className="absolute top-0 left-0 w-full h-1.5 bg-linear-to-r from-[#7F439D] via-[#FBCFF4] to-[#7F439D]" />
 
 				<h3 className="lilita-font text-3xl font-bold leading-6 text-white mb-2 text-center mt-4 tracking-wide drop-shadow-lg">
-					{alreadyClaimed
-						? "Easter Egg Already Found!"
-						: "🎉 Easter Egg Discovered!"}
+					{title ??
+						(alreadyClaimed
+							? "Easter Egg Already Found!"
+							: "🎉 Easter Egg Discovered!")}
 				</h3>
 
 				<div className="mt-4 flex flex-col items-center w-full">
 					<p
-						className={`comic-font text-xl text-gray-300 text-center ${errorMessage.trim() !== "" ? "" : "mb-2"}`}
+						className={`comic-font text-xl text-gray-300 text-center ${
+							errorMessage.trim() !== "" ? "" : "mb-2"
+						}`}
 					>
-						{errorMessage.trim() !== ""
-							? ""
-							: alreadyClaimed
-								? "You have already claimed the reward for this Easter Egg. Keep exploring for more!"
-								: "Congratulations! You've found a hidden Easter Egg and earned FLC Points!"}
+						{subtitle ??
+							(errorMessage.trim() !== ""
+								? ""
+								: alreadyClaimed
+									? "You have already claimed the reward for this Easter Egg. Keep exploring for more!"
+									: "Congratulations! You've found a hidden Easter Egg and earned FLC Points!")}
 					</p>
 
 					<div className="relative py-4">

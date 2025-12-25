@@ -7,6 +7,7 @@ import type { WordleGuess } from "@/lib/wordle";
 interface Props {
 	gameId: string;
 	disabled: boolean;
+	pointsAwarded?: number;
 	onGuess: (
 		guess: WordleGuess & { status: "IN_PROGRESS" | "WON" | "LOST" },
 	) => void;
@@ -51,6 +52,7 @@ export function WordleKeyboard({ gameId, disabled, onGuess }: Props) {
 				guess: value,
 				result: json.data.result,
 				status: json.data.status,
+				pointsAwarded: json.data.pointsAwarded ?? 0,
 			});
 
 			setValue("");

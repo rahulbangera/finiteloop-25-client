@@ -2,20 +2,35 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-
+import EasterEggModal from "@/components/ui/custom/EasterEggModal";
 import { WordleBoard } from "@/components/wordle/WordleBoard";
 import { WordleKeyboard } from "@/components/wordle/WordleKeyboard";
 import type { WordleTodayResponse } from "@/lib/wordle";
 
 export default function WordlePage() {
 	const { data: session, status } = useSession();
-
 	const [game, setGame] = useState<WordleTodayResponse | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const [showWinModal, setShowWinModal] = useState(false);
+	const [awardedPoints, setAwardedPoints] = useState<number>(0);
 
 	// UI-only state: whether user clicked "start"
 	const [started, setStarted] = useState(false);
+
+	const winModalKey = game ? `wordle-win-modal-shown-${game.gameId}` : null;
+	useEffect(() => {
+		if (!game || !winModalKey) return;
+
+		if (game.status !== "WON") return;
+
+		const alreadyShown = localStorage.getItem(winModalKey);
+
+		if (!alreadyShown) {
+			setShowWinModal(true);
+			localStorage.setItem(winModalKey, "true");
+		}
+	}, [game, winModalKey]);
 
 	useEffect(() => {
 		if (status === "loading") return;
@@ -158,6 +173,10 @@ export default function WordlePage() {
 									status: newGuess.status,
 								};
 							});
+
+							if (newGuess.status === "WON") {
+								setAwardedPoints(newGuess.pointsAwarded ?? 0);
+							}
 						}}
 					/>
 
@@ -184,6 +203,14 @@ export default function WordlePage() {
 					)}
 				</div>
 			)}
+			<EasterEggModal
+				isOpen={showWinModal}
+				onClose={() => setShowWinModal(false)}
+				alreadyClaimed={false}
+				flcPoints={awardedPoints}
+				title="🎉 You Guessed Right!"
+				subtitle={`Congratulations! You've earned ${awardedPoints} FLC Points for winning today's Wordle!`}
+			/>
 		</main>
 	);
 }
