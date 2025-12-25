@@ -12,7 +12,7 @@ export default function WordlePromo({
 	href = "/wordle",
 }: WordlePromoProps) {
 	return (
-		<section className="md:py-20 relative overflow-hidden -mt-20 md:mt-0 mb-10">
+		<section className="relative overflow-hidden py-16 md:py-20 mt-0 md:-mt-20 mb-16">
 			<div className="max-w-7xl mx-auto px-6">
 				<div className="relative">
 					{/* Glow background */}
