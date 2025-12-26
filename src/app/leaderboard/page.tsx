@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { Scrollbar } from "react-scrollbars-custom";
 import UserCard from "@/components/elements/UserCard";
+import GlowingSigil from "@/components/ui/custom/GlowingSigil";
 
 const podiumStyle = {
 	1: "order-2 z-10", // First place - center
@@ -132,7 +133,9 @@ export default function Leaderboard() {
 						<button
 							key={user.userId}
 							type="button"
-							className={`flex flex-col items-center justify-end transition-all duration-300 cursor-pointer hover:scale-105 bg-transparent border-none p-0 ${podiumStyle[user.rank as 1 | 2 | 3]} w-[90px]`}
+							className={`flex flex-col items-center justify-end transition-all duration-300 cursor-pointer hover:scale-105 bg-transparent border-none p-0 ${
+								podiumStyle[user.rank as 1 | 2 | 3]
+							} w-22.5`}
 							onClick={() => {
 								window.location.assign(`/profile/${user.userId}`);
 							}}
@@ -148,7 +151,9 @@ export default function Leaderboard() {
 									<Image
 										src={user.avatar}
 										alt={user.name}
-										className={`rounded-full border-4 shadow-xl transition-all duration-300 ${podiumBorder[user.rank as 1 | 2 | 3]} object-cover`}
+										className={`rounded-full border-4 shadow-xl transition-all duration-300 ${
+											podiumBorder[user.rank as 1 | 2 | 3]
+										} object-cover`}
 										width={user.rank === 1 ? 85 : 70}
 										height={user.rank === 1 ? 85 : 70}
 										style={{
@@ -158,11 +163,15 @@ export default function Leaderboard() {
 									/>
 								) : (
 									<div
-										className={`rounded-full border-4 shadow-xl transition-all duration-300 ${podiumBorder[user.rank as 1 | 2 | 3]} flex items-center justify-center font-bold text-white`}
+										className={`rounded-full border-4 shadow-xl transition-all duration-300 ${
+											podiumBorder[user.rank as 1 | 2 | 3]
+										} flex items-center justify-center font-bold text-white`}
 										style={{
 											width: user.rank === 1 ? 85 : 70,
 											height: user.rank === 1 ? 85 : 70,
-											backgroundColor: `hsl(${(user.name.charCodeAt(0) * 137.5) % 360}, 70%, 50%)`,
+											backgroundColor: `hsl(${
+												(user.name.charCodeAt(0) * 137.5) % 360
+											}, 70%, 50%)`,
 											fontSize: user.rank === 1 ? "34px" : "28px",
 										}}
 									>
@@ -170,7 +179,9 @@ export default function Leaderboard() {
 									</div>
 								)}
 								<span
-									className={`absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 ${podiumRankBg[user.rank as 1 | 2 | 3]} text-white text-sm font-bold rounded-full w-7 h-7 flex items-center justify-center shadow-lg border-2`}
+									className={`absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 ${
+										podiumRankBg[user.rank as 1 | 2 | 3]
+									} text-white text-sm font-bold rounded-full w-7 h-7 flex items-center justify-center shadow-lg border-2`}
 								>
 									{user.rank}
 								</span>
@@ -190,7 +201,9 @@ export default function Leaderboard() {
 										: user.name}
 								</p>
 								<p
-									className={`text-gray-600 dark:text-gray-300 font-sans font-medium ${user.rank === 1 ? "text-sm" : "text-xs"}`}
+									className={`text-gray-600 dark:text-gray-300 font-sans font-medium ${
+										user.rank === 1 ? "text-sm" : "text-xs"
+									}`}
 								>
 									{user.totalActivityPoints} pts
 								</p>
@@ -264,7 +277,9 @@ export default function Leaderboard() {
 								<div
 									className="w-full h-full flex items-center justify-center font-bold text-white text-2xl"
 									style={{
-										backgroundColor: `hsl(${((currentUser?.name?.charCodeAt(0) ?? 65) * 137.5) % 360}, 70%, 50%)`,
+										backgroundColor: `hsl(${
+											((currentUser?.name?.charCodeAt(0) ?? 65) * 137.5) % 360
+										}, 70%, 50%)`,
 									}}
 								>
 									{currentUser?.name?.charAt(0).toUpperCase() ?? "U"}
@@ -344,7 +359,9 @@ export default function Leaderboard() {
 						<button
 							key={user.userId}
 							type="button"
-							className={`flex flex-col items-center justify-end transition-all duration-500 cursor-pointer hover:scale-105 bg-transparent border-none p-0 ${podiumStyle[user.rank as 1 | 2 | 3]} relative`}
+							className={`flex flex-col items-center justify-end transition-all duration-500 cursor-pointer hover:scale-105 bg-transparent border-none p-0 ${
+								podiumStyle[user.rank as 1 | 2 | 3]
+							} relative`}
 							onClick={() => {
 								window.location.assign(`/profile/${user.userId}`);
 							}}
@@ -362,7 +379,9 @@ export default function Leaderboard() {
 										<Image
 											src={user.avatar}
 											alt={user.name}
-											className={`rounded-full border-8 shadow-2xl transition-all duration-500 ${podiumBorder[user.rank as 1 | 2 | 3]} object-cover`}
+											className={`rounded-full border-8 shadow-2xl transition-all duration-500 ${
+												podiumBorder[user.rank as 1 | 2 | 3]
+											} object-cover`}
 											width={user.rank === 1 ? 200 : 160}
 											height={user.rank === 1 ? 200 : 160}
 											style={{
@@ -372,11 +391,15 @@ export default function Leaderboard() {
 										/>
 									) : (
 										<div
-											className={`rounded-full border-8 shadow-2xl transition-all duration-500 ${podiumBorder[user.rank as 1 | 2 | 3]} flex items-center justify-center font-bold text-white`}
+											className={`rounded-full border-8 shadow-2xl transition-all duration-500 ${
+												podiumBorder[user.rank as 1 | 2 | 3]
+											} flex items-center justify-center font-bold text-white`}
 											style={{
 												width: user.rank === 1 ? 200 : 160,
 												height: user.rank === 1 ? 200 : 160,
-												backgroundColor: `hsl(${(user.name.charCodeAt(0) * 137.5) % 360}, 70%, 50%)`,
+												backgroundColor: `hsl(${
+													(user.name.charCodeAt(0) * 137.5) % 360
+												}, 70%, 50%)`,
 												fontSize: user.rank === 1 ? "80px" : "64px",
 											}}
 										>
@@ -384,7 +407,13 @@ export default function Leaderboard() {
 										</div>
 									)}
 									<span
-										className={`absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 ${podiumRankBg[user.rank as 1 | 2 | 3]} text-white font-bold rounded-full flex items-center justify-center shadow-xl border-4 border-white ${user.rank === 1 ? "text-xl w-14 h-14" : "text-lg w-12 h-12"}`}
+										className={`absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 ${
+											podiumRankBg[user.rank as 1 | 2 | 3]
+										} text-white font-bold rounded-full flex items-center justify-center shadow-xl border-4 border-white ${
+											user.rank === 1
+												? "text-xl w-14 h-14"
+												: "text-lg w-12 h-12"
+										}`}
 									>
 										{user.rank}
 									</span>
@@ -404,7 +433,9 @@ export default function Leaderboard() {
 											: user.name}
 									</p>
 									<p
-										className={`text-gray-600 dark:text-gray-300 font-sans font-semibold mt-2 ${user.rank === 1 ? "text-xl" : "text-lg"}`}
+										className={`text-gray-600 dark:text-gray-300 font-sans font-semibold mt-2 ${
+											user.rank === 1 ? "text-xl" : "text-lg"
+										}`}
 									>
 										{user.totalActivityPoints} pts
 									</p>
@@ -483,7 +514,9 @@ export default function Leaderboard() {
 									<div
 										className="w-48 h-48 flex items-center justify-center font-bold text-white text-6xl"
 										style={{
-											backgroundColor: `hsl(${((currentUser?.name?.charCodeAt(0) ?? 65) * 137.5) % 360}, 70%, 50%)`,
+											backgroundColor: `hsl(${
+												((currentUser?.name?.charCodeAt(0) ?? 65) * 137.5) % 360
+											}, 70%, 50%)`,
 										}}
 									>
 										{currentUser?.name?.charAt(0).toUpperCase() ?? "U"}
@@ -553,6 +586,7 @@ export default function Leaderboard() {
 					</div>
 				</div>
 			</div>
+			<GlowingSigil />
 		</main>
 	);
 }

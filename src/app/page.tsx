@@ -5,6 +5,7 @@ import JsonLd, {
 	organizationSchema,
 	websiteSchema,
 } from "@/components/seo/JsonLd";
+import GlowingSigil from "@/components/ui/custom/GlowingSigil";
 import Snowman from "@/components/ui/custom/Snowman";
 import Snowman2 from "@/components/ui/custom/Snowman2";
 import MovingBannerWrapper from "@/components/ui/MovingBannerWrapper";
@@ -50,7 +51,9 @@ const page = () => {
 			/>
 
 			<div
-				className={`h-screen flex items-start md:items-center justify-center md:justify-start relative z-10 ${isBannerVisible ? "mt-44 md:mt-10" : "mt-36 md:mt-0"}`}
+				className={`h-screen flex items-start md:items-center justify-center md:justify-start relative z-10 ${
+					isBannerVisible ? "mt-44 md:mt-10" : "mt-36 md:mt-0"
+				}`}
 			>
 				<div className="w-full md:w-3/5 lg:w-2/3 xl:w-3/5 px-8 pr-4 pl-8 sm:px-10 sm:pr-6 sm:pl-10 md:px-16 lg:px-20 text-left">
 					<div className="space-y-4 lg:space-y-6">
@@ -89,6 +92,7 @@ const page = () => {
 
 			<WordlePromo />
 			<Benefits />
+
 			<div className="flex relative justify-end mr-32">
 				<div className="flex -translate-y-1/2 justify-center mt-8">
 					<Snowman />
@@ -97,6 +101,8 @@ const page = () => {
 					<Snowman2 />
 				</div>
 			</div>
+			<GlowingSigil />
+
 			{/* Structured Data */}
 			<JsonLd data={organizationSchema} />
 			<JsonLd data={websiteSchema} />
