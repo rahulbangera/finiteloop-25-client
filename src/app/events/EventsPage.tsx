@@ -14,7 +14,9 @@ import EventWhatsAppShare from "@/components/events/EventWhatsAppShare";
 import PaymentButton from "@/components/razorpay/paymentButton";
 import { Button } from "@/components/ui/button";
 import { HTMLContent } from "@/components/ui/custom/html-content";
-import SantaClaus from "@/components/ui/custom/SantaClaus";
+import SantaClaus from "@/components/ui/custom/winter/SantaClaus";
+import DecoySnowPile from "@/components/ui/custom/winter/SnowPile";
+import GiftBox from "@/components/ui/custom/winter/GiftBox";
 
 type EventYear =
 	| "2020-21"
@@ -72,6 +74,8 @@ type TeamState = {
 	createdTeamId: string;
 	members: { id: string; name: string }[];
 };
+
+const WINTER = true;
 
 const getEventYear = (dateStr: string): EventYear => {
 	const eventDate = new Date(dateStr);
@@ -2599,6 +2603,33 @@ const EventsPage = () => {
 					</Drawer.Content>
 				</Drawer.Portal>
 			</Drawer.Root>
+			{WINTER && (
+				<>
+					{" "}
+					<div className="fixed bottom-1 md:bottom-4 left-4 z-40 scale-75 md:scale-100 origin-bottom-left">
+						<GiftBox />
+					</div>
+					<div className="fixed bottom-1 md:bottom-4 left-[20%] z-10 scale-50 md:scale-100 origin-bottom">
+						<DecoySnowPile />
+					</div>
+					<div className="fixed bottom-1 md:bottom-4 right-[20%] z-10 scale-50 md:scale-100 origin-bottom">
+						<DecoySnowPile />
+					</div>
+					<div className="fixed bottom-0 left-0 w-full pointer-events-none z-0">
+						<svg
+							viewBox="0 0 1440 120"
+							className="w-full h-auto text-white dark:text-slate-900 opacity-90 fill-current"
+						>
+							<title>Winter background</title>
+							<path d="M0,120 L1440,120 L1440,80 C1380,100 1320,110 1260,100 C1180,85 1100,50 1020,70 C940,90 860,110 780,100 C700,90 620,60 540,70 C460,80 380,100 300,90 C220,80 140,50 60,60 C40,63 20,65 0,70 Z" />
+							<path
+								d="M0,120 L1440,120 L1440,90 C1360,110 1280,115 1200,105 C1100,95 1000,70 900,85 C800,100 700,95 600,85 C500,75 400,60 300,70 C200,80 100,90 0,80 Z"
+								opacity="0.5"
+							/>
+						</svg>
+					</div>
+				</>
+			)}
 		</div>
 	);
 };

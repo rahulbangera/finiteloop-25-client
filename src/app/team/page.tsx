@@ -5,7 +5,8 @@ import React from "react";
 import { useEffect, useState } from "react";
 import { FaGithub, FaInstagram, FaLinkedinIn } from "react-icons/fa";
 import { useSession } from "next-auth/react";
-import EasterEggModal from "../../components/ui/custom/EasterEggModal";
+import EasterEggModal from "../../components/ui/custom/winter/EasterEggModal";
+import Yeti from "@/components/ui/custom/winter/Yeti";
 
 const SNOWMAN_EASTER_EGG_ID = 2; // Assuming the ID for the snowman easter egg in the database
 
@@ -227,8 +228,11 @@ export default function Team() {
 		<main className="min-h-screen px-4 relative mb-20">
 			<div className="max-w-7xl mx-auto relative z-10">
 				<div className="text-center">
-					<h1 className="lilita-font text-6xl md:text-7xl lg:text-8xl font-bold text-flc-yellow relative mt-32 md:mt-20 select-none">
+					<h1 className="lilita-font text-6xl md:text-7xl lg:text-8xl font-bold text-flc-yellow relative mt-32 md:mt-20 select-none inline-block">
 						MEET THE TEAM
+						<div className="absolute w-24 -top-1 sm:-top-12 md:-top-8 -right-2 md:-right-24 rotate-12 scale-75 md:scale-100 z-20">
+							<Yeti />
+						</div>
 					</h1>
 					<p className="comic-font text-lg md:text-xl lg:text-2xl text-gray-700 dark:text-gray-300 mt-6 max-w-2xl mx-auto font-medium">
 						Dynamic and Agile

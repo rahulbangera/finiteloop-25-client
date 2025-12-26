@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import EasterEggModal from "@/components/ui/custom/EasterEggModal";
+import EasterEggModal from "@/components/ui/custom/winter/EasterEggModal";
 import { WordleBoard } from "@/components/wordle/WordleBoard";
 import { WordleKeyboard } from "@/components/wordle/WordleKeyboard";
 import type { WordleTodayResponse } from "@/lib/wordle";
