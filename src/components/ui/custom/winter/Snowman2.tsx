@@ -10,7 +10,7 @@ const Snowman = () => {
 	const handleClick = () => {
 		const newParticles = Array.from({ length: 4 }).map(() => ({
 			id: Date.now() + Math.random(),
-			anim: Math.floor(Math.random() * 8) + 1,
+			anim: Math.floor(Math.random() * 6) + 1,
 		}));
 
 		setClickParticles((prev) => [...prev, ...newParticles]);
