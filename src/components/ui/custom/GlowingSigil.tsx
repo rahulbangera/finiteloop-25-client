@@ -6,7 +6,7 @@
 
 import { useSession } from "next-auth/react";
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import EasterEggModal from "./EasterEggModal";
+import EasterEggModal from "./winter/EasterEggModal";
 
 const SIGIL_CONFIG = {
 	easterEggId: 4,
