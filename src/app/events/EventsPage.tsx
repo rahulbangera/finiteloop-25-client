@@ -17,6 +17,7 @@ import { HTMLContent } from "@/components/ui/custom/html-content";
 import SantaClaus from "@/components/ui/custom/winter/SantaClaus";
 import DecoySnowPile from "@/components/ui/custom/winter/SnowPile";
 import GiftBox from "@/components/ui/custom/winter/GiftBox";
+import GlowingSigil from "@/components/ui/custom/GlowingSigil";
 
 type EventYear =
 	| "2020-21"
@@ -219,7 +220,9 @@ const EventsPage = () => {
 	const resetUrl = () => {
 		const params = new URLSearchParams(window.location.search);
 		params.delete("teamInvite");
-		const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+		const newUrl = `${window.location.pathname}${
+			params.toString() ? `?${params.toString()}` : ""
+		}`;
 		window.history.replaceState({}, "", newUrl);
 	};
 
@@ -521,7 +524,9 @@ const EventsPage = () => {
 			const params = new URLSearchParams(window.location.search);
 			params.delete("id");
 			params.delete("teamInvite");
-			const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+			const newUrl = `${window.location.pathname}${
+				params.toString() ? `?${params.toString()}` : ""
+			}`;
 			window.history.replaceState({}, "", newUrl);
 
 			setSelectedEvent(null);
@@ -1601,7 +1606,9 @@ const EventsPage = () => {
 							<VisuallyHidden>{selectedEvent?.name}</VisuallyHidden>
 						</Drawer.Title>
 						<div
-							className={`flex flex-col gap-6 px-4 pb-8 overflow-y-auto flex-1 ${drawerDirection === "bottom" ? "pt-2" : "pt-8"}`}
+							className={`flex flex-col gap-6 px-4 pb-8 overflow-y-auto flex-1 ${
+								drawerDirection === "bottom" ? "pt-2" : "pt-8"
+							}`}
 						>
 							<h2 className="lilita-font text-3xl md:text-4xl font-bold text-purple-900 dark:text-purple-100 break-words text-center">
 								{selectedEvent?.name}
@@ -2310,7 +2317,9 @@ const EventsPage = () => {
 									<button
 										type="button"
 										onClick={handleCopyLink}
-										className={`${BUTTON_CLASSES.secondary} ${selectedEvent ? "flex-1" : "w-full"}`}
+										className={`${BUTTON_CLASSES.secondary} ${
+											selectedEvent ? "flex-1" : "w-full"
+										}`}
 									>
 										Copy Link
 									</button>
@@ -2603,6 +2612,7 @@ const EventsPage = () => {
 					</Drawer.Content>
 				</Drawer.Portal>
 			</Drawer.Root>
+			<GlowingSigil />
 			{WINTER && (
 				<>
 					{" "}

@@ -5,6 +5,7 @@ import JsonLd, {
 	organizationSchema,
 	websiteSchema,
 } from "@/components/seo/JsonLd";
+import GlowingSigil from "@/components/ui/custom/GlowingSigil";
 import Snowman from "@/components/ui/custom/winter/Snowman";
 import Snowman2 from "@/components/ui/custom/winter/Snowman2";
 import MovingBannerWrapper from "@/components/ui/MovingBannerWrapper";
@@ -89,6 +90,7 @@ const page = () => {
 
 			<WordlePromo />
 			<Benefits />
+
 			<div className="flex relative justify-end mr-32">
 				<div className="flex -translate-y-1/2 justify-center mt-8">
 					<Snowman />
@@ -97,6 +99,8 @@ const page = () => {
 					<Snowman2 />
 				</div>
 			</div>
+			<GlowingSigil />
+
 			{/* Structured Data */}
 			<JsonLd data={organizationSchema} />
 			<JsonLd data={websiteSchema} />

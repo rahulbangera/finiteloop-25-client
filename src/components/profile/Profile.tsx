@@ -22,6 +22,7 @@ import ImageSelector from "./ImageSelector";
 import ProfilePictureCropper from "./ProfilePictureCropper";
 import { useWhatsAppShare, WHATSAPP_SHARE_CONFIG } from "./WhatsAppShare";
 import Link from "next/link";
+import GlowingSigil from "../ui/custom/GlowingSigil";
 
 const FROST_EFFECT = true; //Toggle switch for the frost effect on the profile
 
@@ -40,12 +41,14 @@ function ProfileDetail({
 
 	return (
 		<div
-			className={`interactive bg-gradient-to-tr from-neutral-800 to-neutral-900 border border-neutral-700 rounded-lg sm:rounded-xl px-4 py-4 shadow-sm hover:border-orange-400 hover:shadow-md transition-all duration-200${FROST_EFFECT ? " ice-border-subtle" : ""}`}
+			className={`interactive bg-linear-to-tr from-neutral-800 to-neutral-900 border border-neutral-700 rounded-lg sm:rounded-xl px-4 py-4 shadow-sm hover:border-orange-400 hover:shadow-md transition-all duration-200${
+				FROST_EFFECT ? " ice-border-subtle" : ""
+			}`}
 		>
 			<div className="text-xs text-gray-400 uppercase font-semibold mb-2 tracking-wide">
 				{label}
 			</div>
-			<div className="text-sm sm:text-base font-medium break-words leading-relaxed">
+			<div className="text-sm sm:text-base font-medium wrap-break-word leading-relaxed">
 				{hasValue ? (
 					<span className="text-white">{value}</span>
 				) : (
@@ -63,7 +66,9 @@ function ProfileDetail({
 function StatItem({ label, value }: { label: string; value: string | number }) {
 	return (
 		<div
-			className={`interactive text-center bg-gradient-to-tr from-neutral-800 to-neutral-900 border border-neutral-700 rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-5 shadow transition-all duration-300 hover:scale-105 hover:border-orange-500 hover:shadow-lg${FROST_EFFECT ? " ice-border-subtle" : ""}`}
+			className={`interactive text-center bg-linear-to-tr from-neutral-800 to-neutral-900 border border-neutral-700 rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-5 shadow transition-all duration-300 hover:scale-105 hover:border-orange-500 hover:shadow-lg${
+				FROST_EFFECT ? " ice-border-subtle" : ""
+			}`}
 		>
 			<div className="text-xs text-gray-400 uppercase font-semibold mb-1 tracking-wide">
 				{label}
@@ -993,7 +998,9 @@ export default function Profile({ userId }: { userId?: number }) {
 	return (
 		<section className=" relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 px-3 sm:px-4 py-4 sm:py-6 md:py-10 max-w-full sm:max-w-4xl lg:max-w-6xl mx-auto mt-16 sm:mt-20 animate-fade-in">
 			<div
-				className={`card profile-card bg-gradient-to-tr from-white/20 via-white/10 to-white/5 dark:from-neutral-900/40 dark:to-neutral-800/20 border border-black dark:border-white rounded-xl sm:rounded-2xl overflow-hidden shadow transition backdrop-blur-sm relative${FROST_EFFECT ? " ice-border" : ""}`}
+				className={`card profile-card bg-gradient-to-tr from-white/20 via-white/10 to-white/5 dark:from-neutral-900/40 dark:to-neutral-800/20 border border-black dark:border-white rounded-xl sm:rounded-2xl overflow-hidden shadow transition backdrop-blur-sm relative${
+					FROST_EFFECT ? " ice-border" : ""
+				}`}
 			>
 				{FROST_EFFECT && <FrostDecorations />}
 
@@ -1278,7 +1285,9 @@ export default function Profile({ userId }: { userId?: number }) {
 
 					<div className="mb-4">
 						<div
-							className={`interactive bg-gradient-to-tr from-neutral-800 to-neutral-900 border border-neutral-700 rounded-lg px-4 py-3 shadow-sm hover:border-red-400 hover:shadow-md transition-all duration-200${FROST_EFFECT ? " ice-border" : ""} relative`}
+							className={`interactive bg-gradient-to-tr from-neutral-800 to-neutral-900 border border-neutral-700 rounded-lg px-4 py-3 shadow-sm hover:border-red-400 hover:shadow-md transition-all duration-200${
+								FROST_EFFECT ? " ice-border" : ""
+							} relative`}
 						>
 							{FROST_EFFECT && <FrostDecorations />}
 							<div className="flex items-center justify-between">
@@ -1379,13 +1388,20 @@ export default function Profile({ userId }: { userId?: number }) {
 
 						<ProfileDetail
 							label="Branch"
-							value={`${(currentUser as unknown as { Branch: { name: string } })?.Branch?.name || currentUser?.branch || ""}`}
+							value={`${
+								(currentUser as unknown as { Branch: { name: string } })?.Branch
+									?.name ||
+								currentUser?.branch ||
+								""
+							}`}
 							isViewingOther={!!isViewingOtherProfile}
 							userName={currentUser?.name || "This user"}
 						/>
 
 						<div
-							className={`interactive bg-gradient-to-tr from-neutral-800 to-neutral-900 border border-neutral-700 rounded-lg sm:rounded-xl px-4 py-5 shadow-sm hover:border-orange-400 hover:shadow-md transition-all duration-200${FROST_EFFECT ? " ice-border" : ""} relative`}
+							className={`interactive bg-gradient-to-tr from-neutral-800 to-neutral-900 border border-neutral-700 rounded-lg sm:rounded-xl px-4 py-5 shadow-sm hover:border-orange-400 hover:shadow-md transition-all duration-200${
+								FROST_EFFECT ? " ice-border" : ""
+							} relative`}
 						>
 							{FROST_EFFECT && <FrostDecorations />}
 							<div className="text-xs text-gray-400 uppercase font-semibold mb-3 tracking-wide">
@@ -1399,7 +1415,9 @@ export default function Profile({ userId }: { userId?: number }) {
 								) : (
 									<p className="text-gray-500 italic">
 										{isViewingOtherProfile
-											? `${currentUser?.name || "This user"} hasn't shared their bio`
+											? `${
+													currentUser?.name || "This user"
+												} hasn't shared their bio`
 											: "No bio shared"}
 									</p>
 								)}
@@ -1410,14 +1428,21 @@ export default function Profile({ userId }: { userId?: number }) {
 			</div>
 
 			<div
-				className={`bg-gradient-to-tr from-white/20 via-white/10 to-white/5 dark:from-neutral-900/40 dark:to-neutral-800/20 border border-black dark:border-white rounded-xl sm:rounded-2xl shadow transition backdrop-blur-sm${FROST_EFFECT ? " ice-border-subtle" : ""} relative`}
+				className={`bg-gradient-to-tr from-white/20 via-white/10 to-white/5 dark:from-neutral-900/40 dark:to-neutral-800/20 border border-black dark:border-white rounded-xl sm:rounded-2xl shadow transition backdrop-blur-sm${
+					FROST_EFFECT ? " ice-border-subtle" : ""
+				} relative`}
 			>
 				{FROST_EFFECT && <FrostDecorations />}
 				<div className="p-4 sm:p-5 md:p-8 space-y-4 sm:space-y-6 text-black dark:text-white ">
 					<div className="grid grid-cols-2 gap-3 sm:gap-4">
 						<StatItem
 							label="FLC Points"
-							value={`${(currentUser as unknown as { totalActivityPoints: number })?.totalActivityPoints || currentUser?.activityPoints || "0"}`}
+							value={`${
+								(currentUser as unknown as { totalActivityPoints: number })
+									?.totalActivityPoints ||
+								currentUser?.activityPoints ||
+								"0"
+							}`}
 						/>
 						<StatItem
 							label="Attendance"
@@ -1428,7 +1453,9 @@ export default function Profile({ userId }: { userId?: number }) {
 					<div>
 						{!isViewingOtherProfile && (
 							<div
-								className={`interactive bg-gradient-to-tr from-neutral-800 to-neutral-900 border border-neutral-700 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-md hover:shadow-lg hover:border-orange-400/50 transition-all duration-200${FROST_EFFECT ? " ice-border" : ""} relative`}
+								className={`interactive bg-gradient-to-tr from-neutral-800 to-neutral-900 border border-neutral-700 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-md hover:shadow-lg hover:border-orange-400/50 transition-all duration-200${
+									FROST_EFFECT ? " ice-border" : ""
+								} relative`}
 							>
 								{FROST_EFFECT && <FrostDecorations />}
 								<h4 className="text-base sm:text-lg font-bold mb-3 sm:mb-4 text-gray-300 text-center">
@@ -1666,35 +1693,45 @@ export default function Profile({ userId }: { userId?: number }) {
 											const icons: Record<string, React.JSX.Element> = {
 												instagram: (
 													<div
-														className={`w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-gradient-to-tr from-pink-500 via-red-500 to-yellow-500 flex items-center justify-center shadow-lg${FROST_EFFECT ? " ice-border-subtle" : ""}`}
+														className={`w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-gradient-to-tr from-pink-500 via-red-500 to-yellow-500 flex items-center justify-center shadow-lg${
+															FROST_EFFECT ? " ice-border-subtle" : ""
+														}`}
 													>
 														<FaInstagram className="text-white text-xs sm:text-sm" />
 													</div>
 												),
 												linkedin: (
 													<div
-														className={`w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-gradient-to-tr from-blue-600 to-blue-700 flex items-center justify-center shadow-lg${FROST_EFFECT ? " ice-border-subtle" : ""}`}
+														className={`w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-gradient-to-tr from-blue-600 to-blue-700 flex items-center justify-center shadow-lg${
+															FROST_EFFECT ? " ice-border-subtle" : ""
+														}`}
 													>
 														<FaLinkedin className="text-white text-xs sm:text-sm" />
 													</div>
 												),
 												github: (
 													<div
-														className={`w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-gradient-to-tr from-gray-800 to-gray-900 flex items-center justify-center shadow-lg${FROST_EFFECT ? " ice-border-subtle" : ""}`}
+														className={`w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-gradient-to-tr from-gray-800 to-gray-900 flex items-center justify-center shadow-lg${
+															FROST_EFFECT ? " ice-border-subtle" : ""
+														}`}
 													>
 														<FaGithub className="text-white text-xs sm:text-sm" />
 													</div>
 												),
 												portfolio: (
 													<div
-														className={`w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-gradient-to-tr from-orange-500 to-yellow-500 flex items-center justify-center shadow-lg${FROST_EFFECT ? " ice-border-subtle" : ""}`}
+														className={`w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-gradient-to-tr from-orange-500 to-yellow-500 flex items-center justify-center shadow-lg${
+															FROST_EFFECT ? " ice-border-subtle" : ""
+														}`}
 													>
 														<FaGlobe className="text-white text-xs sm:text-sm" />
 													</div>
 												),
 												leetcode: (
 													<div
-														className={`w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-gradient-to-tr from-yellow-500 to-orange-500 flex items-center justify-center shadow-lg${FROST_EFFECT ? " ice-border-subtle" : ""}`}
+														className={`w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-gradient-to-tr from-yellow-500 to-orange-500 flex items-center justify-center shadow-lg${
+															FROST_EFFECT ? " ice-border-subtle" : ""
+														}`}
 													>
 														<SiLeetcode className="text-white text-xs sm:text-sm" />
 													</div>
@@ -1719,7 +1756,10 @@ export default function Profile({ userId }: { userId?: number }) {
 														target="_blank"
 														rel="noopener noreferrer"
 														className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0 transition-all duration-200"
-														title={`Visit ${platformNames[link.linkName.toLowerCase()] || link.linkName} profile`}
+														title={`Visit ${
+															platformNames[link.linkName.toLowerCase()] ||
+															link.linkName
+														} profile`}
 													>
 														{icons[link.linkName.toLowerCase()] || (
 															<div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-gradient-to-tr from-gray-600 to-gray-700 flex items-center justify-center shadow-lg flex-shrink-0">
@@ -1780,12 +1820,16 @@ export default function Profile({ userId }: { userId?: number }) {
 								</div>
 							) : (
 								<div
-									className={`bg-gradient-to-tr from-neutral-800/50 to-neutral-900/50 border border-neutral-700/30 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center${FROST_EFFECT ? " ice-border" : ""}`}
+									className={`bg-gradient-to-tr from-neutral-800/50 to-neutral-900/50 border border-neutral-700/30 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center${
+										FROST_EFFECT ? " ice-border" : ""
+									}`}
 								>
 									<div className="text-3xl sm:text-4xl mb-3 opacity-50">🔗</div>
 									<p className="text-sm sm:text-base dark:text-gray-400 mb-1 text-white">
 										{isViewingOtherProfile
-											? `${currentUser?.name || "This user"} hasn't shared their social handles yet`
+											? `${
+													currentUser?.name || "This user"
+												} hasn't shared their social handles yet`
 											: "You haven't added any social links yet"}
 									</p>
 									<p className="text-xs dark:text-gray-500 text-white">
@@ -1801,7 +1845,9 @@ export default function Profile({ userId }: { userId?: number }) {
 			</div>
 
 			<div
-				className={`col-span-full text-black dark:text-white bg-gradient-to-tr from-white/20 via-white/10 to-white/5 dark:from-neutral-900/40 dark:to-neutral-800/20 border border-black dark:border-white rounded-xl sm:rounded-2xl p-4 sm:p-5 md:p-8 text-center shadow backdrop-blur-sm${FROST_EFFECT ? " ice-border" : ""}`}
+				className={`col-span-full text-black dark:text-white bg-gradient-to-tr from-white/20 via-white/10 to-white/5 dark:from-neutral-900/40 dark:to-neutral-800/20 border border-black dark:border-white rounded-xl sm:rounded-2xl p-4 sm:p-5 md:p-8 text-center shadow backdrop-blur-sm${
+					FROST_EFFECT ? " ice-border" : ""
+				}`}
 			>
 				<h2 className="text-xl sm:text-2xl md:text-4xl font-extrabold bg-gradient-to-tr from-orange-400 to-yellow-400 bg-clip-text text-transparent mb-2 sm:mb-3">
 					My Events
@@ -1880,6 +1926,7 @@ export default function Profile({ userId }: { userId?: number }) {
 				imageSrc={selectedImage}
 				onUpload={handleImageUpload}
 			/>
+			<GlowingSigil />
 		</section>
 	);
 }
