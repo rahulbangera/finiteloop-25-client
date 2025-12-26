@@ -73,7 +73,7 @@ export default function SantaClaus() {
 
 	return (
 		<>
-			<div className="flex items-center justify-center min-h-screen">
+			<div className="flex items-center justify-center">
 				<div className="text-center">
 					<svg
 						width="300"
