@@ -1,7 +1,7 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import Coin3D from "./flcCoin";
+import Coin3D from "../flcCoin";
 
 interface EasterEggModalProps {
 	isOpen: boolean;

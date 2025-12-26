@@ -4,7 +4,7 @@ import Image from "next/image";
 
 const Benefits = () => {
 	return (
-		<section className="md:py-20 relative overflow-hidden -mt-20 md:mt-0 mb-10">
+		<section className="mt-10 md:mt-0 pb-10 md:py-10 relative overflow-hidden mb-10">
 			<div className="absolute inset-0 -z-10">
 				<div className="absolute top-10 left-10 w-32 h-32 bg-flc-yellow/10 rounded-full blur-3xl"></div>
 				<div className="absolute bottom-10 right-10 w-40 h-40 bg-flc-yellow/5 rounded-full blur-3xl"></div>

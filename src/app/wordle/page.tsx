@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import EasterEggModal from "@/components/ui/custom/EasterEggModal";
+import EasterEggModal from "@/components/ui/custom/winter/EasterEggModal";
 import { WordleBoard } from "@/components/wordle/WordleBoard";
 import { WordleKeyboard } from "@/components/wordle/WordleKeyboard";
 import type { WordleTodayResponse } from "@/lib/wordle";
+import { AlertCircle, Gamepad2, Loader2, RefreshCcw } from "lucide-react";
 
 export default function WordlePage() {
 	const { data: session, status } = useSession();
@@ -83,15 +84,77 @@ export default function WordlePage() {
 	}, [status, session]);
 
 	if (loading) {
-		return <div className="p-6">Loading...</div>;
+		return (
+			<div className="min-h-screen flex flex-col items-center justify-center p-4">
+				<div className="relative mx-auto rounded-3xl p-1.5 shadow-[0_15px_30px_-5px_rgba(151,65,252,0.2)] bg-[linear-gradient(144deg,#FBCFF4,#E4CCF8,#C4E2F7,#FEF9FF)] dark:bg-[linear-gradient(144deg,#7F439D,#33107C,#060329)]">
+					<div className="h-full w-full rounded-2xl bg-white/35 dark:bg-white/15 backdrop-blur-md flex flex-col items-center justify-center p-10 text-center">
+						<Loader2 className="h-12 w-12 animate-spin text-flc-yellow mb-4" />
+						<p className="lilita-font text-2xl text-gray-800 dark:text-white tracking-wide">
+							Loading Wordle...
+						</p>
+					</div>
+				</div>
+			</div>
+		);
 	}
 
 	if (error) {
-		return <div className="p-6 text-red-500">{error}</div>;
+		return (
+			<div className="min-h-screen flex flex-col items-center justify-center p-4">
+				<div className="relative mx-auto rounded-3xl p-1.5 shadow-[0_15px_30px_-5px_rgba(151,65,252,0.2)] bg-[linear-gradient(144deg,#FBCFF4,#E4CCF8,#C4E2F7,#FEF9FF)] dark:bg-[linear-gradient(144deg,#7F439D,#33107C,#060329)] max-w-md w-full">
+					<div className="h-full w-full rounded-2xl bg-white/35 dark:bg-white/15 backdrop-blur-md flex flex-col items-center justify-center p-8 text-center text-gray-800 dark:text-white">
+						<div className="bg-white/50 dark:bg-black/20 p-4 rounded-full mb-4 shadow-sm">
+							<AlertCircle className="h-10 w-10 text-red-500" />
+						</div>
+						<h3 className="lilita-font text-3xl mb-2 text-red-500">
+							Game Error
+						</h3>
+						<p className="comic-font text-lg mb-6 opacity-90">
+							{error || "Something went wrong while loading the game."}
+						</p>
+						<button
+							type="button"
+							onClick={() => window.location.reload()}
+							className="group relative px-6 py-3 rounded-xl font-bold text-white transition-all duration-200 shadow-lg hover:scale-105 active:scale-95 bg-linear-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700"
+						>
+							<span className="flex items-center gap-2">
+								<RefreshCcw className="h-4 w-4" />
+								Try Again
+							</span>
+						</button>
+					</div>
+				</div>
+			</div>
+		);
 	}
 
 	if (!game) {
-		return <div className="p-6">No game available</div>;
+		return (
+			<div className="min-h-screen flex flex-col items-center justify-center p-4">
+				<div className="relative mx-auto rounded-3xl p-1.5 shadow-[0_15px_30px_-5px_rgba(151,65,252,0.2)] bg-[linear-gradient(144deg,#FBCFF4,#E4CCF8,#C4E2F7,#FEF9FF)] dark:bg-[linear-gradient(144deg,#7F439D,#33107C,#060329)] max-w-md w-full">
+					<div className="h-full w-full rounded-2xl bg-white/35 dark:bg-white/15 backdrop-blur-md flex flex-col items-center justify-center p-10 text-center text-gray-800 dark:text-white">
+						<div className="bg-white/50 dark:bg-black/20 p-5 rounded-full mb-6 shadow-sm border border-white/20">
+							<Gamepad2 className="h-14 w-14 text-flc-yellow" />
+						</div>
+
+						<h2 className="lilita-font text-4xl mb-3 tracking-wide">
+							No Active Game
+						</h2>
+
+						<p className="comic-font text-xl mb-8 leading-relaxed opacity-90">
+							There are currently no active Wordle challenges. Check back soon!
+						</p>
+
+						<a
+							href="/"
+							className="inline-flex items-center justify-center px-8 py-3 rounded-xl font-bold bg-flc-yellow hover:bg-yellow-500 text-black shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-1"
+						>
+							Return Home
+						</a>
+					</div>
+				</div>
+			</div>
+		);
 	}
 
 	return (

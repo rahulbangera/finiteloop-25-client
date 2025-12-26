@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Scrollbar } from "react-scrollbars-custom";
 import UserCard from "@/components/elements/UserCard";
 import GlowingSigil from "@/components/ui/custom/GlowingSigil";
+import SkatingPenguin from "@/components/ui/custom/winter/HidingPenguin";
 
 const podiumStyle = {
 	1: "order-2 z-10", // First place - center
@@ -587,6 +588,9 @@ export default function Leaderboard() {
 				</div>
 			</div>
 			<GlowingSigil />
+			<div className="fixed bottom-0 right-4 md:right-10 z-20">
+				<SkatingPenguin />
+			</div>
 		</main>
 	);
 }
