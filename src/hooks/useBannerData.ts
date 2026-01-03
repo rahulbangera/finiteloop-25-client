@@ -2,9 +2,19 @@
 
 import { useEffect, useState } from "react";
 
+export interface PopupData {
+	imageUrl: string;
+	title: string;
+	description: string;
+	link: string;
+	buttonText: string;
+}
+
 interface BannerData {
 	isVisible: boolean;
 	description: string;
+	popupIsVisible: boolean;
+	popupValue: string;
 }
 
 let cachedBannerData: BannerData | null = null;
@@ -15,6 +25,8 @@ export const useBannerData = () => {
 	const [bannerData, setBannerData] = useState<BannerData>({
 		isVisible: false,
 		description: "",
+		popupIsVisible: false,
+		popupValue: "",
 	});
 	const [loading, setLoading] = useState(true);
 
@@ -52,6 +64,8 @@ export const useBannerData = () => {
 				const fallbackData: BannerData = {
 					isVisible: false,
 					description: "",
+					popupIsVisible: false,
+					popupValue: "",
 				};
 				cachedBannerData = fallbackData;
 				setBannerData(fallbackData);
@@ -82,12 +96,16 @@ const fetchBannerDataFromAPI = async (): Promise<BannerData> => {
 
 		const data = await response.json();
 		return {
-			isVisible: Boolean(data.isVisible),
-			description: String(data.description || "").trim(),
+			isVisible: Boolean(data.notice.isVisible),
+			description: String(data.notice.description || "").trim(),
+			popupIsVisible: Boolean(data.popup.isVisible),
+			popupValue: String(data.popup.value || "").trim(),
 		};
 	} catch (_error) {}
 	return {
 		isVisible: false,
 		description: "",
+		popupIsVisible: false,
+		popupValue: "",
 	};
 };
