@@ -9,6 +9,7 @@ import GlowingSigil from "@/components/ui/custom/GlowingSigil";
 import Snowman from "@/components/ui/custom/winter/Snowman";
 import Snowman2 from "@/components/ui/custom/winter/Snowman2";
 import MovingBannerWrapper from "@/components/ui/MovingBannerWrapper";
+import PopupBanner from "@/components/ui/popupBanner";
 import { useBannerContext } from "@/contexts/BannerContext";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -17,7 +18,7 @@ import { useEffect } from "react";
 const page = () => {
 	const router = useRouter();
 	const session = useSession();
-	const { isBannerVisible } = useBannerContext();
+	const { isBannerVisible, isPopupVisible } = useBannerContext();
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <no need of exhaustive deps here>
 	useEffect(() => {
@@ -35,6 +36,7 @@ const page = () => {
 	return (
 		<div className="min-h-screen relative">
 			<MovingBannerWrapper />
+			<PopupBanner />
 
 			<div
 				className="hidden md:block absolute top-0 right-0 w-3/5 lg:w-1/2 xl:w-3/5 h-screen pointer-events-none z-0 bg-[url('/desktop_rocket_light.webp')] dark:bg-[url('/desktop_rocket_dark.webp')] bg-contain bg-no-repeat"
