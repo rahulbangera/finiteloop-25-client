@@ -22,7 +22,9 @@ const PopupBanner = () => {
 
 	useEffect(() => {
 		if (popupIsVisible && !loading) {
-			setIsOpen(true);
+			setTimeout(() => {
+				setIsOpen(true);
+			}, 1000);
 		}
 	}, [popupIsVisible, loading]);
 
