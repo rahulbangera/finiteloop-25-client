@@ -1555,7 +1555,7 @@ const EventsPage = () => {
 							<Card image={event.imgSrc}>
 								<div className="comic-font flex flex-col items-center justify-center text-center space-y-2 h-full">
 									<div className="text-sm md:text-base text-black dark:text-white font-medium opacity-80">
-										{event.category}
+										{event.category.replaceAll("_", " ")}
 									</div>
 									<div className="text-lg md:text-xl lg:text-2xl font-bold text-black dark:text-white leading-tight">
 										{event.name}
