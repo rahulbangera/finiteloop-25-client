@@ -1,5 +1,44 @@
 "use client";
 
+export default function WordlePage() {
+	return (
+		<main className="min-h-screen p-4 md:p-6 flex flex-col items-center justify-center">
+			<div className="text-center max-w-md">
+				<h1 className="lilita-font text-6xl md:text-7xl lg:text-8xl font-bold text-flc-yellow mb-4">
+					WORDLE
+				</h1>
+
+				<p className="comic-font text-xl md:text-2xl text-black dark:text-white mb-6">
+					Event Ended
+				</p>
+
+				<p className="text-gray-600 dark:text-gray-400 mb-10 leading-relaxed">
+					Thank you for participating in our Wordle challenge! We hope you had a
+					great time guessing the words.
+				</p>
+
+				<div className="flex flex-col sm:flex-row gap-4 justify-center">
+					<a
+						href="/leaderboard"
+						className="px-8 py-3 rounded-xl font-bold bg-flc-yellow hover:bg-yellow-500 text-black transition-all duration-200"
+					>
+						View Leaderboard
+					</a>
+
+					<a
+						href="/"
+						className="px-8 py-3 rounded-xl font-medium border-2 border-gray-300 dark:border-neutral-600 text-black dark:text-white hover:bg-gray-100 dark:hover:bg-neutral-800 transition-all duration-200"
+					>
+						Return Home
+					</a>
+				</div>
+			</div>
+		</main>
+	);
+}
+
+/*
+
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import EasterEggModal from "@/components/ui/custom/winter/EasterEggModal";
@@ -181,7 +220,6 @@ export default function WordlePage() {
 				Guess the word in 5 tries. New word every day.
 			</p>
 
-			{/* Launcher */}
 			{!started && (
 				<button
 					type="button"
@@ -202,12 +240,11 @@ export default function WordlePage() {
 					</span>
 
 					<span className="text-sm text-purple-600 dark:text-purple-300">
-						Today’s Wordle
+						Today's Wordle
 					</span>
 				</button>
 			)}
 
-			{/* Game */}
 			{started && (
 				<div className="flex flex-col items-center gap-6 w-full max-w-md">
 					<WordleBoard
@@ -246,9 +283,9 @@ export default function WordlePage() {
 					{game.status === "WON" && (
 						<div
 							className="
-                            text-center text-lg font-semibold
-                            text-green-600 dark:text-green-400
-                        "
+							text-center text-lg font-semibold
+							text-green-600 dark:text-green-400
+						"
 						>
 							You Guessed it Right! Congratulations!
 						</div>
@@ -257,9 +294,9 @@ export default function WordlePage() {
 					{game.status === "LOST" && (
 						<div
 							className="
-                            text-center text-lg font-semibold
-                            text-red-600 dark:text-red-400
-                        "
+							text-center text-lg font-semibold
+							text-red-600 dark:text-red-400
+						"
 						>
 							Game over. Better luck tomorrow!
 						</div>
@@ -277,3 +314,4 @@ export default function WordlePage() {
 		</main>
 	);
 }
+*/

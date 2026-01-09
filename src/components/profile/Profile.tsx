@@ -24,7 +24,7 @@ import { useWhatsAppShare, WHATSAPP_SHARE_CONFIG } from "./WhatsAppShare";
 import Link from "next/link";
 import GlowingSigil from "../ui/custom/GlowingSigil";
 
-const FROST_EFFECT = true; //Toggle switch for the frost effect on the profile
+const FROST_EFFECT = false; //Toggle switch for the frost effect on the profile
 
 function ProfileDetail({
 	label,

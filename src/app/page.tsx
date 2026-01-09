@@ -93,15 +93,15 @@ const page = () => {
 			<WordlePromo />
 			<Benefits />
 
-			<div className="flex relative justify-end mr-32">
+			{/* <div className="flex relative justify-end mr-32">
 				<div className="flex -translate-y-1/2 justify-center mt-8">
 					<Snowman />
 				</div>
 				<div className="flex -translate-y-3/4 translate-x-1/2 justify-center mt-8">
 					<Snowman2 />
 				</div>
-			</div>
-			<GlowingSigil />
+			</div> */}
+			{/* <GlowingSigil /> */}
 
 			{/* Structured Data */}
 			<JsonLd data={organizationSchema} />

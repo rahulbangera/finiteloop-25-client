@@ -78,8 +78,6 @@ export default function RootLayout({
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body className="min-h-screen flex flex-col">
-				<SnowfallEffect />
-				<SnowballThrow />
 				<Providers>
 					<BannerProvider>
 						<Toaster />
@@ -88,7 +86,6 @@ export default function RootLayout({
 							<Background />
 						</div>
 						<main className="flex-1">{children}</main>
-
 						<Footer />
 					</BannerProvider>
 				</Providers>

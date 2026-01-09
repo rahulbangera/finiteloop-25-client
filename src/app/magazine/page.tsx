@@ -3,7 +3,6 @@
 import Radio from "@/components/elements/specialRadio";
 import dynamic from "next/dynamic";
 import { useRef, useState } from "react";
-import PolarBear from "@/components/ui/custom/winter/PolarBear";
 
 type MagazineYear = "2024-25" | "2025-26";
 
@@ -42,12 +41,7 @@ export default function MagazinePage() {
 	return (
 		<main className="min-h-screen mb-8 md:mb-16 p-2 sm:p-4 md:p-6 bg-[radial-gradient(at_top_right,#FBCFF4,#E4CCF8,#C4E2F7,#FEF9FF)] dark:bg-[radial-gradient(at_top_right,#7F439D,#33107C,#060329)]">
 			<h1 className="lilita-font text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-extrabold text-flc-yellow mb-2 mt-20 sm:mt-24 md:mt-20 text-center w-full">
-				<span className="relative inline-block">
-					MAGAZINE
-					<div className="absolute left-full bottom-0 ml-2 sm:ml-4 flex items-end origin-bottom-left scale-50 sm:scale-75 md:scale-90 lg:scale-100">
-						<PolarBear />
-					</div>
-				</span>
+				<span className="relative inline-block">MAGAZINE</span>
 			</h1>
 			<p className="text-sm sm:text-base md:text-lg text-purple-900 dark:text-purple-100 mb-4 sm:mb-6 md:mb-12 text-center px-4">
 				Explore the {selectedYearData.year.split("-")[0]} edition of inFinite
