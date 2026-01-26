@@ -73,9 +73,9 @@ const PopupBanner = () => {
 					>
 						<X className="w-5 h-5 text-purple-800 dark:text-purple-200" />
 					</button>
-					<div className="flex flex-col md:flex-row gap-6 text-white dark:text-purple-100 min-h-[300px] md:min-h-[350px]">
+					<div className="flex flex-col md:flex-row gap-6 text-white dark:text-purple-100 min-h-[300px] md:min-h-[350px] max-h-[60vh]">
 						{imageUrl && (
-							<div className="flex justify-center items-center md:w-[40%] md:shrink-0">
+							<div className="flex justify-center items-center md:w-[40%] md:shrink-0 md:self-start md:sticky md:top-0">
 								<Image
 									src={imageUrl}
 									alt={title || "Popup banner"}
@@ -86,17 +86,21 @@ const PopupBanner = () => {
 								/>
 							</div>
 						)}
-						<div className="flex flex-col justify-center text-center md:text-left md:w-[60%]">
+						<div className="flex flex-col md:w-[60%] text-center md:text-left">
 							{title && (
-								<h2 className="text-2xl md:text-3xl font-bold mb-3">{title}</h2>
+								<h2 className="text-2xl md:text-3xl font-bold mb-3 shrink-0">
+									{title}
+								</h2>
 							)}
 							{description && (
-								<p className="text-base md:text-lg mb-4 opacity-90 whitespace-pre-line">
-									{description}
-								</p>
+								<div className="flex-1 overflow-y-auto min-h-0 mb-4">
+									<p className="text-base md:text-lg opacity-90 whitespace-pre-line pr-2">
+										{description}
+									</p>
+								</div>
 							)}
 							{link && buttonText && (
-								<div>
+								<div className="shrink-0 pt-2">
 									<a
 										href={link}
 										target="_blank"
