@@ -90,7 +90,7 @@ const page = () => {
 				</div>
 			</div>
 
-			<WordlePromo />
+			{/* <WordlePromo /> */}
 			<Benefits />
 
 			{/* <div className="flex relative justify-end mr-32">
