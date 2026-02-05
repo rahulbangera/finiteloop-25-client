@@ -51,6 +51,8 @@ type Event = {
 	batchRestriction?: {
 		year: number;
 	}[];
+	statusOfGenderRestriction: boolean;
+	genderRestriction?: "MALE" | "FEMALE";
 	Organiser?: {
 		name: string;
 		email: string;
@@ -168,6 +170,13 @@ const EventsPage = () => {
 	);
 	const [showRemoveMemberDialog, setShowRemoveMemberDialog] = useState(false);
 	const [available, setAvailable] = useState<null | boolean>(null);
+	const [showGenderModal, setShowGenderModal] = useState(false);
+	const [selectedGender, setSelectedGender] = useState<
+		"MALE" | "FEMALE" | null
+	>(null);
+	const [pendingAction, setPendingAction] = useState<
+		"REGISTER_SOLO" | "CREATE_TEAM" | "JOIN_TEAM" | null
+	>(null);
 
 	useEffect(() => {
 		const fetchEvents = async () => {
@@ -619,6 +628,19 @@ const EventsPage = () => {
 			toast.error("Login to register");
 			return;
 		}
+		if (selectedEvent.statusOfGenderRestriction) {
+			if (!selectedGender) {
+				setPendingAction("REGISTER_SOLO");
+				setShowGenderModal(true);
+				return;
+			}
+			if (selectedGender !== selectedEvent.genderRestriction) {
+				toast.error(
+					`This event is restricted to ${selectedEvent.genderRestriction?.toLowerCase()}s only`,
+				);
+				return;
+			}
+		}
 		if (selectedEvent.eventType === "SOLO") {
 			try {
 				setLoading((prev) => ({ ...prev, register: true }));
@@ -804,6 +826,19 @@ const EventsPage = () => {
 			setLoading((prev) => ({ ...prev, createTeam: false }));
 			return;
 		}
+		if (selectedEvent.statusOfGenderRestriction) {
+			if (!selectedGender) {
+				setPendingAction("CREATE_TEAM");
+				setShowGenderModal(true);
+				return;
+			}
+			if (selectedGender !== selectedEvent.genderRestriction) {
+				toast.error(
+					`This event is restricted to ${selectedEvent.genderRestriction?.toLowerCase()}s only`,
+				);
+				return;
+			}
+		}
 		try {
 			setLoading((prev) => ({ ...prev, createTeam: true }));
 			const res = await fetch(
@@ -861,6 +896,7 @@ const EventsPage = () => {
 		teamState.teamName,
 		refreshRegistrationData,
 		teamState.yearOfStudy,
+		selectedGender,
 	]);
 
 	const joinTeam = useCallback(async () => {
@@ -871,6 +907,19 @@ const EventsPage = () => {
 			return;
 		}
 		if (!teamState.teamId) return;
+		if (selectedEvent.statusOfGenderRestriction) {
+			if (!selectedGender) {
+				setPendingAction("JOIN_TEAM");
+				setShowGenderModal(true);
+				return;
+			}
+			if (selectedGender !== selectedEvent.genderRestriction) {
+				toast.error(
+					`This event is restricted to ${selectedEvent.genderRestriction?.toLowerCase()}s only`,
+				);
+				return;
+			}
+		}
 		try {
 			setLoading((prev) => ({ ...prev, joinTeam: true }));
 			const res = await fetch(
@@ -920,6 +969,7 @@ const EventsPage = () => {
 		teamState.teamId,
 		session,
 		refreshRegistrationData,
+		selectedGender,
 	]);
 
 	const confirmTeam = async () => {
@@ -2600,6 +2650,131 @@ const EventsPage = () => {
 										</div>
 									</div>
 								)}
+								{showGenderModal &&
+									selectedEvent?.statusOfGenderRestriction && (
+										<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs">
+											<div className="relative bg-white dark:bg-indigo-950 p-6 rounded-xl shadow-xl flex flex-col items-center max-w-sm w-full mx-4">
+												<button
+													type="button"
+													onClick={() => {
+														setShowGenderModal(false);
+														setPendingAction(null);
+													}}
+													className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+													aria-label="Close"
+												>
+													<X className="h-6 w-6" />
+												</button>
+												<h3 className="text-lg font-semibold text-purple-900 dark:text-purple-100 mb-2">
+													Please select your gender
+												</h3>
+												<p className="text-sm text-gray-600 dark:text-gray-300 mb-4 text-center">
+													This event is restricted to{" "}
+													<span className="font-semibold text-purple-700 dark:text-purple-300">
+														{selectedEvent.genderRestriction?.toLowerCase()}s
+														only
+													</span>
+													. Please confirm your gender to proceed.
+												</p>
+												<div className="flex gap-4 mb-4">
+													<label
+														className={`flex items-center gap-2 px-4 py-3 rounded-lg border-2 cursor-pointer transition-all ${
+															selectedGender === "MALE"
+																? "border-purple-600 bg-purple-100 dark:bg-purple-900"
+																: "border-gray-300 dark:border-gray-600 hover:border-purple-400"
+														}`}
+													>
+														<input
+															type="radio"
+															name="gender"
+															value="MALE"
+															checked={selectedGender === "MALE"}
+															onChange={() => setSelectedGender("MALE")}
+															className="sr-only"
+														/>
+														<span className="font-medium text-gray-800 dark:text-gray-200">
+															Male
+														</span>
+													</label>
+													<label
+														className={`flex items-center gap-2 px-4 py-3 rounded-lg border-2 cursor-pointer transition-all ${
+															selectedGender === "FEMALE"
+																? "border-purple-600 bg-purple-100 dark:bg-purple-900"
+																: "border-gray-300 dark:border-gray-600 hover:border-purple-400"
+														}`}
+													>
+														<input
+															type="radio"
+															name="gender"
+															value="FEMALE"
+															checked={selectedGender === "FEMALE"}
+															onChange={() => setSelectedGender("FEMALE")}
+															className="sr-only"
+														/>
+														<span className="font-medium text-gray-800 dark:text-gray-200">
+															Female
+														</span>
+													</label>
+												</div>
+												{selectedGender &&
+													selectedGender !==
+														selectedEvent.genderRestriction && (
+														<div className="w-full p-3 mb-4 rounded-lg bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700">
+															<p className="text-sm text-red-700 dark:text-red-300 text-center">
+																Sorry, this event is only for{" "}
+																{selectedEvent.genderRestriction?.toLowerCase()}
+																s. You cannot register.
+															</p>
+														</div>
+													)}
+												<div className="flex gap-3 w-full">
+													<button
+														type="button"
+														onClick={() => {
+															setShowGenderModal(false);
+															if (
+																selectedGender &&
+																selectedGender ===
+																	selectedEvent.genderRestriction
+															) {
+																if (pendingAction === "REGISTER_SOLO") {
+																	handleRegister();
+																} else if (pendingAction === "CREATE_TEAM") {
+																	createTeam();
+																} else if (pendingAction === "JOIN_TEAM") {
+																	joinTeam();
+																}
+															}
+															setPendingAction(null);
+														}}
+														disabled={
+															!selectedGender ||
+															selectedGender !== selectedEvent.genderRestriction
+														}
+														className={`flex-1 ${
+															selectedGender &&
+															selectedGender === selectedEvent.genderRestriction
+																? BUTTON_CLASSES.primary
+																: "px-4 py-2 bg-gray-300 text-gray-500 rounded-lg font-semibold cursor-not-allowed"
+														}`}
+													>
+														Confirm & Proceed
+													</button>
+													<button
+														type="button"
+														onClick={() => {
+															setShowGenderModal(false);
+															setPendingAction(null);
+															setSelectedGender(null);
+														}}
+														className={BUTTON_CLASSES.secondary}
+													>
+														Cancel
+													</button>
+												</div>
+											</div>
+										</div>
+									)}
 							</div>
 						</div>
 					</Drawer.Content>
