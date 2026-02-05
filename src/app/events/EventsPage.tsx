@@ -1337,13 +1337,7 @@ const EventsPage = () => {
 			);
 		}
 
-		if (teamState.action === "CREATE") {
-			if (!userId) {
-				toast.error("Login to register");
-				setTeamState((prev) => ({ ...prev, action: "NONE" }));
-				return null;
-			}
-			if (!loading.createTeam) createTeam();
+		if (loading.createTeam) {
 			return (
 				<div className="flex flex-col gap-3 mt-4">
 					<button type="button" className={BUTTON_CLASSES.primary} disabled>
@@ -2532,10 +2526,7 @@ const EventsPage = () => {
 															toast.error("Login to register");
 															return;
 														}
-														setTeamState((prev) => ({
-															...prev,
-															action: "CREATE",
-														}));
+														createTeam();
 													}}
 													className="mt-2 px-4 py-2 rounded-lg bg-purple-700 dark:bg-purple-400 text-white dark:text-black font-medium hover:scale-105 transition"
 												>
