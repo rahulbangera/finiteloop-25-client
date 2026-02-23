@@ -36,18 +36,13 @@ ${urlElements}
 </urlset>`;
 }
 
-export const siteUrl = "https://www.finiteloop.club";
+export const siteUrl = "https://finiteloop.club";
 
 export const staticRoutes: SitemapUrl[] = [
 	{
 		url: `${siteUrl}/`,
 		changeFrequency: "weekly",
 		priority: 1.0,
-	},
-	{
-		url: `${siteUrl}/blogs`,
-		changeFrequency: "daily",
-		priority: 0.8,
 	},
 	{
 		url: `${siteUrl}/events`,
